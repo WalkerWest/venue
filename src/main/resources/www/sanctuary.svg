@@ -1,52 +1,5 @@
-<html>
-<head>
-<title>Test</title>
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-	var selectedSeat='';
-	//var tables = [1, 2, 17]
-	//tables.forEach((t, i) => {
-	for(var t=1; t<30; t++) {
-		for(var s=1; s<20; s++) {
-			var seatString = 'S'+t+'-'+s;
-			if(document.getElementById(seatString)!=null) {
-				var seat = document.getElementById(seatString);
-				seat.style.fill="green";
-				seat.onclick = function() {
-					if(selectedSeat=='') {
-						document.getElementById('seat').innerHTML=this.id;
-						this.style.fill="cyan";
-						selectedSeat=this.id;
-					} else if (selectedSeat==this.id) {
-						document.getElementById('seat').innerHTML='';
-						selectedSeat='';
-						this.style.fill="green";
-					}
-				};
-			
-			}
-		}
-	};
-	console.log("Started");
-	var seat1 = document.getElementById('S1-1');
-	console.log(seat1);
-	seat1.style.fill="red";
-	document.getElementById('S1-6').style.fill="yellow";
-},false);
-</script>
-</head>
-<body>
-	<h1>Test - WW</h1>
-	<div>
-	<b>Selected reservation:</b>
-	<select id="reservation">
-		<option value="0">SELECT ONE</option>
-		<option value="1">HORNER, JESSICA</option>
-		<option value="2">REIDFORD, SHARRON</option>
-		<option value="3">WEST, JUDY</option>
-	</select>
-	</div>
-	<h4>Selected seat: <span id="seat"></span></h4>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
    width="11in"
@@ -465,6 +418,3 @@ document.addEventListener('DOMContentLoaded', function(){
            id="tspan8">Table 2</tspan></tspan></text>
   </g>
 </svg>
-
-</body>
-</html>
