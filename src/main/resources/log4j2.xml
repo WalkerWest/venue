@@ -1,0 +1,20 @@
+<Configuration status="WARN" name="MyApp">
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <!-- 2023-09-04 10:50:14.997:INFO:oejs.session:nblc.App.main(): node0 Scavenging every 600000ms -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%highlight{%p}{FATAL=red blink, ERROR=red, WARN=yellow bright, INFO=blue bright, DEBUG=green bright, TRACE=bright cyan}] %C %m%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="STDOUT" level="TRACE"/>
+        </Root>
+	<Logger name="org.eclipse.jetty" level="OFF" />
+	<Logger name="nblc.App" level="TRACE" />
+	<!--<Logger name="org.eclipse.jetty" level="OFF" />
+        <Logger name="org.eclipse" level="OFF" />
+        <Logger name="oejs.*" level="OFF" />
+        <Logger name="oejsh.*" level="OFF" />
+	<Logger name="org.eclipse.jetty.server.session" level="OFF" />-->
+    </Loggers>
+</Configuration>
