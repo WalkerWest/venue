@@ -76,6 +76,21 @@
         <version>1.2</version>
     </dependency>
     <dependency>
+        <groupId>com.google.apis</groupId>
+        <artifactId>google-api-services-drive</artifactId>
+        <version>v3-rev105-1.23.0</version>
+    </dependency>
+    <dependency>
+        <groupId>com.google.api-client</groupId>
+        <artifactId>google-api-client</artifactId>
+        <version>1.23.0</version>
+        </dependency>
+    <dependency>
+        <groupId>com.google.oauth-client</groupId>
+        <artifactId>google-oauth-client-jetty</artifactId>
+        <version>1.23.0</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.13.2</version>
