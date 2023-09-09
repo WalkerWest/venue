@@ -45,8 +45,10 @@ public class App
         // Create a server that listens on port 8080.
 	Server server = new Server(8080);
 	server.setDumpAfterStart(false);
-	WebAppContext webAppContext = new WebAppContext();
-	webAppContext.setContextPath("/");
+	String webDir = App.class.getProtectionDomain().
+			getCodeSource().getLocation().toExternalForm();
+	WebAppContext webAppContext = new WebAppContext(webDir,"/");
+	//webAppContext.setContextPath("/");
 	//server.setHandler(webAppContext);
 
 	// Setup for RESTful calls
@@ -66,12 +68,13 @@ public class App
 
 	// Load static content from the top level directory.
 	URL webAppDir = App.class.getClassLoader().getResource("./www");
-	webAppContext.setResourceBase(webAppDir.toURI().toString());
+	if (webAppDir!=null) webAppContext.setResourceBase(webAppDir.toURI().toString());
 
 	// Start the server! 🚀
 	server.start();
 	logger.info("Server started!");
-	logger.info("Serving from: "+webAppDir.toString());
+	//logger.info("Serving from: "+webAppDir.toString());
+	logger.info("Serving from: "+webAppContext.getResourceBase());
 
 	App app = new App();
 	app.connectionToDerby();
