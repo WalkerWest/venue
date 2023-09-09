@@ -70,7 +70,7 @@ public class App
 	URL webAppDir = App.class.getClassLoader().getResource("./www");
 	if (webAppDir!=null) webAppContext.setResourceBase(webAppDir.toURI().toString());
 
-	// Start the server! 🚀
+	// Start the server! 
 	server.start();
 	logger.info("Server started!");
 	//logger.info("Serving from: "+webAppDir.toString());
