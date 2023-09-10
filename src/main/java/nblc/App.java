@@ -75,8 +75,8 @@ public class App
 		URL webAppDir = App.class.getClassLoader().getResource("./www");
 		if (webAppDir!=null) webAppContext.setResourceBase(webAppDir.toURI().toString());
 		else {
-			// webAppContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed","false");
-			webAppContext.getServletHandler().getServletMapping("/www").setDefault(true);
+			webAppContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed","false");
+			// webAppContext.getServletHandler().getServletMapping("/www").setDefault(true);
 			/*
 			ResourceHandler rh = new ResourceHandler();
 			rh.setDirectoriesListed(false);
