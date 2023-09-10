@@ -8,6 +8,9 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.util.log.Log;
 
@@ -70,7 +73,15 @@ public class App
 		// Load static content from the top level directory.
 		URL webAppDir = App.class.getClassLoader().getResource("./www");
 		if (webAppDir!=null) webAppContext.setResourceBase(webAppDir.toURI().toString());
-		else webAppContext.setResourceBase("./www");
+		else {
+			ResourceHandler rh = new ResourceHandler();
+			rh.setDirectoriesListed(false);
+			rh.setWelcomeFiles(new String[]{"index.html"});
+			rh.setResourceBase("./www");
+			HandlerList handlers = new HandlerList();
+			handlers.setHandlers(new Handler[] { rh, new DefaultHandler()});
+			server.setHandler(handlers);
+		}
 
 		// Start the server!
 		server.start();

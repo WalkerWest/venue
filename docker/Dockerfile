@@ -47,12 +47,12 @@ COPY .bashrc /root
 COPY .bash_profile /root
 COPY startup.sh /root
 
+EXPOSE 8080
+
 RUN mkdir /app
 WORKDIR "/app"
 RUN git clone https://github.com/WalkerWest/venue.git
 WORKDIR "/app/venue"
 RUN mvn clean compile assembly:single
-
-EXPOSE 8080
 
 CMD /root/startup.sh
