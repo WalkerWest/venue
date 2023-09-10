@@ -55,7 +55,7 @@ public class App
 		String webDir = App.class.getProtectionDomain().
 				getCodeSource().getLocation().toExternalForm();
 		logger.info("The webDir is: "+webDir);
-		WebAppContext webAppContext = new WebAppContext(webDir+"/www","/");
+		WebAppContext webAppContext = new WebAppContext(webDir,"/");
 
 		// Setup for RESTful calls
 		ServletContextHandler ctx =
@@ -75,6 +75,8 @@ public class App
 		URL webAppDir = App.class.getClassLoader().getResource("./www");
 		if (webAppDir!=null) webAppContext.setResourceBase(webAppDir.toURI().toString());
 		else {
+			// webAppContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed","false");
+			webAppContext.getServletHandler().getServletMapping("/www").setDefault(true);
 			/*
 			ResourceHandler rh = new ResourceHandler();
 			rh.setDirectoriesListed(false);
