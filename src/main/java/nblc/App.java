@@ -74,6 +74,7 @@ public class App
 		URL webAppDir = App.class.getClassLoader().getResource("./www");
 		if (webAppDir!=null) webAppContext.setResourceBase(webAppDir.toURI().toString());
 		else {
+			/*
 			ResourceHandler rh = new ResourceHandler();
 			rh.setDirectoriesListed(false);
 			rh.setWelcomeFiles(new String[]{"index.html"});
@@ -81,6 +82,7 @@ public class App
 			HandlerList handlers = new HandlerList();
 			handlers.setHandlers(new Handler[] { rh, new DefaultHandler()});
 			server.setHandler(handlers);
+			*/
 		}
 
 		// Start the server!

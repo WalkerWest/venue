@@ -1,4 +1,5 @@
 #!/bin/bash
+
 /usr/bin/mysql_install_db --user=mysql --ldata=/var/lib/mysql
 /usr/bin/screen -dmS session bash
 /usr/bin/screen -S session -p 0 -X stuff "/usr/libexec/mysqld --user mysql"
