@@ -54,7 +54,8 @@ public class App
 		server.setDumpAfterStart(false);
 		String webDir = App.class.getProtectionDomain().
 				getCodeSource().getLocation().toExternalForm();
-		WebAppContext webAppContext = new WebAppContext(webDir,"/");
+		logger.info("The webDir is: "+webDir);
+		WebAppContext webAppContext = new WebAppContext(webDir+"/www","/");
 
 		// Setup for RESTful calls
 		ServletContextHandler ctx =
