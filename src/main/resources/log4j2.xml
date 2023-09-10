@@ -9,12 +9,13 @@
         <Root level="debug">
             <AppenderRef ref="STDOUT" level="TRACE"/>
         </Root>
-	<Logger name="org.eclipse.jetty" level="OFF" />
-	<Logger name="nblc.App" level="TRACE" />
-	<!--<Logger name="org.eclipse.jetty" level="OFF" />
-        <Logger name="org.eclipse" level="OFF" />
-        <Logger name="oejs.*" level="OFF" />
-        <Logger name="oejsh.*" level="OFF" />
-	<Logger name="org.eclipse.jetty.server.session" level="OFF" />-->
+        <Logger name="org.eclipse.jetty" level="OFF" />
+        <Logger name="nblc.App" level="TRACE" />
+        <Logger name="nblc.DriveQuickstart" level="TRACE" />
+        <!--<Logger name="org.eclipse.jetty" level="OFF" />
+            <Logger name="org.eclipse" level="OFF" />
+            <Logger name="oejs.*" level="OFF" />
+            <Logger name="oejsh.*" level="OFF" />
+        <Logger name="org.eclipse.jetty.server.session" level="OFF" />-->
     </Loggers>
 </Configuration>
