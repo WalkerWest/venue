@@ -70,6 +70,7 @@ public class App
 		// Load static content from the top level directory.
 		URL webAppDir = App.class.getClassLoader().getResource("./www");
 		if (webAppDir!=null) webAppContext.setResourceBase(webAppDir.toURI().toString());
+		else webAppContext.setResourceBase("./www");
 
 		// Start the server!
 		server.start();

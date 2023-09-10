@@ -1,6 +1,6 @@
 FROM amazonlinux:2
 
-ARG version=1.8.0_382.b05-1
+ARG version=11.0.20.9-1
 # In addition to installing the Amazon corretto, we also install
 # fontconfig. The folks who manage the docker hub's
 # official image library have found that font management
@@ -23,13 +23,14 @@ RUN set -eux \
     && curl -fL -o /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo \
     && grep -q '^gpgcheck=1' /etc/yum.repos.d/corretto.repo \
     && echo "priority=9" >> /etc/yum.repos.d/corretto.repo \
-    && yum install -y java-1.8.0-amazon-corretto-devel-$version \
-    && (find /usr/lib/jvm/java-1.8.0-amazon-corretto -name src.zip -delete || true) \
+    && yum install -y java-11-amazon-corretto-devel-$version \
+    && (find /usr/lib/jvm/java-11-amazon-corretto -name src.zip -delete || true) \
     && yum install -y fontconfig \
     && yum clean all
 
 ENV LANG C.UTF-8
-ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-amazon-corretto
+ENV JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto
+
 RUN yum -y install git
 RUN yum -y install mlocate
 RUN yum -y install mysql
@@ -39,17 +40,19 @@ RUN yum -y install screen
 RUN yum -y install which
 RUN yum -y install maven
 
-RUN mkdir /app
-WORKDIR "/app"
-RUN git clone https://github.com/WalkerWest/venue.git
-WORKDIR "/app/venue"
-RUN mvn clean compile assembly:single
-
 RUN yum -y install net-tools
 RUN yum -y install links
 
 COPY .bashrc /root
 COPY .bash_profile /root
 COPY startup.sh /root
+
+RUN mkdir /app
+WORKDIR "/app"
+RUN git clone https://github.com/WalkerWest/venue.git
+WORKDIR "/app/venue"
+RUN mvn clean compile assembly:single
+
+EXPOSE 8080
 
 CMD /root/startup.sh
