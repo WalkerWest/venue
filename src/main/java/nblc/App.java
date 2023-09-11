@@ -1,12 +1,17 @@
 package nblc;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 
+import com.google.api.services.drive.Drive;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.apache.commons.compress.utils.IOUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -16,6 +21,7 @@ import org.eclipse.jetty.util.log.Log;
 
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -44,8 +50,7 @@ public class App
 
     private static Logger logger = LogManager.getLogger(App.class);
 
-    public static void main( String[] args ) throws Exception
-    {
+    public static void main( String[] args ) throws Exception {
         logger.info("------------------------------< nblc:tea >------------------------------");
 		logger.info("Starting now ...");
 		Log.setLog(new Slf4jLog());
@@ -90,13 +95,22 @@ public class App
 
 		// Start the server!
 		server.start();
+
 		logger.info("Server started!");
 		//logger.info("Serving from: "+webAppDir.toString());
 		logger.info("Serving from: "+webAppContext.getResourceBase());
 
-		App app = new App();
-		app.connectionToDerby();
+		//DriveQuickstart.DeleteDb();
 
+		App app = new App();
+
+		try {
+			app.downloadDb();
+		} catch (GeneralSecurityException|IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		app.connectionToDerby();
 		app.normalDbUsage();
 
 		// Keep the main thread alive while the server is running.
@@ -120,19 +134,6 @@ public class App
 		catch (FileNotFoundException fnfe) {
 			logger.info("No tea.properties file found.");
 		}
-    }
-
-    Connection conn;
-    String dbLoc = null;
-	String dbPath = null;
-
-	String gDriveFolder = null;
-
-    public void connectionToDerby() throws SQLException, UnsupportedEncodingException {
-        // -------------------------------------------
-        // URL format is
-        // jdbc:derby:<local directory to save data>
-        // -------------------------------------------
 		dbPath = null;
 		if (dbLoc != null) dbPath = dbLoc;
 		else {
@@ -140,22 +141,37 @@ public class App
 			dbPath = URLDecoder.decode(dbPath, "UTF-8");
 			dbPath+="/attendees";
 		}
+
+    }
+
+    Connection conn;
+    String dbLoc = null;
+	String dbPath = null;
+	String gDriveFolder = null;
+
+    public void connectionToDerby() throws SQLException, UnsupportedEncodingException {
+        // -------------------------------------------
+        // URL format is
+        // jdbc:derby:<local directory to save data>
+        // -------------------------------------------
 		logger.info("Derby's path is: "+dbPath);
 			String dbUrl = "jdbc:derby:"+dbPath+";create=true";
-		try {
-			//String tarFileName = source.getFileName().toString() + ".tar.gz";
-			Files.walkFileTree(Paths.get(dbPath),new MyFileVisitor(dbPath, dbPath+".tar.gz"));
-			logger.info("The tarball database backup file is: "+dbPath+".tar.gz");
-			String fileId = DriveQuickstart.Upload(dbPath+".tar.gz",prop);
-			if(fileId!=null) logger.info("The archive file id is "+fileId);
-		}
-		catch (Exception ex) {
-			logger.error(ex.getMessage());
-			for (StackTraceElement e : ex.getStackTrace())
-				logger.error(e);
-		}
+
 		logger.info("Derby's URL is: "+dbUrl);
-		conn = DriverManager.getConnection(dbUrl);
+		boolean databaseConnected=false;
+		while(!databaseConnected) {
+			logger.info("Attempting database connection...");
+			try {
+				conn = DriverManager.getConnection(dbUrl);
+				databaseConnected=true;
+			} catch (Exception ex) {
+				if(ex.getMessage().contains("Failed to start database")) {
+					try { Thread.sleep(1000); }
+					catch (InterruptedException e) { throw new RuntimeException(e); }
+				}
+				else throw ex;
+			}
+		}
     }
 
     public void normalDbUsage() throws SQLException 
@@ -191,6 +207,53 @@ public class App
 								logger.trace(logstr);
 					}
 			}
+			uploadDb();
 		}
     }
+
+	public void uploadDb() {
+		try {
+			//String tarFileName = source.getFileName().toString() + ".tar.gz";
+			Files.walkFileTree(Paths.get(dbPath),new MyFileVisitor(dbPath, dbPath+".tar.gz"));
+			logger.info("The tarball database backup file is: "+dbPath+".tar.gz");
+			String fileId = DriveQuickstart.Upload(dbPath+".tar.gz",prop);
+			if(fileId!=null) logger.info("The archive file id is "+fileId);
+		}
+		catch (Exception ex) {
+			logger.error(ex.getMessage());
+			for (StackTraceElement e : ex.getStackTrace())
+				logger.error(e);
+		}
+	}
+
+	public void downloadDb() throws GeneralSecurityException, IOException {
+		ByteArrayOutputStream fileId = DriveQuickstart.Download();
+		if(fileId!=null) {
+			logger.info("Successfully downloaded attendees.tar.gz!");
+			logger.info("Writing downloaded database to "+dbPath+".tar.gz");
+			OutputStream os = new FileOutputStream(dbPath+".tar.gz");
+			fileId.writeTo(os);
+			fileId.close();
+			os.close();
+			TarArchiveInputStream tarIn = new TarArchiveInputStream(
+					new GzipCompressorInputStream(
+							new BufferedInputStream(
+									new FileInputStream(dbPath+".tar.gz"))));
+			TarArchiveEntry tarEntry = tarIn.getNextTarEntry();
+			while(tarEntry!=null) {
+				File file = new File(dbLoc+System.getProperty("file.separator")+tarEntry.getName());
+				logger.trace("Working: " + file);
+				String dir = file.toPath().toString().substring(0,
+						file.toPath().toString().lastIndexOf(System.getProperty("file.separator")));
+				Files.createDirectories(new File(dir).toPath());
+				IOUtils.copy(tarIn,new FileOutputStream(file));
+				tarEntry = tarIn.getNextTarEntry();
+			}
+			tarIn.close();
+		}
+		else {
+			logger.error("File attendees.tgz does not exist on Google Drive!");
+		}
+	}
+
 }

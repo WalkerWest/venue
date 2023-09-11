@@ -100,6 +100,25 @@ public class DriveQuickstart {
         return files;
     }
 
+    public static void DeleteDb() throws GeneralSecurityException, IOException {
+        List<File> driveFiles = Drive();
+        File foundFile = null;
+        for (File f : driveFiles) {
+            if (f.getName().equals("attendees.tar.gz")) {
+                logger.trace("Found attendees.tar.gz!");
+                foundFile = f;
+                break;
+            }
+        }
+        if(foundFile!=null) {
+            final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+            service.files().delete(foundFile.getId()).execute();
+        }
+    }
+
     public static String Upload(String inFilePath, Properties prop) throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -144,5 +163,36 @@ public class DriveQuickstart {
             throw e;
         }
     }
+
+    public static ByteArrayOutputStream Download() throws IOException, GeneralSecurityException {
+        // Build a new authorized API client service.
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        List<File> driveFiles = Drive();
+
+        File foundFile = null;
+        for (File f : driveFiles) {
+            if (f.getName().equals("attendees.tar.gz")) {
+                logger.trace("Found attendees.tar.gz!");
+                foundFile = f;
+                break;
+            }
+        }
+
+        if(foundFile!=null) {
+            Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+            try {
+                OutputStream outputStream = new ByteArrayOutputStream();
+                service.files().get(foundFile.getId()).executeMediaAndDownloadTo(outputStream);
+                return (ByteArrayOutputStream) outputStream;
+            } catch (GoogleJsonResponseException e) {
+                logger.error("Unable to download file: " + e.getDetails());
+                throw e;
+            }
+        }
+        else return null;
+    }
+
 }
 
