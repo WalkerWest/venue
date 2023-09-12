@@ -1,6 +1,5 @@
 package nblc;
 
-import static nblc.TableType.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -28,12 +27,16 @@ public class ChristmasTea {
 				boolean foundSeat=false;
 				for (ReservedSeat rs : seats) {
 					if(rs.seat==s) {
-						System.out.println("Table #"+t.num+", Seat #"+s.number+": "+rs.person);
+						System.out.println(
+								"Table #"+t.num+", " +
+										"Seat #"+s.number+": "+
+										rs.person);
 						foundSeat=true;
 						break;
 					}
 				}
-				if(!foundSeat) System.out.println("Table #"+t.num+", Seat #"+s.number+": *** OPEN ***");
+				if(!foundSeat) System.out.println("Table #"+t.num+", Seat #"+
+						s.number+": *** OPEN ***");
 			}
 			System.out.println("----------------------------------------");
 		}
@@ -67,6 +70,5 @@ public class ChristmasTea {
 		}
 		return res;
 	}
-
 
 }

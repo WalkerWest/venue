@@ -32,13 +32,14 @@ public class MyFileVisitor implements FileVisitor<Path> {
     }
 
     @Override
-    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+    public FileVisitResult preVisitDirectory(
+            Path dir, BasicFileAttributes attrs) throws IOException {
         return FileVisitResult.CONTINUE;
     }
 
     @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
-
+    public FileVisitResult visitFile(
+            Path file, BasicFileAttributes attributes) throws IOException {
         if (attributes.isSymbolicLink()) {
             return FileVisitResult.CONTINUE;
         }
@@ -55,23 +56,25 @@ public class MyFileVisitor implements FileVisitor<Path> {
             tOut.closeArchiveEntry();
             logger.trace(String.format("file : %s", file));
         } catch (IOException e) {
-            logger.error(String.format("Unable to tar.gz : %s%n%s%n", file, e));
+            logger.error(String.format("Unable to tar.gz : %s%n%s%n",
+                    file, e));
         }
 
         return FileVisitResult.CONTINUE;
     }
 
     @Override
-    public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+    public FileVisitResult visitFileFailed(Path file, IOException exc)
+            throws IOException {
         logger.error(String.format("Unable to tar.gz : %s%n%s%n", file, exc));
         return FileVisitResult.CONTINUE;
     }
 
     @Override
-    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+    public FileVisitResult postVisitDirectory(Path dir, IOException exc)
+            throws IOException {
         boolean finishedSearch = Files.isSameFile(dir, source);
         if (finishedSearch) {
-            // System.out.println("File:" + FILE_NAME + " not found");
             tOut.finish();
             tOut.close();
             gzOut.close();
@@ -80,4 +83,5 @@ public class MyFileVisitor implements FileVisitor<Path> {
             return FileVisitResult.TERMINATE;
         }
         return FileVisitResult.CONTINUE;    }
+
 }

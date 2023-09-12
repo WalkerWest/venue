@@ -116,6 +116,13 @@
           <artifactId>guava</artifactId>
           <version>32.1.2-jre</version>
       </dependency>
+      <!-- https://mvnrepository.com/artifact/org.glassfish.hk2/guice-bridge -->
+      <dependency>
+          <groupId>org.glassfish.hk2</groupId>
+          <artifactId>guice-bridge</artifactId>
+          <version>2.5.0</version>
+      </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

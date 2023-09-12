@@ -2,29 +2,33 @@ package nblc;
 
 import java.net.URL;
 
-import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.util.log.Log;
-
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.glassfish.jersey.servlet.ServletContainer;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.util.log.Slf4jLog;
+
+import org.glassfish.jersey.servlet.ServletContainer;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class App
 {
+	private DataAccess da;
+	@Inject
+	public void setDataAccess(DataAccess da) {
+		this.da=da;
+	}
     private static Logger logger = LogManager.getLogger(App.class);
 
     public static void main( String[] args ) throws Exception {
-        logger.info("------------------------------< nblc:tea >------------------------------");
+        logger.info("---------------------< nblc:tea >---------------------");
 		logger.info("Starting now ...");
 		Log.setLog(new Slf4jLog());
 
@@ -48,30 +52,27 @@ public class App
 		serHol.setInitOrder(1);
 		serHol.setInitParameter("jersey.config.server.provider.packages",
 			"nblc.rest");
+		serHol.setInitParameter("javax.ws.rs.Application",
+				"nblc.Config");
 
 		// Load static content from the top level directory.
 		URL webAppDir = App.class.getClassLoader().getResource("./www");
-		if (webAppDir!=null) webAppContext.setResourceBase(webAppDir.toURI().toString());
+		if (webAppDir!=null)
+			webAppContext.setResourceBase(webAppDir.toURI().toString());
 		else {
-			webAppContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed","false");
+			webAppContext.setInitParameter(
+					"org.eclipse.jetty.servlet.Default.dirAllowed","false");
 		}
 
 		// Start the server!
 		server.start();
-
 		logger.info("Server started!");
-		//logger.info("Serving from: "+webAppDir.toString());
 		logger.info("Serving from: "+webAppContext.getResourceBase());
-
-		Injector injector = Guice.createInjector(new AppModule());
-		App app = new App(injector);
 
 		// Keep the main thread alive while the server is running.
 		server.join();
     }
 
-    public App(Injector injector) throws Exception {
-		DataAccess da = injector.getInstance(DataAccess.class);
-	}
+    public App() {	}
 
 }

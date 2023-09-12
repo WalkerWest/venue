@@ -2,7 +2,6 @@ package nblc;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -18,10 +17,9 @@ public final class DefaultEnvironmentProperties
 
     public DefaultEnvironmentProperties() {
         Map<String, String> tempMap;
-        /*FileInputStream ip= new FileInputStream(System.getProperty("user.dir")+"/tea.properties");*/
-        /*InputStream is = DefaultEnvironmentProperties.class.getResourceAsStream("/tea.properties")*/
 
-        try(FileInputStream is= new FileInputStream(System.getProperty("user.dir")+"/tea.properties")) {
+        try(FileInputStream is= new FileInputStream(
+                System.getProperty("user.dir")+"/tea.properties")) {
             Properties properties = new Properties();
             properties.load(is);
             tempMap = properties

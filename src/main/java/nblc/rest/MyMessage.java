@@ -5,10 +5,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import nblc.AppModule;
+import javax.inject.Inject;
 import nblc.DataAccess;
 import nblc.Reservation;
 import org.apache.logging.log4j.Logger;
@@ -22,13 +19,8 @@ public class MyMessage {
 
     private static Logger logger = LogManager.getLogger(MyMessage.class);
 
-    /*
-    DataAccess da;
-    public MyMessage() {
-        Injector injector = Guice.createInjector(new AppModule());
-        da = injector.getInstance(DataAccess.class);
-    }
-    */
+    @Inject
+    private DataAccess da;
 
     @Path("msg") @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -39,10 +31,9 @@ public class MyMessage {
     public List<Reservation> getReservation() {
         var retList = new ArrayList<Reservation>();
         retList.add(new Reservation("Walker",4));
-        // da.getReservations();
+        da.getReservations();
         return retList;
     }
-
 
 }
 
