@@ -10,11 +10,12 @@ import nblc.DataAccess;
 import nblc.Reservation;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.glassfish.hk2.api.Immediate;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Path("")
+@Path("") @Immediate
 public class MyMessage {
 
     private static Logger logger = LogManager.getLogger(MyMessage.class);
