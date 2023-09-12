@@ -2,6 +2,9 @@ package nblc;
 
 import java.net.URL;
 
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.util.log.Log;
@@ -60,14 +63,15 @@ public class App
 		//logger.info("Serving from: "+webAppDir.toString());
 		logger.info("Serving from: "+webAppContext.getResourceBase());
 
-		App app = new App();
+		Injector injector = Guice.createInjector(new AppModule());
+		App app = new App(injector);
 
 		// Keep the main thread alive while the server is running.
 		server.join();
     }
 
-    public App() throws Exception {
-		DataAccess da = new DataAccessDerby();
-    }
+    public App(Injector injector) throws Exception {
+		DataAccess da = injector.getInstance(DataAccess.class);
+	}
 
 }

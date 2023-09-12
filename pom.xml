@@ -104,6 +104,18 @@
         <artifactId>google-oauth-client-jetty</artifactId>
         <version>1.25.0</version>
     </dependency>
+      <dependency>
+          <groupId>com.google.inject</groupId>
+          <artifactId>guice</artifactId>
+          <!-- {version} can be 6.0.0, 7.0.0, etc. -->
+          <version>7.0.0</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+      <dependency>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+          <version>32.1.2-jre</version>
+      </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
