@@ -24,8 +24,11 @@ public class Config extends ResourceConfig {
         packages("nblc.rest");
         Injector injector = Guice.createInjector(new AppModule());
         initGuiceIntoHK2Bridge(serviceLocator, injector);
+        /*
         register(new LoggingFeature(Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME),
                 Level.INFO, LoggingFeature.Verbosity.PAYLOAD_ANY, 10000));
+
+        */
     }
 
     private void initGuiceIntoHK2Bridge(
