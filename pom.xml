@@ -84,7 +84,22 @@
         <artifactId>log4j-slf4j-impl</artifactId>
         <version>2.6.1</version>
     </dependency>
-    <dependency>
+      <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-jul -->
+      <dependency>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-jul</artifactId>
+          <version>2.6.1</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j -->
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jul-to-slf4j</artifactId>
+          <version>2.0.9</version>
+      </dependency>
+
+
+
+      <dependency>
         <groupId>org.javatuples</groupId>
         <artifactId>javatuples</artifactId>
         <version>1.2</version>

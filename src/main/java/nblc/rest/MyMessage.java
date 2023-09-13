@@ -8,17 +8,15 @@ import javax.ws.rs.core.MediaType;
 import javax.inject.Inject;
 import nblc.DataAccess;
 import nblc.Reservation;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 import org.glassfish.hk2.api.Immediate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Path("") @Immediate
 public class MyMessage {
-
-    private static Logger logger = LogManager.getLogger(MyMessage.class);
 
     @Inject
     private DataAccess da;
@@ -32,6 +30,8 @@ public class MyMessage {
     public List<Reservation> getReservation() {
         var retList = new ArrayList<Reservation>();
         retList.add(new Reservation("Walker",4));
+        Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
+                "Serving: "+retList.get(0).reservationId);
         da.getReservations();
         return retList;
     }

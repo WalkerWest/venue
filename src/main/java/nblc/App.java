@@ -17,6 +17,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public class App
 {
@@ -31,6 +32,9 @@ public class App
         logger.info("---------------------< nblc:tea >---------------------");
 		logger.info("Starting now ...");
 		Log.setLog(new Slf4jLog());
+
+		SLF4JBridgeHandler.removeHandlersForRootLogger();
+		SLF4JBridgeHandler.install();
 
 		Server server = new Server(8080);
 		server.setDumpAfterStart(false);
@@ -54,6 +58,8 @@ public class App
 			"nblc.rest");
 		serHol.setInitParameter("javax.ws.rs.Application",
 				"nblc.Config");
+		serHol.setInitParameter("java.util.logging.manager",
+				"org.apache.logging.log4j.jul.LogManager");
 
 		// Load static content from the top level directory.
 		URL webAppDir = App.class.getClassLoader().getResource("./www");
