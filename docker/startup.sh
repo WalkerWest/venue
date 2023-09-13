@@ -13,4 +13,5 @@ cd /app/venue
 
 
 
+
 java -jar target/tea-1.0-SNAPSHOT-jar-with-dependencies.jar
