@@ -6,4 +6,7 @@
 ## Compilation Notes
 
 * For running locally:
-  `mvn compile exec:java -Dexec.mainClass="nblc.App"`
+  1.  Option 1: `mvn compile exec:java -Dexec.mainClass="nblc.App"`
+  2.  Option 2: `mvn compile exec:exec`
+  3.  Option 3: `gradle runWithExec`
+
