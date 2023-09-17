@@ -1,2 +1,5 @@
 target
 derby.log
+.gradle
+.idea
+docker/go.sh
