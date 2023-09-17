@@ -6,8 +6,9 @@
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>10</java.version>
+        <maven.compiler.source>10</maven.compiler.source>
+        <maven.compiler.target>10</maven.compiler.target>
     </properties>
     <name>tea</name>
   <url>http://maven.apache.org</url>
@@ -192,14 +193,28 @@
           </descriptorRefs>
         </configuration>
       </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <source>10</source>
-                <target>10</target>
-            </configuration>
-        </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>10</source>
+          <target>10</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.0</version>
+          <configuration>
+		  <executable>java</executable>
+		  <arguments>
+			  <argument>-classpath</argument>
+			  <classpath/>
+			  <argument>nblc.App</argument>
+		  </arguments>
+		  <environmentScript>go.sh</environmentScript>
+          </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

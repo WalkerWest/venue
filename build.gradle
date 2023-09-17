@@ -9,8 +9,9 @@ plugins {
 
 repositories {
     mavenLocal()
+    mavenCentral()
     maven {
-        url = uri('http://repo.maven.apache.org/maven2')
+        url = uri('https://repo1.maven.org/maven2')
     }
 }
 
@@ -25,20 +26,22 @@ dependencies {
     implementation 'org.glassfish.jersey.core:jersey-server:2.27'
     implementation 'org.glassfish.jersey.containers:jersey-container-servlet-core:2.27'
     implementation 'org.glassfish.jersey.inject:jersey-hk2:2.27'
+    /* 2.6.1 */
     implementation 'org.apache.logging.log4j:log4j-api:2.6.1'
     implementation 'org.apache.logging.log4j:log4j-core:2.6.1'
     implementation 'org.apache.logging.log4j:log4j-jcl:2.6.1'
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.6.1'
+    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0'
     implementation 'org.apache.logging.log4j:log4j-jul:2.6.1'
     implementation 'org.slf4j:jul-to-slf4j:2.0.9'
     implementation 'org.javatuples:javatuples:1.2'
     implementation 'com.google.apis:google-api-services-drive:v3-rev197-1.25.0'
     implementation 'com.google.api-client:google-api-client:1.25.0'
+    /* 2.2.0 */
+    implementation 'com.google.api-client:google-api-client-gson:1.25.0'
     implementation 'com.google.oauth-client:google-oauth-client-jetty:1.25.0'
     implementation 'com.google.inject:guice:7.0.0'
     implementation 'com.google.guava:guava:32.1.2-jre'
     implementation 'org.glassfish.hk2:guice-bridge:2.5.0'
-    implementation 'com.google.api-client:google-api-client-gson:2.2.0'
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.2'
     implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
     implementation 'org.apache.commons:commons-compress:1.20'
@@ -58,3 +61,18 @@ publishing {
         }
     }
 }
+
+task runWithExec(type: Exec) {
+    environment 'CLIENT_EMAIL', System.getenv('CLIENT_EMAIL')
+    environment 'CLIENT_ID', System.getenv('CLIENT_ID')
+    environment 'CLIENT_X509_CERT_URL', System.getenv('CLIENT_X509_CERT_URL')
+    environment 'GDRIVE_PROJECT', System.getenv('GDRIVE_PROJECT')
+    environment 'PRIVATE_KEY', System.getenv('PRIVATE_KEY')
+    environment 'PRIVATE_KEY_2', System.getenv('PRIVATE_KEY_2')
+    environment 'PRIVATE_KEY_ID', System.getenv('PRIVATE_KEY_ID')
+    dependsOn build
+    group = 'Execution'
+    description = 'Run the main class with ExecTask'
+    commandLine 'java','-classpath',sourceSets.main.runtimeClasspath.getAsPath(),'nblc.App' 
+}
+

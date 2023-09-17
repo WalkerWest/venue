@@ -3,3 +3,7 @@ derby.log
 .gradle
 .idea
 docker/go.sh
+build
+go.sh
+src/main/resources/credentials.json
+tokens
