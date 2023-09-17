@@ -28,7 +28,7 @@ public class MyMessage {
     @Path("reservation") @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Reservation> getReservation() {
-        var retList = new ArrayList<Reservation>();
+        List<Reservation> retList = new ArrayList<Reservation>();
         retList.add(new Reservation("Walker",4));
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                 "Serving: "+retList.get(0).reservationId);
