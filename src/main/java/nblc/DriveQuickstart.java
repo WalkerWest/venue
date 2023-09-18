@@ -39,19 +39,19 @@ public class DriveQuickstart {
     private static final EnvironmentProperties env =
             new DefaultEnvironmentProperties();
     private static final String GDRIVE_PROJECT =
-            env.getEnvironmentProperties("gdrive.project").orElseThrow();
+            env.getEnvironmentProperties("gdrive.project");
     private static final String CLIENT_ID =
-            env.getEnvironmentProperties("client.id").orElseThrow();
+            env.getEnvironmentProperties("client.id");
     private static final String CLIENT_X509_CERT_URL =
-            env.getEnvironmentProperties("client.x509.cert.url").orElseThrow();
+            env.getEnvironmentProperties("client.x509.cert.url");
     private static final String PRIVATE_KEY_ID =
-            env.getEnvironmentProperties("private.key.id").orElseThrow();
+            env.getEnvironmentProperties("private.key.id");
     private static final String PRIVATE_KEY =
-            env.getEnvironmentProperties("private.key").orElseThrow();
+            env.getEnvironmentProperties("private.key");
     private static final String PRIVATE_KEY_2 =
-            env.getEnvironmentProperties("private.key.2").orElseThrow();
+            env.getEnvironmentProperties("private.key.2");
     private static final String CLIENT_EMAIL =
-            env.getEnvironmentProperties("client.email").orElseThrow();
+            env.getEnvironmentProperties("client.email");
 
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
             throws IOException {

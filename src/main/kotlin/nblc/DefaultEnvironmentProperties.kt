@@ -36,18 +36,19 @@ class DefaultEnvironmentProperties : EnvironmentProperties {
         map = resolvePlaceHolders(addEnvironment(tempMap))
     }
 
-    override fun getEnvironmentProperties(key: String): Optional<String> {
-        return Optional.ofNullable(map!![key])
+    override fun getEnvironmentProperties(key: String): String? {
+        return map!![key]
     }
 
     private fun resolvePlaceHolders(
             mapin: Map<String, String>): Map<String, String> {
-        return mapin.entries
+        var myMap = mapin.entries
                 .stream()
-                .collect(toUnmodifiableMap<Map.Entry<String, String>, String, String>(
+                .collect(toMap<Map.Entry<String, String>, String, String>(
                     {(key, value) -> key as String },
                     {(_, value): Map.Entry<String, String> -> replaceValue(value, mapin)}
                 ))
+        return Collections.unmodifiableMap(myMap)
     }
 
     private fun replaceValue(
@@ -81,7 +82,7 @@ class DefaultEnvironmentProperties : EnvironmentProperties {
                     .replace('_', '.')
             temp[mappedKey] = value
         })
-        return temp.entries.stream().collect(toUnmodifiableMap(
+        return temp.entries.stream().collect(toMap(
             { (key, value) -> key  as String},
             { (_, value) -> value as String }
         ))
