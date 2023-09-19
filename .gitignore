@@ -7,3 +7,4 @@ build
 go.sh
 src/main/resources/credentials.json
 tokens
+out

@@ -25,7 +25,7 @@ class DefaultEnvironmentProperties : EnvironmentProperties {
                 properties.load(`is`)
                 tempMap = properties.entries.stream()
                     .collect(
-                        Collectors.toUnmodifiableMap(
+                        Collectors.toMap(
                             { e -> e.key },
                             { e -> e.value }
                         )) as Map<String?, String?>;
@@ -51,7 +51,32 @@ class DefaultEnvironmentProperties : EnvironmentProperties {
         return Collections.unmodifiableMap(myMap)
     }
 
-    private fun replaceValue(
+    private fun replaceValue(value: String, mapin: Map<String, String>): String? {
+        val mr  = REPLACEMENT_PATTERN.matcher(value)
+        var ret: String? = null
+        while(mr.find()) {
+            val item = mr.group()
+            if ("$$".equals(item)) {
+                ret = "\\$"
+            } else if (item.startsWith("\${") && item.endsWith("}")) {
+                ret = mapin[item.substring(2, item.length - 1)]
+            } else if (item.length > 1) {
+                ret = mapin[item.substring(1)]
+            }
+            if (ret == null) {
+                throw RuntimeException(
+                    "Unable to find replacement value for mr "
+                            + mr.group()
+                )
+            }
+            ret = replaceValue(ret, mapin)
+        }
+        if(ret==null) ret=value;
+        return ret
+    }
+
+    /*
+    private fun replaceValueOld(
             value: String,
             mapin: Map<String, String>): String {
         return REPLACEMENT_PATTERN.matcher(value).replaceAll { mr: MatchResult ->
@@ -72,6 +97,7 @@ class DefaultEnvironmentProperties : EnvironmentProperties {
             ret
         }
     }
+    */
 
     private fun addEnvironment(
             mapin: Map<String?, String?>): Map<String, String> {
