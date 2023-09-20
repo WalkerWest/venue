@@ -6,17 +6,19 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '1.6.21'
+    id 'distribution'
 }
 
 repositories {
     mavenLocal()
-    mavenCentral()
     maven {
         url = uri('https://repo1.maven.org/maven2')
     }
+    mavenCentral()
 }
 
 dependencies {
+    /* implementation 'javax.servlet:javax.servlet-api:4.0.1' */
     implementation 'org.glassfish.jersey.media:jersey-media-json-jackson:2.27'
     implementation 'org.eclipse.jetty:jetty-server:9.4.52.v20230823'
     implementation 'org.eclipse.jetty:jetty-webapp:9.4.52.v20230823'
@@ -87,4 +89,41 @@ compileTestKotlin {
         jvmTarget = "1.8"
     }
 }
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'nblc.App'
+    }
+    archiveBaseName = "${rootProject.name}"
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } 
+    }
+}
+
+/*
+distributions {
+    main {
+        baseName=project.name
+        contents {
+            into('lib/') {
+                from jar
+                from configurations.runtimeClasspath
+                dirMode=0755
+                fileMode=0644
+            }
+            from('src/main/dist') {
+                dirMode=0755
+                fileMode=0644
+            }
+            
+        }
+    }
+}
+
+distTar {
+    compression = Compression.GZIP
+    extension = 'tar.gz'
+    classifier = 'dist'
+}
+*/
 

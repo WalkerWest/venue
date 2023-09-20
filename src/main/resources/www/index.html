@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Test</title>
+<title>Christmas Tea</title>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 	var selectedSeat='';
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function(){
 						this.style.fill="green";
 					}
 				};
-			
+
 			}
 		}
 	};
@@ -34,19 +34,51 @@ document.addEventListener('DOMContentLoaded', function(){
 	document.getElementById('S1-6').style.fill="yellow";
 },false);
 </script>
+<style>
+</style>
 </head>
 <body>
-	<h1>Test - WW</h1>
+	<h1>Christmas Tea</h1>
 	<div>
 	<b>Selected reservation:</b>
 	<select id="reservation">
-		<option value="0">SELECT ONE</option>
+		<option value="0">--SELECT ONE--</option>
+        <option value="999">--ADD NEW--</option>
 		<option value="1">HORNER, JESSICA</option>
 		<option value="2">REIDFORD, SHARRON</option>
 		<option value="3">WEST, JUDY</option>
 	</select>
 	</div>
 	<h4>Selected seat: <span id="seat"></span></h4>
+    <div style="display:none;">
+      <h2>Add Reservation</h2>
+      <span>
+        <b>Party's name:</b> <input type="text"><br/><br/>
+        <b>Number in party:</b> <input type="number" min="1" max="18">
+      </span>
+      <br/><br/>
+      <table border="1">
+        <tr>
+          <th>Person's Name</th>
+          <th>Meal Selection</th>
+          <th>Seat</th>
+          <th>Action</th>
+        </tr>
+        <tr>
+          <td><input type="text"></td>
+          <td><select>
+            <option>--SELECT ONE--</option>
+            <option>Chicken</option>
+            <option>Fish</option>
+            <option>Steak</option>
+          </select></td>
+          <td>&nbsp;</td>
+          <td><input type="button" value="Add"></td>
+        </tr>
+      </table>
+      <br>
+      <input type="button" value="Save">
+    </div>
 
 <svg
    width="11in"

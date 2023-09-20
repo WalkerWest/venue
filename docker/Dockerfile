@@ -53,6 +53,6 @@ RUN mkdir /app
 WORKDIR "/app"
 RUN git clone https://github.com/WalkerWest/venue.git
 WORKDIR "/app/venue"
-RUN mvn clean compile assembly:single
+# RUN mvn clean compile assembly:single
 
 CMD /root/startup.sh
