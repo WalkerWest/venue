@@ -3,6 +3,7 @@ derby.log
 .gradle
 .idea
 docker/go.sh
+docker/go2.sh
 build
 go.sh
 src/main/resources/credentials.json
