@@ -9,3 +9,4 @@ go.sh
 src/main/resources/credentials.json
 tokens
 out
+package-lock.json

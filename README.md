@@ -56,15 +56,17 @@ Remember, to access Google Drive, this app requires the following environment va
     * With the same `-e` parameters inserted between `run` and `--name` as mentioned above, execute:
       `docker run --name ww ww-test:auto`
     * From another window, locate the Java process and kill it:
-      ` 78490 ?        Sl     0:33 java -jar target/tea-1.0-SNAPSHOT-jar-with-dependencies.jar`
+      ```
+      78490 ?        Sl     0:33 java -jar target/tea-1.0-SNAPSHOT-jar-with-dependencies.jar
+      ```
     * Find the left over Docker container and remove it:
       ```
-[root@WW81 venue]# docker ps -a
-CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                            PORTS     NAMES
-b264ec7434f8   ww-test:auto   "/bin/sh -c /root/st..." 2 minutes ago   Exited (137) About a minute ago             ww
-[root@WW81 venue]# docker rm b264ec7434f8
-b264ec7434f8
-[root@WW81 venue]#
+      [root@WW81 venue]# docker ps -a
+      CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                            PORTS     NAMES
+      b264ec7434f8   ww-test:auto   "/bin/sh -c /root/st..." 2 minutes ago   Exited (137) About a minute ago             ww
+      [root@WW81 venue]# docker rm b264ec7434f8
+      b264ec7434f8
+      [root@WW81 venue]#
       ```
 
 ## Push the Docker Image to Docker Hub
@@ -83,7 +85,10 @@ b264ec7434f8
 7.  Once deployed, copy the URL, paste it into a browser window and append `/www` onto the end
 8.  Additionally, to test REST, remove the `/www` and append `/rest`
     * Add, after `/rest`, `/msg` for the test message: `My message` 
-    * Use `/reservation` for JSON: `[{"name":"Walker","seatQty":4,"reservationId":"f2277f09-0a92-4175-9fad-662f031bf4b4"}]`
+    * Use `/reservation` for JSON: 
+      ```
+      [{"name":"Walker","seatQty":4,"reservationId":"f2277f09-0a92-4175-9fad-662f031bf4b4"}]
+      ```
 
 ## Reference Websites
 
@@ -95,3 +100,13 @@ b264ec7434f8
 
 * [An Overview of 3 Java Embedded Databases](https://dzone.com/articles/3-java-embedded-databases#:~:text=An%20embedded%20database%20is%20a,testability%2C%20and%20ease%20of%20configuration.)
 * [Derby Reference PDF](https://db.apache.org/derby/docs/10.5/ref/refderby.pdf)
+
+## Unit Testing
+
+* Run all unit tests with Maven:  `mvn test`
+* Run a single unit test:  `mvn -Dtest=nblc.MoreTest#verifyReservationEmpty test`
+
+## Debugging Web Pages
+
+* Run:  `npm install -g browser-sync`
+

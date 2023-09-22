@@ -1,8 +1,9 @@
 <html>
 <head>
-<title>Christmas Tea</title>
+<title>Christmas Tea 2023</title>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
+	var seatSelect=document.getElementById('seatSelect');
 	var selectedSeat='';
 	//var tables = [1, 2, 17]
 	//tables.forEach((t, i) => {
@@ -17,10 +18,16 @@ document.addEventListener('DOMContentLoaded', function(){
 						document.getElementById('seat').innerHTML=this.id;
 						this.style.fill="cyan";
 						selectedSeat=this.id;
+						let newOption = new Option(this.id,this.id);
+						seatSelect.add(newOption,undefined);
 					} else if (selectedSeat==this.id) {
 						document.getElementById('seat').innerHTML='';
 						selectedSeat='';
 						this.style.fill="green";
+						for (var i=0; i<seatSelect.length; i++) {
+    							if (seatSelect.options[i].value == this.id)
+        							seatSelect.remove(i);
+						}
 					}
 				};
 
@@ -32,6 +39,27 @@ document.addEventListener('DOMContentLoaded', function(){
 	console.log(seat1);
 	seat1.style.fill="red";
 	document.getElementById('S1-6').style.fill="yellow";
+	var resBox = document.getElementById('reservation');
+	var addFormDiv = document.getElementById('addFormDiv');
+	var addForm = document.getElementById('addForm');
+	var cancelAdd = document.getElementById('cancelAdd');
+	resBox.addEventListener('change',function(){
+		console.log('Reservation selected: '+resBox.value);
+		if(resBox.value==='999') {
+			console.log('Time to display ADD form!');
+			addFormDiv.style.display='block';
+		}
+	},false);
+	cancelAdd.addEventListener('click',function() {
+		addFormDiv.style.display='none';
+		resBox.value='0';
+	},false);
+	addForm.addEventListener('submit',function(event) {
+		event.preventDefault();
+		const data = new FormData(event.target);
+		const value = Object.fromEntries(data.entries());
+		console.log({ value });
+	},false);
 },false);
 </script>
 <style>
@@ -49,36 +77,45 @@ document.addEventListener('DOMContentLoaded', function(){
 		<option value="3">WEST, JUDY</option>
 	</select>
 	</div>
-	<h4>Selected seat: <span id="seat"></span></h4>
-    <div style="display:none;">
+    <div style="display:none;" id="addFormDiv">
       <h2>Add Reservation</h2>
+      <form id="addForm">
       <span>
-        <b>Party's name:</b> <input type="text"><br/><br/>
-        <b>Number in party:</b> <input type="number" min="1" max="18">
+        <b>Party's name:</b> <input type="text" name="partyName"><br/><br/>
+        <b>Number in party:</b> <input type="number" name="partyQty" min="1" max="18" value="1">
       </span>
       <br/><br/>
       <table border="1">
         <tr>
           <th>Person's Name</th>
           <th>Meal Selection</th>
-          <th>Seat</th>
+          <th style="width:60px;">Seat</th>
           <th>Action</th>
         </tr>
         <tr>
-          <td><input type="text"></td>
-          <td><select>
+          <td><input name="seatHolder" type="text"></td>
+          <td><select name="mealSelect">
             <option>--SELECT ONE--</option>
             <option>Chicken</option>
             <option>Fish</option>
             <option>Steak</option>
           </select></td>
-          <td>&nbsp;</td>
-          <td><input type="button" value="Add"></td>
+          <td>
+		  <select id="seatSelect" name="seatSelect">
+		  </select>
+	  </td>
+          <td>
+		  <input type="button" value="Add">
+	  </td>
         </tr>
       </table>
       <br>
-      <input type="button" value="Save">
+      <input type="button" value="Cancel" id="cancelAdd">
+      <input type="submit" value="Save">
     </div>
+      </form>
+
+	<h4>Selected seat: <span id="seat"></span></h4>
 
 <svg
    width="11in"
