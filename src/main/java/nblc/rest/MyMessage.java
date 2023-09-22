@@ -4,6 +4,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.Consumes;
 
 import javax.inject.Inject;
 import nblc.DataAccess;
@@ -34,6 +36,18 @@ public class MyMessage {
                 "Serving: "+retList.get(0).reservationId);
         da.getReservations();
         return retList;
+    }
+
+    @Produces(MediaType.TEXT_HTML)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public void postReservation(
+	@FormParam("partyName") String partyName,
+	@FormParam("seatSelect") String seatSelect,
+	@FormParam("seatHolder") String seatHolder,
+        @FormParam("mealSelect") String mealSelect
+    ) {
+        Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
+                "Seat "+seatSelect+" reserved for "+seatHolder+"!");
     }
 
 }
