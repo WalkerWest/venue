@@ -19,6 +19,8 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import javax.annotation.PreDestroy;
+
 public class App
 {
     private DataAccess da;
@@ -79,6 +81,11 @@ public class App
 		// Keep the main thread alive while the server is running.
 		server.join();
     }
+
+	@PreDestroy
+	public void tearDown() {
+		((DataAccessDerby) da).uploadDb();
+	}
 
     public App() {	}
 

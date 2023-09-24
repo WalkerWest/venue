@@ -45,6 +45,7 @@ public class MyMessage {
         @FormParam("seatHolder") String seatHolder,
         @FormParam("mealSelect") String mealSelect
     ) {
+        da.createReservation(new Reservation(partyName,partyQty));
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                 "Seat "+seatSelect+" reserved for "+seatHolder+"!");
     }
