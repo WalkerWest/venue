@@ -17,6 +17,8 @@ import java.sql.*;
 import java.util.List;
 import java.util.Properties;
 
+import io.hypersistence.tsid;
+
 @Singleton
 public class DataAccessDerby implements DataAccess {
 
@@ -104,6 +106,7 @@ public class DataAccessDerby implements DataAccess {
 
     public void normalDbUsage() throws SQLException
     {
+	boolean needsUploading = false;
         Statement stmt = conn.createStatement();
         try {
             ResultSet rs = stmt.executeQuery("SELECT * FROM users");
@@ -114,6 +117,7 @@ public class DataAccessDerby implements DataAccess {
                 logger.trace(logstr);
             }
         } catch (SQLException se) {
+            needsUploading = true;
             if(se.getMessage().equals("Table/View 'USERS' does not exist.")) {
                 logger.info("Database must be created ...");
 
@@ -139,8 +143,52 @@ public class DataAccessDerby implements DataAccess {
                     logger.trace(logstr);
                 }
             }
-            uploadDb();
         }
+        stmt = conn.createStatement();
+        try {
+            ResultSet rs = stmt.executeQuery("SELECT * FROM reservations");
+            while (rs.next()) {
+                String logstr = String.format("%s\t%d",
+                        rs.getString("name"),
+                        rs.getInt("seatQty"));
+                logger.trace(logstr);
+            }
+        } catch (SQLException se) {
+            // needsUploading = true;
+            if(se.getMessage().equals("Table/View 'RESERVATIONS' does not exist.")) {
+                logger.info("Table must be created ...");
+
+                // drop table
+                // stmt.executeUpdate("Drop Table users");
+
+                // create table
+                stmt.executeUpdate(
+                        "Create table reservations " +
+                                "(id bigint data primary key, name varchar(256), seatQty int)");
+
+                // insert 2 rows
+                stmt.executeUpdate("insert into reservations values ("+
+				TSID.fast().toLong().toString()+
+				",'HORNER, JESS,4')");
+                stmt.executeUpdate("insert into reservations values ("+
+				TSID.fast().toLong().toString()+
+				",'REIDFORD, SHARRON,3')");
+                stmt.executeUpdate("insert into reservations values ("+
+				TSID.fast().toLong().toString()+
+				",'WEST, JUDITH,2')");
+
+                // query
+                ResultSet rs = stmt.executeQuery("SELECT * FROM reservations");
+
+                // print out query result
+                while (rs.next()) {
+                    String logstr = String.format("%d\t%s\t%d", rs.getLong("id"),
+                            rs.getString("name"), rs.getInt("seatQty"));
+                    logger.trace(logstr);
+                }
+            }
+        }
+        if(needsUploading) uploadDb();
     }
 
     public void uploadDb() {
