@@ -2,11 +2,33 @@
 <head>
 <title>Christmas Tea 2023</title>
 <script>
+var reservations = [];
+
 document.addEventListener('DOMContentLoaded', function(){
 	var seatSelect=document.getElementById('seatSelect');
 	var selectedSeat='';
 	//var tables = [1, 2, 17]
 	//tables.forEach((t, i) => {
+
+    var myHost = window.location.origin;
+    var resSel = document.getElementById('reservation');
+    fetch(myHost+'/rest/reservation').then(response => {
+      response.json().then(r2 => {
+        reservations=r2;
+        for (var i=resSel.length; i>1; i--) {
+          resSel.remove(i);
+        }
+        reservations.forEach(function (r) {
+          var opt = document.createElement('option');
+          opt.value=r.reservationId;
+          opt.innerHTML = r.name;
+          resSel.appendChild(opt);
+          //console.log(r.name)
+        });
+        console.log(JSON.stringify(reservations));
+      });
+    });
+
 	for(var t=1; t<30; t++) {
 		for(var s=1; s<20; s++) {
 			var seatString = 'S'+t+'-'+s;

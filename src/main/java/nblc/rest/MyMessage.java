@@ -30,11 +30,11 @@ public class MyMessage {
     @Path("reservation") @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Reservation> getReservation() {
-        List<Reservation> retList = new ArrayList<Reservation>();
-        retList.add(new Reservation("Walker",4));
+        List<Reservation> retList = da.getReservations();
+        //retList.add(new Reservation("Walker",4));
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                 "Serving: "+retList.get(0).reservationId);
-        da.getReservations();
+        //da.getReservations();
         return retList;
     }
 

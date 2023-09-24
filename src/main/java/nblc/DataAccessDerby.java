@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -23,7 +24,22 @@ public class DataAccessDerby implements DataAccess {
 
     @Override
     public List<Reservation> getReservations() {
-        return null;
+        List<Reservation> myList = new ArrayList<Reservation>();
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM reservations");
+            while (rs.next()) {
+                myList.add(new Reservation(
+                        rs.getString("name"),
+                        rs.getInt("seatQty")
+                ));
+                String logstr = String.format("%s\t%d",
+                        rs.getString("name"),
+                        rs.getInt("seatQty"));
+                logger.trace(logstr);
+            }
+        } catch (SQLException se) { }
+        return myList;
     }
 
     @Override
