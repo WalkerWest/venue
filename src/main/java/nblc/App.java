@@ -84,6 +84,7 @@ public class App
 
 	@PreDestroy
 	public void tearDown() {
+		((DataAccessDerby) da).close();
 		((DataAccessDerby) da).uploadDb();
 	}
 
