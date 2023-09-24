@@ -1,11 +1,7 @@
 package nblc.rest;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.Consumes;
 
 import javax.inject.Inject;
 import nblc.DataAccess;
@@ -30,20 +26,23 @@ public class MyMessage {
     @Path("reservation") @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Reservation> getReservation() {
-        List<Reservation> retList = new ArrayList<Reservation>();
-        retList.add(new Reservation("Walker",4));
+        List<Reservation> retList = da.getReservations();
+        //retList.add(new Reservation("Walker",4));
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                 "Serving: "+retList.get(0).reservationId);
-        da.getReservations();
+        //da.getReservations();
         return retList;
     }
 
+    @POST
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("postReservation")
     public void postReservation(
-	@FormParam("partyName") String partyName,
-	@FormParam("seatSelect") String seatSelect,
-	@FormParam("seatHolder") String seatHolder,
+        @FormParam("partyName") String partyName,
+        @FormParam("seatSelect") String seatSelect,
+        @FormParam("partyQty") int partyQty,
+        @FormParam("seatHolder") String seatHolder,
         @FormParam("mealSelect") String mealSelect
     ) {
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
