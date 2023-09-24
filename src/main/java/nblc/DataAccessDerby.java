@@ -1,6 +1,7 @@
 package nblc;
 
 import com.google.inject.Singleton;
+import io.hypersistence.tsid.TSID;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -16,8 +17,6 @@ import java.security.GeneralSecurityException;
 import java.sql.*;
 import java.util.List;
 import java.util.Properties;
-
-import io.hypersistence.tsid;
 
 @Singleton
 public class DataAccessDerby implements DataAccess {
@@ -110,12 +109,14 @@ public class DataAccessDerby implements DataAccess {
         Statement stmt = conn.createStatement();
         try {
             ResultSet rs = stmt.executeQuery("SELECT * FROM users");
+            /*
             while (rs.next()) {
                 String logstr = String.format("%d\t%s",
                         rs.getInt("id"),
                         rs.getString("name"));
                 logger.trace(logstr);
             }
+            */
         } catch (SQLException se) {
             needsUploading = true;
             if(se.getMessage().equals("Table/View 'USERS' does not exist.")) {
@@ -138,8 +139,8 @@ public class DataAccessDerby implements DataAccess {
 
                 // print out query result
                 while (rs.next()) {
-                    String logstr = String.format("%d\t%s", rs.getInt("id"),
-                            rs.getString("name"));
+                    String logstr = String.format("%d --> %s --> %d", rs.getLong("id"),
+                            rs.getString("name"), rs.getInt("seatQty"));
                     logger.trace(logstr);
                 }
             }
@@ -164,25 +165,25 @@ public class DataAccessDerby implements DataAccess {
                 // create table
                 stmt.executeUpdate(
                         "Create table reservations " +
-                                "(id bigint data primary key, name varchar(256), seatQty int)");
+                                "(id bigint primary key, name varchar(256), seatQty int)");
 
                 // insert 2 rows
                 stmt.executeUpdate("insert into reservations values ("+
-				TSID.fast().toLong().toString()+
-				",'HORNER, JESS,4')");
+				TSID.fast().toLong()+
+				",'HORNER, JESS',4)");
                 stmt.executeUpdate("insert into reservations values ("+
-				TSID.fast().toLong().toString()+
-				",'REIDFORD, SHARRON,3')");
+				TSID.fast().toLong()+
+				",'REIDFORD, SHARRON',3)");
                 stmt.executeUpdate("insert into reservations values ("+
-				TSID.fast().toLong().toString()+
-				",'WEST, JUDITH,2')");
+				TSID.fast().toLong()+
+				",'WEST, JUDITH',2)");
 
                 // query
                 ResultSet rs = stmt.executeQuery("SELECT * FROM reservations");
 
                 // print out query result
                 while (rs.next()) {
-                    String logstr = String.format("%d\t%s\t%d", rs.getLong("id"),
+                    String logstr = String.format("%d --> %s --> %d", rs.getLong("id"),
                             rs.getString("name"), rs.getInt("seatQty"));
                     logger.trace(logstr);
                 }

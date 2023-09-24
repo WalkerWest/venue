@@ -16,7 +16,7 @@
     <dependency>
         <groupId>io.hypersistence</groupId>
         <artifactId>hypersistence-tsid</artifactId>
-        <version>2.1.1</version>
+        <version>2.1.0</version>
     </dependency>
     <dependency>
         <groupId>org.glassfish.jersey.media</groupId>
