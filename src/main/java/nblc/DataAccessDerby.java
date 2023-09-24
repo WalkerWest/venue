@@ -269,4 +269,10 @@ public class DataAccessDerby implements DataAccess {
         }
     }
 
+    public void close() {
+        try {
+            conn.close();
+        } catch (SQLException e) { }
+    }
+
 }
