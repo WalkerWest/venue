@@ -100,6 +100,7 @@ Remember, to access Google Drive, this app requires the following environment va
 
 * [An Overview of 3 Java Embedded Databases](https://dzone.com/articles/3-java-embedded-databases#:~:text=An%20embedded%20database%20is%20a,testability%2C%20and%20ease%20of%20configuration.)
 * [Derby Reference PDF](https://db.apache.org/derby/docs/10.5/ref/refderby.pdf)
+* [The best UUID type for a database Primary Key](https://vladmihalcea.com/uuid-database-primary-key/)
 
 ## Unit Testing
 
