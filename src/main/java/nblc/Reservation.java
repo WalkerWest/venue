@@ -10,6 +10,8 @@ public class Reservation {
 	public int seatQty;
 	public UUID reservationId;
 
+	public String getName() { return name; }
+
 	public Reservation(String person,int seats) {
 		this.name=person;
 		this.seatQty=seats;
