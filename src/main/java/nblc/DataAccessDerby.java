@@ -25,6 +25,11 @@ public class DataAccessDerby implements DataAccess {
         return null;
     }
 
+    @Override
+    public void createReservation(Reservation r) {
+        return;
+    }
+
     private static Logger logger = LogManager.getLogger(App.class);
 
     private Properties prop=new Properties();

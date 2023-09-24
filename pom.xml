@@ -13,11 +13,11 @@
     <name>tea</name>
   <url>http://maven.apache.org</url>
   <dependencies>
-      <dependency>
-          <groupId>org.glassfish.jersey.media</groupId>
-          <artifactId>jersey-media-json-jackson</artifactId>
-          <version>2.27</version>
-      </dependency>
+    <dependency>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-json-jackson</artifactId>
+        <version>2.27</version>
+    </dependency>
     <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
@@ -58,12 +58,12 @@
         <artifactId>jersey-container-servlet-core</artifactId>
         <version>2.27</version>
     </dependency>
-      <dependency>
-          <groupId>org.glassfish.jersey.inject</groupId>
-          <artifactId>jersey-hk2</artifactId>
-          <version>2.27</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider -->
+    <dependency>
+        <groupId>org.glassfish.jersey.inject</groupId>
+        <artifactId>jersey-hk2</artifactId>
+        <version>2.27</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider -->
     <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-api</artifactId>
@@ -86,22 +86,19 @@
         <artifactId>log4j-slf4j-impl</artifactId>
         <version>2.6.1</version>
     </dependency>
-      <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-jul -->
-      <dependency>
-          <groupId>org.apache.logging.log4j</groupId>
-          <artifactId>log4j-jul</artifactId>
-          <version>2.6.1</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j -->
-      <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>jul-to-slf4j</artifactId>
-          <version>2.0.9</version>
-      </dependency>
-
-
-
-      <dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-jul -->
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-jul</artifactId>
+        <version>2.6.1</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j -->
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-to-slf4j</artifactId>
+        <version>2.0.9</version>
+    </dependency>
+    <dependency>
         <groupId>org.javatuples</groupId>
         <artifactId>javatuples</artifactId>
         <version>1.2</version>
@@ -121,30 +118,36 @@
         <artifactId>google-oauth-client-jetty</artifactId>
         <version>1.25.0</version>
     </dependency>
-      <dependency>
-          <groupId>com.google.inject</groupId>
-          <artifactId>guice</artifactId>
-          <!-- {version} can be 6.0.0, 7.0.0, etc. -->
-          <version>7.0.0</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-      <dependency>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-          <version>32.1.2-jre</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.glassfish.hk2/guice-bridge -->
-      <dependency>
-          <groupId>org.glassfish.hk2</groupId>
-          <artifactId>guice-bridge</artifactId>
-          <version>2.5.0</version>
-      </dependency>
-
+    <dependency>
+        <groupId>com.google.inject</groupId>
+        <artifactId>guice</artifactId>
+        <!-- {version} can be 6.0.0, 7.0.0, etc. -->
+        <version>7.0.0</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+    <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>32.1.2-jre</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.glassfish.hk2/guice-bridge -->
+    <dependency>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>guice-bridge</artifactId>
+        <version>2.5.0</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.13.2</version>
       <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest-junit -->
+    <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-junit</artifactId>
+        <version>2.0.0.0</version>
+        <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.google.api-client/google-api-client-gson -->
     <dependency>
@@ -152,31 +155,30 @@
         <artifactId>google-api-client-gson</artifactId>
         <version>2.2.0</version>
     </dependency>
-      <!-- API, java.xml.bind module -->
-      <dependency>
-          <groupId>jakarta.xml.bind</groupId>
-          <artifactId>jakarta.xml.bind-api</artifactId>
-          <version>2.3.2</version>
-      </dependency>
-
-      <!-- Runtime, com.sun.xml.bind module -->
-      <dependency>
-          <groupId>org.glassfish.jaxb</groupId>
-          <artifactId>jaxb-runtime</artifactId>
-          <version>2.3.2</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
-      <dependency>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-compress</artifactId>
-          <version>1.20</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.json/json -->
-      <dependency>
-          <groupId>org.json</groupId>
-          <artifactId>json</artifactId>
-          <version>20230618</version>
-      </dependency>
+    <!-- API, java.xml.bind module -->
+    <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>2.3.2</version>
+    </dependency>
+    <!-- Runtime, com.sun.xml.bind module -->
+    <dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-runtime</artifactId>
+        <version>2.3.2</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-compress</artifactId>
+        <version>1.20</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.json/json -->
+    <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20230618</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

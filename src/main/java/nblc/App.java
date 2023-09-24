@@ -21,11 +21,11 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public class App
 {
-	private DataAccess da;
-	@Inject
-	public void setDataAccess(DataAccess da) {
-		this.da=da;
-	}
+    private DataAccess da;
+
+    @Inject
+    public void setDataAccess(DataAccess da) { this.da=da; }
+
     private static Logger logger = LogManager.getLogger(App.class);
 
     public static void main( String[] args ) throws Exception {
@@ -36,6 +36,7 @@ public class App
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
 
+		// Setup context for static content
 		Server server = new Server(8080);
 		server.setDumpAfterStart(false);
 		String webDir = App.class.getProtectionDomain().

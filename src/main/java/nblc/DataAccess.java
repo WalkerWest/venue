@@ -6,4 +6,6 @@ public interface DataAccess {
 
     public List<Reservation> getReservations();
 
+    public void createReservation(Reservation r);
+
 }
