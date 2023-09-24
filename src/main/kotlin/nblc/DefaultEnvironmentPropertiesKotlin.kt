@@ -8,12 +8,10 @@ import java.util.regex.Pattern
 import java.util.stream.Collectors
 import java.util.stream.Collectors.*
 
-
 class DefaultEnvironmentPropertiesKotlin : EnvironmentProperties {
 
     private var map: Map<String, String>? = null
     private val REPLACEMENT_PATTERN = Pattern.compile("([$][$])|([$][{].*[}])|([$]\\w+)")
-
 
     constructor() {
         var tempMap: Map<String?, String?>
