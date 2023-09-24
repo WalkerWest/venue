@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		resBox.value='0';
 	},false);
 	addForm.addEventListener('submit',function(event) {
-		event.preventDefault();
+		//event.preventDefault();
 		const data = new FormData(event.target);
 		const value = Object.fromEntries(data.entries());
 		console.log({ value });
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	</div>
     <div style="display:none;" id="addFormDiv">
       <h2>Add Reservation</h2>
-      <form id="addForm">
+      <form id="addForm" action="/rest/postReservation" method="post">
       <span>
         <b>Party's name:</b> <input type="text" name="partyName"><br/><br/>
         <b>Number in party:</b> <input type="number" name="partyQty" min="1" max="18" value="1">
@@ -134,8 +134,8 @@ document.addEventListener('DOMContentLoaded', function(){
       <br>
       <input type="button" value="Cancel" id="cancelAdd">
       <input type="submit" value="Save">
-    </div>
       </form>
+    </div>
 
 	<h4>Selected seat: <span id="seat"></span></h4>
 
