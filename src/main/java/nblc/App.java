@@ -10,10 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-
-import com.google.inject.Injector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.util.log.Log;
@@ -27,19 +23,13 @@ import org.glassfish.jersey.servlet.ServletContainer;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import javax.annotation.PreDestroy;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public class App
 {
-    private DataAccess da;
-
-    @Inject
-    public void setDataAccess(DataAccess da) { this.da=da; }
 
     private static Logger logger = LogManager.getLogger(App.class);
-
 	public static Server server = new Server(8080);
 
     public static void main( String[] args ) throws Exception {
@@ -51,7 +41,6 @@ public class App
 		SLF4JBridgeHandler.install();
 
 		// Setup context for static content
-		//Server server = new Server(8080);
 		server.setDumpAfterStart(false);
 		String webDir = App.class.getProtectionDomain().
 				getCodeSource().getLocation().toExternalForm();
@@ -62,7 +51,6 @@ public class App
 		ServletContextHandler ctx =
 				new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
 		ctx.setContextPath("/rest");
-		// ctx.setClassLoader(Thread.currentThread().getContextClassLoader());
 
 		HandlerCollection handlerCollection = new HandlerCollection();
 		handlerCollection.setHandlers(new Handler[] {ctx, webAppContext});
@@ -146,13 +134,14 @@ public class App
 				}
 
 				try {
-					//String tarFileName = source.getFileName().toString() + ".tar.gz";
 					Files.walkFileTree(Paths.get(dbPath),
 							new MyFileVisitor(dbPath, dbPath+".tar.gz"));
 					logger.info("The tarball database backup file is: "+
 							dbPath+".tar.gz");
-					String fileId = DriveQuickstart.Upload(dbPath+".tar.gz",prop);
-					if(fileId!=null) logger.info("The archive file id is "+fileId);
+					String fileId = DriveQuickstart.Upload(
+							dbPath+".tar.gz",prop);
+					if(fileId!=null) logger.info("The archive file id is "+
+							fileId);
 				}
 				catch (Exception ex) {
 					logger.error(ex.getMessage());
@@ -160,12 +149,6 @@ public class App
 						logger.error(e);
 				}
 
-				/*
-				Injector injector = Guice.createInjector(new AppModule());
-				DataAccess da2 = injector.getInstance(DataAccess.class);
-				((DataAccessDerby) da2).close();
-				((DataAccessDerby) da2).uploadDb();
-				*/
 			}
 		};
 		Runtime.getRuntime().addShutdownHook(shutdownListener);

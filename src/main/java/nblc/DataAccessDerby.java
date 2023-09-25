@@ -46,11 +46,6 @@ public class DataAccessDerby implements DataAccess {
     public void createReservation(Reservation r) {
         try {
             Statement stmt = conn.createStatement();
-            /*
-            stmt.executeUpdate("insert into reservations values ("+
-                    TSID.fast().toLong()+
-                    ",'HORNER, JESS',4)");
-            */
             String sql="insert into reservations " +
                     "(id, name, seatQty) values (" + TSID.fast().toLong() +
                     ",'" + r.name + "'," + r.seatQty + ")";
@@ -60,7 +55,6 @@ public class DataAccessDerby implements DataAccess {
     }
 
     private static Logger logger = LogManager.getLogger(App.class);
-
     private Properties prop=new Properties();
     private String dbLoc = null;
     private String gDriveFolder = null;
@@ -137,14 +131,6 @@ public class DataAccessDerby implements DataAccess {
         Statement stmt = conn.createStatement();
         try {
             ResultSet rs = stmt.executeQuery("SELECT * FROM users");
-            /*
-            while (rs.next()) {
-                String logstr = String.format("%d\t%s",
-                        rs.getInt("id"),
-                        rs.getString("name"));
-                logger.trace(logstr);
-            }
-            */
         } catch (SQLException se) {
             needsUploading = true;
             if(se.getMessage().equals("Table/View 'USERS' does not exist.")) {
@@ -167,8 +153,10 @@ public class DataAccessDerby implements DataAccess {
 
                 // print out query result
                 while (rs.next()) {
-                    String logstr = String.format("%d --> %s --> %d", rs.getLong("id"),
-                            rs.getString("name"), rs.getInt("seatQty"));
+                    String logstr = String.format("%d --> %s --> %d",
+                            rs.getLong("id"),
+                            rs.getString("name"),
+                            rs.getInt("seatQty"));
                     logger.trace(logstr);
                 }
             }
@@ -184,16 +172,13 @@ public class DataAccessDerby implements DataAccess {
             }
         } catch (SQLException se) {
             // needsUploading = true;
-            if(se.getMessage().equals("Table/View 'RESERVATIONS' does not exist.")) {
+            if(se.getMessage().equals("Table/View 'RESERVATIONS' DNE.")) {
                 logger.info("Table must be created ...");
-
-                // drop table
-                // stmt.executeUpdate("Drop Table users");
 
                 // create table
                 stmt.executeUpdate(
-                        "Create table reservations " +
-                                "(id bigint primary key, name varchar(256), seatQty int)");
+                "Create table reservations " +
+                    "(id bigint primary key, name varchar(256), seatQty int)");
 
                 // insert 2 rows
                 stmt.executeUpdate("insert into reservations values ("+
@@ -211,8 +196,10 @@ public class DataAccessDerby implements DataAccess {
 
                 // print out query result
                 while (rs.next()) {
-                    String logstr = String.format("%d --> %s --> %d", rs.getLong("id"),
-                            rs.getString("name"), rs.getInt("seatQty"));
+                    String logstr = String.format("%d --> %s --> %d",
+                            rs.getLong("id"),
+                            rs.getString("name"),
+                            rs.getInt("seatQty"));
                     logger.trace(logstr);
                 }
             }

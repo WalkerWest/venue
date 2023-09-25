@@ -53,7 +53,8 @@ public class DriveQuickstart {
     private static final String CLIENT_EMAIL =
             env.getEnvironmentProperties("client.email");
 
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
+    private static Credential getCredentials(
+            final NetHttpTransport HTTP_TRANSPORT)
             throws IOException {
         JSONObject json = new JSONObject();
         json.put("type","service_account");

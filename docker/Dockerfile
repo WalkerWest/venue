@@ -55,4 +55,6 @@ RUN git clone https://github.com/WalkerWest/venue.git
 WORKDIR "/app/venue"
 RUN mvn clean compile assembly:single
 
-CMD /root/startup.sh
+# CMD /root/startup.sh
+WORKDIR "/app/venue"
+ENTRYPOINT ["java", "-jar", "target/tea-1.0-SNAPSHOT-jar-with-dependencies.jar"]

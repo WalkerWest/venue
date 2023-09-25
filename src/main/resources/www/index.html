@@ -5,13 +5,12 @@
 var reservations = [];
 
 document.addEventListener('DOMContentLoaded', function(){
+
 	var seatSelect=document.getElementById('seatSelect');
 	var selectedSeat='';
-	//var tables = [1, 2, 17]
-	//tables.forEach((t, i) => {
-
     var myHost = window.location.origin;
     var resSel = document.getElementById('reservation');
+
     fetch(myHost+'/rest/reservation').then(response => {
       response.json().then(r2 => {
         reservations=r2;
@@ -103,8 +102,10 @@ document.addEventListener('DOMContentLoaded', function(){
       <h2>Add Reservation</h2>
       <form id="addForm" action="/rest/postReservation" method="post">
       <span>
-        <b>Party's name:</b> <input type="text" name="partyName"><br/><br/>
-        <b>Number in party:</b> <input type="number" name="partyQty" min="1" max="18" value="1">
+        <b>Party's name:</b>
+        <input type="text" name="partyName"><br/><br/>
+        <b>Number in party:</b>
+        <input type="number" name="partyQty" min="1" max="18" value="1">
       </span>
       <br/><br/>
       <table border="1">
