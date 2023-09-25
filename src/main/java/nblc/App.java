@@ -1,9 +1,19 @@
 package nblc;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Properties;
 
+import com.google.inject.Guice;
 import com.google.inject.Inject;
 
+import com.google.inject.Injector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.util.log.Log;
@@ -30,6 +40,8 @@ public class App
 
     private static Logger logger = LogManager.getLogger(App.class);
 
+	public static Server server = new Server(8080);
+
     public static void main( String[] args ) throws Exception {
         logger.info("---------------------< nblc:tea >---------------------");
 		logger.info("Starting now ...");
@@ -39,7 +51,7 @@ public class App
 		SLF4JBridgeHandler.install();
 
 		// Setup context for static content
-		Server server = new Server(8080);
+		//Server server = new Server(8080);
 		server.setDumpAfterStart(false);
 		String webDir = App.class.getProtectionDomain().
 				getCodeSource().getLocation().toExternalForm();
@@ -50,6 +62,7 @@ public class App
 		ServletContextHandler ctx =
 				new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
 		ctx.setContextPath("/rest");
+		// ctx.setClassLoader(Thread.currentThread().getContextClassLoader());
 
 		HandlerCollection handlerCollection = new HandlerCollection();
 		handlerCollection.setHandlers(new Handler[] {ctx, webAppContext});
@@ -78,16 +91,84 @@ public class App
 		logger.info("Server started!");
 		logger.info("Serving from: "+webAppContext.getResourceBase());
 
+		new App();
+
 		// Keep the main thread alive while the server is running.
 		server.join();
     }
 
-	@PreDestroy
-	public void tearDown() {
-		((DataAccessDerby) da).close();
-		((DataAccessDerby) da).uploadDb();
-	}
+    public App() {
+		Thread shutdownListener = new Thread(){
+			public void run() {
+				logger.warn("Shutdown signal received!");
+				try {
+					server.stop();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+				logger.warn("Server stopped.");
 
-    public App() {	}
+				logger.info("The start dir is "+System.getProperty("user.dir"));
+
+				String dbPath = null;
+				Properties prop=new Properties();
+				String dbLoc = null;
+				String gDriveFolder = null;
+
+				try {
+					FileInputStream ip= new FileInputStream(
+							System.getProperty("user.dir")+"/tea.properties");
+					try {
+						prop.load(ip);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+					dbLoc = prop.getProperty("dbLoc");
+					gDriveFolder = prop.getProperty("gDriveFolder");
+					logger.info("User has requested the database to be stored at: "+
+							dbLoc);
+					logger.info("User has database to be persisted at: "+
+							gDriveFolder);
+				}
+				catch (FileNotFoundException fnfe) {
+					logger.info("No tea.properties file found.");
+				}
+				if (dbLoc != null) dbPath = dbLoc;
+				else {
+					dbPath = App.class.getClassLoader().getResource("./derby").
+							getPath();
+					try {
+						dbPath = URLDecoder.decode(dbPath, "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						throw new RuntimeException(e);
+					}
+					dbPath+="/attendees";
+				}
+
+				try {
+					//String tarFileName = source.getFileName().toString() + ".tar.gz";
+					Files.walkFileTree(Paths.get(dbPath),
+							new MyFileVisitor(dbPath, dbPath+".tar.gz"));
+					logger.info("The tarball database backup file is: "+
+							dbPath+".tar.gz");
+					String fileId = DriveQuickstart.Upload(dbPath+".tar.gz",prop);
+					if(fileId!=null) logger.info("The archive file id is "+fileId);
+				}
+				catch (Exception ex) {
+					logger.error(ex.getMessage());
+					for (StackTraceElement e : ex.getStackTrace())
+						logger.error(e);
+				}
+
+				/*
+				Injector injector = Guice.createInjector(new AppModule());
+				DataAccess da2 = injector.getInstance(DataAccess.class);
+				((DataAccessDerby) da2).close();
+				((DataAccessDerby) da2).uploadDb();
+				*/
+			}
+		};
+		Runtime.getRuntime().addShutdownHook(shutdownListener);
+	}
 
 }
