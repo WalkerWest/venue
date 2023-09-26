@@ -2,6 +2,9 @@ package nblc;
 
 import com.google.inject.Singleton;
 import io.hypersistence.tsid.TSID;
+import nblc.tables.DatabaseTable;
+import nblc.tables.Reservations;
+import nblc.tables.Users;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -36,7 +39,7 @@ public class DataAccessDerby implements DataAccess {
                 String logstr = String.format("%s\t%d",
                         rs.getString("name"),
                         rs.getInt("seatQty"));
-                logger.trace(logstr);
+                // logger.trace(logstr);
             }
         } catch (SQLException se) { }
         return myList;
@@ -127,83 +130,28 @@ public class DataAccessDerby implements DataAccess {
 
     public void normalDbUsage() throws SQLException
     {
-	boolean needsUploading = false;
-        Statement stmt = conn.createStatement();
-        try {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM users");
-        } catch (SQLException se) {
-            needsUploading = true;
-            if(se.getMessage().equals("Table/View 'USERS' does not exist.")) {
-                logger.info("Database must be created ...");
+	    boolean needsUploading = false;
 
-                // drop table
-                // stmt.executeUpdate("Drop Table users");
-
-                // create table
-                stmt.executeUpdate(
-                        "Create table users " +
-                                "(id int primary key, name varchar(30))");
-
-                // insert 2 rows
-                stmt.executeUpdate("insert into users values (1,'tom')");
-                stmt.executeUpdate("insert into users values (2,'peter')");
-
-                // query
-                ResultSet rs = stmt.executeQuery("SELECT * FROM users");
-
-                // print out query result
-                while (rs.next()) {
-                    String logstr = String.format("%d --> %s --> %d",
-                            rs.getLong("id"),
-                            rs.getString("name"),
-                            rs.getInt("seatQty"));
-                    logger.trace(logstr);
-                }
-            }
+        DatabaseTable users = new Users(conn);
+        if(!users.isExistingTable()) {
+            needsUploading=true;
+            logger.info("Database table 'USERS' must be created ...");
+            users.createTable();
+            for(String line : users.outputTable()) logger.trace(line);
         }
-        stmt = conn.createStatement();
-        try {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM reservations");
-            while (rs.next()) {
-                String logstr = String.format("%s\t%d",
-                        rs.getString("name"),
-                        rs.getInt("seatQty"));
-                logger.trace(logstr);
-            }
-        } catch (SQLException se) {
-            // needsUploading = true;
-            if(se.getMessage().equals("Table/View 'RESERVATIONS' DNE.")) {
-                logger.info("Table must be created ...");
 
-                // create table
-                stmt.executeUpdate(
-                "Create table reservations " +
-                    "(id bigint primary key, name varchar(256), seatQty int)");
-
-                // insert 2 rows
-                stmt.executeUpdate("insert into reservations values ("+
-				TSID.fast().toLong()+
-				",'HORNER, JESS',4)");
-                stmt.executeUpdate("insert into reservations values ("+
-				TSID.fast().toLong()+
-				",'REIDFORD, SHARRON',3)");
-                stmt.executeUpdate("insert into reservations values ("+
-				TSID.fast().toLong()+
-				",'WEST, JUDITH',2)");
-
-                // query
-                ResultSet rs = stmt.executeQuery("SELECT * FROM reservations");
-
-                // print out query result
-                while (rs.next()) {
-                    String logstr = String.format("%d --> %s --> %d",
-                            rs.getLong("id"),
-                            rs.getString("name"),
-                            rs.getInt("seatQty"));
-                    logger.trace(logstr);
-                }
-            }
+        DatabaseTable reservations = new Reservations(conn);
+        if(!reservations.isExistingTable()) {
+            needsUploading=true;
+            logger.info("Database table 'RESERVATIONS' must be created ...");
+            users.createTable();
+            for(String line : users.outputTable()) logger.trace(line);
         }
+        else {
+            for(String line : reservations.outputTable())
+                logger.trace(line);
+        }
+
         if(needsUploading) uploadDb();
     }
 
