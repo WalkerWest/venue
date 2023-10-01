@@ -46,25 +46,25 @@ public class AppTest
 	    assertTrue (r1.seatQty==2);
 
 	    List<Table> tablist = new ArrayList<Table>();
-	    tablist.add(new Table(1,FOUR));
-	    tablist.add(new Table(2,EIGHT));
-	    tablist.add(new Table(3,FOUR));
-	    assertTrue (ChristmasTea.seatsTotal(tablist)==16);
+	    tablist.add(new Table(1, TEN));
+	    tablist.add(new Table(2, EIGHTEEN));
+	    tablist.add(new Table(3, TEN));
+	    assertTrue (ChristmasTea.seatsTotal(tablist)==38);
 
 	    List<ReservedSeat> reslist = new ArrayList<ReservedSeat>();
 	    reslist = ChristmasTea.addReservation(tablist,reslist,r1,tablist.get(0).seats[0],"Judith");
-	    assertTrue (ChristmasTea.seatsLeft(tablist,reslist)==15);
+	    assertTrue (ChristmasTea.seatsLeft(tablist,reslist)==37);
 	    reslist = ChristmasTea.addReservation(tablist,reslist,r1,tablist.get(0).seats[1],"Liz");
-	    assertTrue (ChristmasTea.seatsLeft(tablist,reslist)==14);
+	    assertTrue (ChristmasTea.seatsLeft(tablist,reslist)==36);
 
 	    Reservation r2 = new Reservation("Reidford",2);
 	    assertTrue (r2.seatQty==2);
 
 	    reslist = ChristmasTea.addReservation(tablist,reslist,r2,tablist.get(1).seats[0],"Connie");
-	    assertTrue (ChristmasTea.seatsLeft(tablist,reslist)==13);
+	    assertTrue (ChristmasTea.seatsLeft(tablist,reslist)==35);
 
 	    reslist = ChristmasTea.addReservation(tablist,reslist,r2,tablist.get(2).seats[2],"Bernie");
-	    assertTrue (ChristmasTea.seatsLeft(tablist,reslist)==12);
+	    assertTrue (ChristmasTea.seatsLeft(tablist,reslist)==34);
 
 	    ChristmasTea.ListAttendees(tablist,reslist);
     }

@@ -1,7 +1,6 @@
 package nblc;
 
 import org.junit.Test;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import static org.junit.Assert.assertEquals;
@@ -23,7 +22,7 @@ public class MoreTest
 
 	    Reservation r1 = new Reservation("West",2);
 	    List<Table> tablist = Arrays.asList(new Table[] {
-	    	new Table(1,FOUR)
+	    	new Table(1, TEN)
 	    });
 	    List<ReservedSeat> reslist = new ArrayList<ReservedSeat>();
 	    
@@ -38,7 +37,7 @@ public class MoreTest
 
 	    Reservation r1 = new Reservation("West",2);
 	    List<Table> tablist = Arrays.asList(new Table[] {
-	    	new Table(1,FOUR)
+	    	new Table(1, TEN)
 	    });
 	    List<ReservedSeat> reslist = new ArrayList<ReservedSeat>();
 	    

@@ -8,7 +8,7 @@ import java.util.regex.Pattern
 import java.util.stream.Collectors
 import java.util.stream.Collectors.*
 
-class DefaultEnvironmentPropertiesKotlin : EnvironmentProperties {
+class DefaultEnvironmentPropertiesKotlin {
 
     private var map: Map<String, String>? = null
     private val REPLACEMENT_PATTERN = Pattern.compile("([$][$])|([$][{].*[}])|([$]\\w+)")
@@ -33,7 +33,7 @@ class DefaultEnvironmentPropertiesKotlin : EnvironmentProperties {
         map = resolvePlaceHolders(addEnvironment(tempMap))
     }
 
-    override fun getEnvironmentProperties(key: String): String? {
+    fun getEnvironmentProperties(key: String): String? {
         return map!![key]
     }
 

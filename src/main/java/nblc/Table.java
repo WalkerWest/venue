@@ -1,7 +1,5 @@
 package nblc;
-import static nblc.TableType.*;
 import java.util.List;
-import java.util.ArrayList;
 
 public class Table {
 	public int num;
@@ -12,10 +10,10 @@ public class Table {
 		this.num=q;
 		this.type=t;
 		switch(t) {
-			case FOUR: 
+			case TEN:
 				seats = new Seat[4];
 				break;
-			case EIGHT: 
+			case EIGHTEEN:
 				seats = new Seat[8];
 				break;
 		}

@@ -9,8 +9,8 @@ public class ChristmasTea {
 		int seats=0;
 		for(Table t : tables) {
 			switch(t.type) {
-				case EIGHT: seats+=8; break;
-				case FOUR: seats+=4; break;
+				case EIGHTEEN: seats+=18; break;
+				case TEN: seats+=10; break;
 			}
 		}
 		return seats;

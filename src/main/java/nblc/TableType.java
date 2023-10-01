@@ -1,3 +1,3 @@
 package nblc;
 
-public enum TableType { EIGHT, FOUR }
+public enum TableType {EIGHTEEN, TEN}
