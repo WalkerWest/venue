@@ -6,7 +6,7 @@ public interface DataAccess {
 
     public List<Reservation> getReservations();
 
-    public void createReservation(Reservation r);
+    public long createReservation(Reservation r);
 
     public void createReservedSeat(ReservedSeat rs);
 

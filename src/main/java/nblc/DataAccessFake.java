@@ -13,8 +13,9 @@ public class DataAccessFake implements DataAccess {
     }
 
     @Override
-    public void createReservation(Reservation r) {
+    public long createReservation(Reservation r) {
 	    resList.add(r);
+        return 1L;
     }
 
     @Override

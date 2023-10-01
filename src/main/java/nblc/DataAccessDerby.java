@@ -46,15 +46,16 @@ public class DataAccessDerby implements DataAccess {
     }
 
     @Override
-    public void createReservation(Reservation r) {
+    public long createReservation(Reservation r) {
+        long myId = TSID.fast().toLong();
         try {
             Statement stmt = conn.createStatement();
             String sql="insert into reservations " +
-                    "(id, name, seatQty) values (" + TSID.fast().toLong() +
+                    "(id, name, seatQty) values (" + myId +
                     ",'" + r.name + "'," + r.seatQty + ")";
             stmt.executeUpdate(sql);
         } catch (SQLException se) { }
-        return;
+        return myId;
     }
 
     @Override

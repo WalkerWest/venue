@@ -131,10 +131,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		console.log({ value });
 	},false);
     partyQty.addEventListener('change',function(event) {
-      console.log('Seat qty changed to '+partyQty.value);
-      if(partyQty.value>selectedQty) cloneRow();
-      else deleteRow();
-      selectedQty=partyQty.value;
+      console.log('Seat qty changed to '+partyQty.value+'; it was '+selectedQty);
+      while(partyQty.value>selectedQty) {
+        console.log('append clone');
+        cloneRow(); selectedQty++;
+      }
+      while(partyQty.value<selectedQty) { deleteRow(); selectedQty--; }
+      selectedQty=Number(partyQty.value);
     },false);
 
 },false);
