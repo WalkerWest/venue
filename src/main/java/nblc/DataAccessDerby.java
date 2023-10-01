@@ -57,6 +57,20 @@ public class DataAccessDerby implements DataAccess {
         return;
     }
 
+    @Override
+    public void createReservedSeat(/*long r, */ ReservedSeat rs) {
+        /*
+        try {
+            Statement stmt = conn.createStatement();
+            String sql="insert into reserved_seats " +
+                    "(reservationId, seatId, mealEnum, seatQty) values (" + r +
+                    ",'" + rs.seat.number + "'," + rs.seat..seatQty + ")";
+            stmt.executeUpdate(sql);
+        } catch (SQLException se) { }
+        */
+        return;
+    }
+
     private static Logger logger = LogManager.getLogger(App.class);
     private Properties prop=new Properties();
     private String dbLoc = null;

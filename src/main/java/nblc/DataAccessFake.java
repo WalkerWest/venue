@@ -17,4 +17,9 @@ public class DataAccessFake implements DataAccess {
 	    resList.add(r);
     }
 
+    @Override
+    public void createReservedSeat(ReservedSeat rs) {
+
+    }
+
 }

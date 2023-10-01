@@ -1,15 +1,41 @@
 <html>
 <head>
 <title>Christmas Tea 2023</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
+<!--
+<script id="seat_template" type="text/template">
+  <tr>
+    <td><input name="seatHolder" type="text" value="{{ seatHolder }}"></td>
+    <td>
+      <select name="mealSelect">
+        <option>--SELECT ONE--</option>
+        {{#mealChoices}}
+        <option value="{{val}}" {{#sel}}selected{{/sel}}>{{txt}}</option>
+        {{/mealChoices}}
+    </select></td>
+    <td>
+      <select id="seatSelect" name="seatSelect">
+      </select>
+    </td>
+  </tr>
+</script>
+-->
 <script>
+var mealChoices = { options: [
+    { val: 'BEEF', txt: 'Beef' },
+    { val: 'CHICKEN', txt: 'Chicken' },
+    { val: 'FISH', txt: 'Fish' }
+]};
 var reservations = [];
+var selectedSeat=[];
+var seatSelect=document.getElementsByClassName('seatSelect');
 
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function() {
 
-	var seatSelect=document.getElementById('seatSelect');
-	var selectedSeat='';
     var myHost = window.location.origin;
     var resSel = document.getElementById('reservation');
+    var partyQty = document.getElementById('partyQty');
+    var selectedQty = 1;
 
     fetch(myHost+'/rest/reservation').then(response => {
       response.json().then(r2 => {
@@ -29,32 +55,55 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 
 	for(var t=1; t<30; t++) {
-		for(var s=1; s<20; s++) {
-			var seatString = 'S'+t+'-'+s;
-			if(document.getElementById(seatString)!=null) {
-				var seat = document.getElementById(seatString);
-				seat.style.fill="green";
-				seat.onclick = function() {
-					if(selectedSeat=='') {
-						document.getElementById('seat').innerHTML=this.id;
-						this.style.fill="cyan";
-						selectedSeat=this.id;
-						let newOption = new Option(this.id,this.id);
-						seatSelect.add(newOption,undefined);
-					} else if (selectedSeat==this.id) {
-						document.getElementById('seat').innerHTML='';
-						selectedSeat='';
-						this.style.fill="green";
-						for (var i=0; i<seatSelect.length; i++) {
-    							if (seatSelect.options[i].value == this.id)
-        							seatSelect.remove(i);
-						}
-					}
-				};
-
-			}
-		}
-	};
+      for (var s = 1; s < 20; s++) {
+        var seatString = 'S' + t + '-' + s;
+        if (document.getElementById(seatString) != null) {
+          var seat = document.getElementById(seatString);
+          seat.style.fill = "green";
+          seat.onclick = function () {
+            if (selectedSeat.length < partyQty.value && !selectedSeat.includes(this.id)) {
+              var mySeat = this.id;
+              document.getElementById('seat').innerHTML = mySeat;
+              this.style.fill = "cyan";
+              selectedSeat.push(mySeat);
+              seatSelect=document.getElementsByClassName('seatSelect');
+              for (let s of seatSelect) {
+                let newOption = new Option(mySeat, mySeat);
+                s.add(newOption, undefined);
+              }
+              /*
+              seatSelect.forEach(function (s) {
+              });
+              */
+              //seatSelect.add(newOption,undefined);
+            } else if (selectedSeat.includes(this.id)) {
+              var mySeat=this.id;
+              document.getElementById('seat').innerHTML = '';
+              const index = selectedSeat.indexOf(mySeat);
+              selectedSeat.splice(index,1);
+              this.style.fill = "green";
+              seatSelect=document.getElementsByClassName('seatSelect');
+              for (let s of seatSelect) {
+                console.log("Checking for seat ...");
+                for (var i = 0; i <= seatSelect.length; i++) {
+                  console.log(s.options[i].value+'; i is '+i+' and total length is '+seatSelect.length);
+                  if (s.options[i].value === mySeat) {
+                    s.remove(i); break;
+                  }
+                }
+              }
+              /*
+              seatSelect.forEach(function (s) {
+              });
+              */
+              /* if (seatSelect.options[i].value == this.id)
+                  seatSelect.remove(i); */
+            }
+            console.log('selectedSeat array: '+selectedSeat);
+          }
+        }
+      }
+    }
 	console.log("Started");
 	var seat1 = document.getElementById('S1-1');
 	console.log(seat1);
@@ -81,7 +130,48 @@ document.addEventListener('DOMContentLoaded', function(){
 		const value = Object.fromEntries(data.entries());
 		console.log({ value });
 	},false);
+    partyQty.addEventListener('change',function(event) {
+      console.log('Seat qty changed to '+partyQty.value);
+      if(partyQty.value>selectedQty) cloneRow();
+      else deleteRow();
+      selectedQty=partyQty.value;
+    },false);
+
 },false);
+
+function cloneRow() {
+  var row = document.getElementById("dataRow1"); // find row to copy
+  var table = document.getElementById("reservedSeats"); // find table to append to
+  var clone = row.cloneNode(true); // copy children too
+  clone.id = "dataRow"+table.rows.length; // change id or other attributes/contents
+  for(var i = 0, col; i<clone.cells.length; i++) {
+    col = clone.cells[i];
+    //console.log(col.firstChild.name);
+    //console.log(col.firstChild);
+    col.firstChild.name=col.firstChild.name.slice(0,-1)+table.rows.length;
+  }
+  table.appendChild(clone); // add new row to end of table
+}
+
+function deleteRow() {
+  var table = document.getElementById("reservedSeats");
+  var rowCount = table.rows.length;
+  table.deleteRow(rowCount -1);
+}
+
+/*
+function createRow() {
+  var row = document.createElement('tr'); // create row node
+  var col = document.createElement('td'); // create column node
+  var col2 = document.createElement('td'); // create second column node
+  row.appendChild(col); // append first column to row
+  row.appendChild(col2); // append second column to row
+  col.innerHTML = "qwe"; // put data in first column
+  col2.innerHTML = "rty"; // put data in second column
+  var table = document.getElementById("tableToModify"); // find table to append to
+  table.appendChild(row); // append row to table
+}
+*/
 </script>
 <style>
 </style>
@@ -105,31 +195,26 @@ document.addEventListener('DOMContentLoaded', function(){
         <b>Party's name:</b>
         <input type="text" name="partyName"><br/><br/>
         <b>Number in party:</b>
-        <input type="number" name="partyQty" min="1" max="18" value="1">
+        <input type="number" id="partyQty" name="partyQty" min="1" max="18" value="1">
       </span>
       <br/><br/>
-      <table border="1">
+      <table border="1" id="reservedSeats">
         <tr>
           <th>Person's Name</th>
           <th>Meal Selection</th>
           <th style="width:60px;">Seat</th>
-          <th>Action</th>
         </tr>
-        <tr>
-          <td><input name="seatHolder" type="text"></td>
-          <td><select name="mealSelect">
-            <option>--SELECT ONE--</option>
+        <tr id="dataRow1">
+          <td><input name="seatHolder1" type="text"></td>
+          <td><select name="mealSelect1">
+            <option>N/A</option>
             <option>Chicken</option>
             <option>Fish</option>
             <option>Steak</option>
           </select></td>
-          <td>
-		  <select id="seatSelect" name="seatSelect">
-		  </select>
-	  </td>
-          <td>
-		  <input type="button" value="Add">
-	  </td>
+          <td><select name="seatSelect1" class="seatSelect">
+              <option>N/A</option>
+          </select></td>
         </tr>
       </table>
       <br>
