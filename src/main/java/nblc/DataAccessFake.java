@@ -19,7 +19,7 @@ public class DataAccessFake implements DataAccess {
     }
 
     @Override
-    public void createReservedSeat(ReservedSeat rs) {
+    public void createReservedSeat(long resId, int tableNo, ReservedSeat rs) {
 
     }
 

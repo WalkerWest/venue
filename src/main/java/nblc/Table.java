@@ -11,10 +11,10 @@ public class Table {
 		this.type=t;
 		switch(t) {
 			case TEN:
-				seats = new Seat[4];
+				seats = new Seat[10];
 				break;
 			case EIGHTEEN:
-				seats = new Seat[8];
+				seats = new Seat[18];
 				break;
 		}
 		for(int i=0; i<seats.length; i++) seats[i]=new Seat(i+1);

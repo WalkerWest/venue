@@ -19,7 +19,7 @@ public class Users implements DatabaseTable {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM users");
         } catch (SQLException se) {
-            if(se.getMessage().equals("Table/View does not exist."))
+            if(se.getMessage().equals("Table/View 'USERS' does not exist."))
                 return false;
         }
         return true;

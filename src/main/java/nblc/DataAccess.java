@@ -8,6 +8,6 @@ public interface DataAccess {
 
     public long createReservation(Reservation r);
 
-    public void createReservedSeat(ReservedSeat rs);
+    public void createReservedSeat(long resId, int tableNo, ReservedSeat rs);
 
 }

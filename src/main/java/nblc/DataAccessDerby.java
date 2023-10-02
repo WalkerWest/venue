@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import io.hypersistence.tsid.TSID;
 import nblc.tables.DatabaseTable;
 import nblc.tables.Reservations;
+import nblc.tables.ReservedSeats;
 import nblc.tables.Users;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -59,16 +60,20 @@ public class DataAccessDerby implements DataAccess {
     }
 
     @Override
-    public void createReservedSeat(/*long r, */ ReservedSeat rs) {
-        /*
+    public void createReservedSeat(long resId, int tableNo, ReservedSeat rs) {
         try {
-            Statement stmt = conn.createStatement();
-            String sql="insert into reserved_seats " +
-                    "(reservationId, seatId, mealEnum, seatQty) values (" + r +
-                    ",'" + rs.seat.number + "'," + rs.seat..seatQty + ")";
-            stmt.executeUpdate(sql);
-        } catch (SQLException se) { }
-        */
+            PreparedStatement stmt = conn.prepareStatement(
+                    "insert into reserved_seats " +
+                            "(reservationId, seatId, name, mealEnum) " +
+                            "values (?,?,?,?)");
+            stmt.setLong(1,resId);
+            stmt.setString(2,"S" + tableNo + "-" + rs.seat.number);
+            stmt.setString(3,rs.person);
+            stmt.setString(4,rs.meal.toString());
+            stmt.executeUpdate();
+        } catch (SQLException se) {
+            logger.error(se.getMessage());
+        }
         return;
     }
 
@@ -133,6 +138,7 @@ public class DataAccessDerby implements DataAccess {
                 databaseConnected=true;
             } catch (Exception ex) {
                 if(ex.getMessage().contains("Failed to start database")) {
+                    ex.getStackTrace();
                     try { Thread.sleep(1000); }
                     catch (InterruptedException e) {
                         throw new RuntimeException(e);
@@ -159,11 +165,23 @@ public class DataAccessDerby implements DataAccess {
         if(!reservations.isExistingTable()) {
             needsUploading=true;
             logger.info("Database table 'RESERVATIONS' must be created ...");
-            users.createTable();
-            for(String line : users.outputTable()) logger.trace(line);
+            reservations.createTable();
+            for(String line : reservations.outputTable()) logger.trace(line);
         }
         else {
             for(String line : reservations.outputTable())
+                logger.trace(line);
+        }
+
+        DatabaseTable reservedSeats = new ReservedSeats(conn);
+        if(!reservedSeats.isExistingTable()) {
+            needsUploading=true;
+            logger.info("Database table 'RESERVED_SEATS' must be created ...");
+            reservedSeats.createTable();
+            for(String line : reservedSeats.outputTable()) logger.trace(line);
+        }
+        else {
+            for(String line : reservedSeats.outputTable())
                 logger.trace(line);
         }
 

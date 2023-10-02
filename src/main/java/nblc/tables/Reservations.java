@@ -30,7 +30,7 @@ public class Reservations implements DatabaseTable {
             */
             return true;
         } catch (SQLException se) {
-            if(se.getMessage().equals("Table/View does not exist."))
+            if(se.getMessage().equals("Table/View 'RESERVATIONS' does not exist."))
                 return false;
         }
         return true;

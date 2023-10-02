@@ -8,7 +8,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import nblc.*;
 import static nblc.TableType.*;
-import static nblc.MealType.*;
 
 import org.glassfish.hk2.api.Immediate;
 
@@ -40,29 +39,12 @@ public class MyMessage {
         return retList;
     }
 
-    /*
-    @POST
-    @Produces(MediaType.TEXT_HTML)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("postReservation")
-    public void postReservation(
-        @FormParam("partyName") String partyName,
-        @FormParam("seatSelect") String seatSelect,
-        @FormParam("partyQty") int partyQty,
-        @FormParam("seatHolder") String seatHolder,
-        @FormParam("mealSelect") String mealSelect
-    ) {
-        da.createReservation(new Reservation(partyName,partyQty));
-        Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
-                "Seat "+seatSelect+" reserved for "+seatHolder+"!");
-    }
-    */
-
-    List<Table> tables = new ArrayList() {{
+    List<Table> tables = new ArrayList<Table>() {{
 
         // parking lot side of sanctuary
         add(new Table( 1,TEN));
         add(new Table( 2,EIGHTEEN));
+        add(new Table( 3,TEN));
         add(new Table( 4,TEN));
         add(new Table( 5,TEN));
         add(new Table( 6,TEN));
@@ -84,11 +66,11 @@ public class MyMessage {
         add(new Table(18,EIGHTEEN));
         add(new Table(19,TEN));
         add(new Table(20,TEN));
-        add(new Table(21,EIGHTEEN));
-        add(new Table(22,EIGHTEEN));
-        add(new Table(13,EIGHTEEN));
-        add(new Table(14,EIGHTEEN));
-        add(new Table(15,EIGHTEEN));
+        add(new Table(21,TEN));
+        add(new Table(22,TEN));
+        add(new Table(23,TEN));
+        add(new Table(24,TEN));
+        add(new Table(25,TEN));
     }};
 
     @POST
@@ -113,24 +95,23 @@ public class MyMessage {
                 Matcher matcher = pattern.matcher(seatSelect);
                 if(matcher.find()) {
                     String seatHolder = params.get("seatHolder"+i).get(0);
+                    int table = Integer.parseInt(matcher.group("table"));
+                    int seat = Integer.parseInt(matcher.group("seat"));
                     Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
-                            "Seat "+matcher.group("seat")+" at table #"+
-                                    matcher.group("table")+" reserved for "+
+                            "Seat "+seat+" at table #"+ table +" reserved for "+
                                     seatHolder+" who ordered "+mealSelect+"!");
-                    Seat mySeat = tables.get(
-                            Integer.parseInt(matcher.group("table"))-1).
-                            seats[Integer.parseInt(matcher.group("seat"))];
+                    Seat mySeat = tables.get(table-1).seats[seat-1];
                     ReservedSeat resSeat = new ReservedSeat(
                             newReservation,
                             mySeat,
                             seatHolder,
                             MealType.valueOf(mealSelect)
                     );
+                    da.createReservedSeat(resId,table,resSeat);
                 }
             }
         }
     }
-
 
 }
 
