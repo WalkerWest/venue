@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -127,6 +128,19 @@ public class DataAccessDerby implements DataAccess {
             logger.error(se.getMessage());
         }
         return myList;
+    }
+
+    @Override
+    public void deleteReservation(long resId) {
+        try {
+            Statement stmt = conn.createStatement();
+            int num=stmt.executeUpdate("DELETE FROM reserved_seats " +
+                    "WHERE reservationId="+ BigInteger.valueOf(resId));
+            num=stmt.executeUpdate("DELETE FROM reservations " +
+                    "WHERE id="+BigInteger.valueOf(resId));
+        } catch (SQLException se) {
+            logger.error(se.getMessage());
+        }
     }
 
     private static Logger logger = LogManager.getLogger(App.class);

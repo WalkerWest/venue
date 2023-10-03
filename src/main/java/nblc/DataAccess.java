@@ -14,4 +14,6 @@ public interface DataAccess {
 
     public List<String> getReservedSeatIds(Reservation r);
 
+    public void deleteReservation(long resId);
+
 }

@@ -43,6 +43,7 @@ public class MyMessage {
     public void deleteReservation(@QueryParam("id") long resId) {
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                 "I will delete "+resId);
+        da.deleteReservation(resId);
         return;
     }
 

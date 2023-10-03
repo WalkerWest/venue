@@ -33,4 +33,9 @@ public class DataAccessFake implements DataAccess {
         return null;
     }
 
+    @Override
+    public void deleteReservation(long resId) {
+
+    }
+
 }
