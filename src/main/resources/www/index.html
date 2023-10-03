@@ -21,22 +21,23 @@
 </script>
 -->
 <script>
+var myHost = window.location.origin;
+
 var mealChoices = { options: [
     { val: 'BEEF', txt: 'Beef' },
     { val: 'CHICKEN', txt: 'Chicken' },
     { val: 'FISH', txt: 'Fish' }
 ]};
 var reservations = [];
+var reservedSeats = [];
 var selectedSeat=[];
 var seatSelect=document.getElementsByClassName('seatSelect');
-
+var resSel = document.getElementById('reservation');
 document.addEventListener('DOMContentLoaded', function() {
 
-    var myHost = window.location.origin;
-    var resSel = document.getElementById('reservation');
     var partyQty = document.getElementById('partyQty');
     var selectedQty = 1;
-    var reservedSeats = [];
+    resSel = document.getElementById('reservation');
 
     fetch(myHost+'/rest/reservation').then(response => {
       response.json().then(r2 => {
@@ -120,6 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById('S1-6').style.fill="yellow";
     */
 
+    var delRes = document.getElementById('delRes');
 	var resBox = document.getElementById('reservation');
 	var addFormDiv = document.getElementById('addFormDiv');
 	var addForm = document.getElementById('addForm');
@@ -129,8 +131,23 @@ document.addEventListener('DOMContentLoaded', function() {
 		if(resBox.value==='999') {
 			console.log('Time to display ADD form!');
 			addFormDiv.style.display='block';
+            delRes.style.display='none';
 		}
+        else if (!isNaN(resBox.value)) {
+          delRes.style.display='inline-block';
+          addFormDiv.style.display='none';
+        }
+        else {
+          delRes.style.display='none';
+          addFormDiv.style.display='none';
+        }
 	},false);
+    delRes.addEventListener('click',function() {
+        console.log("It's time to delete reservation "+resBox.value+"!");
+        fetch(myHost+'/rest/deleteReservation?id='+resBox.value).then(response => {
+          console.log("Back from delete routine");
+        });
+    },false);
 	cancelAdd.addEventListener('click',function() {
 		addFormDiv.style.display='none';
 		resBox.value='0';
@@ -139,7 +156,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		//event.preventDefault();
 		const data = new FormData(event.target);
 		const value = Object.fromEntries(data.entries());
-		console.log({ value });
+        console.log({ value });
+        setTimeout(function() {
+          location.reload(true);
+        },1500);
 	},false);
     partyQty.addEventListener('change',function(event) {
       console.log('Seat qty changed to '+partyQty.value+'; it was '+selectedQty);
@@ -201,6 +221,7 @@ function createRow() {
 		<option value="2">REIDFORD, SHARRON</option>
 		<option value="3">WEST, JUDY</option>
 	</select>
+    <input type="button" id="delRes" value="Delete" style="display:none;">
 	</div>
     <div style="display:none;" id="addFormDiv">
       <h2>Add Reservation</h2>

@@ -38,6 +38,14 @@ public class MyMessage {
         return retList;
     }
 
+    @Path("deleteReservation") @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public void deleteReservation(@QueryParam("id") long resId) {
+        Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
+                "I will delete "+resId);
+        return;
+    }
+
     public static List<Table> tables = new ArrayList<Table>() {{
 
         // parking lot side of sanctuary
