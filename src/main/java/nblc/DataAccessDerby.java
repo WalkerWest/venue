@@ -2,6 +2,7 @@ package nblc;
 
 import com.google.inject.Singleton;
 import io.hypersistence.tsid.TSID;
+import nblc.rest.MyMessage;
 import nblc.tables.DatabaseTable;
 import nblc.tables.Reservations;
 import nblc.tables.ReservedSeats;
@@ -22,6 +23,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Singleton
 public class DataAccessDerby implements DataAccess {
@@ -31,18 +34,22 @@ public class DataAccessDerby implements DataAccess {
         List<Reservation> myList = new ArrayList<Reservation>();
         try {
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM reservations");
+            ResultSet rs = stmt.executeQuery("SELECT id, name, seatQty FROM reservations");
             while (rs.next()) {
                 myList.add(new Reservation(
+                        rs.getLong("id"),
                         rs.getString("name"),
                         rs.getInt("seatQty")
                 ));
                 String logstr = String.format("%s\t%d",
                         rs.getString("name"),
                         rs.getInt("seatQty"));
-                // logger.trace(logstr);
             }
-        } catch (SQLException se) { }
+        } catch (SQLException se) {
+            logger.error(se.getMessage());
+        } catch (Exception e) {
+            logger.error("Uncaught error",e);
+        }
         return myList;
     }
 
@@ -55,7 +62,9 @@ public class DataAccessDerby implements DataAccess {
                     "(id, name, seatQty) values (" + myId +
                     ",'" + r.name + "'," + r.seatQty + ")";
             stmt.executeUpdate(sql);
-        } catch (SQLException se) { }
+        } catch (SQLException se) {
+            logger.error(se.getMessage());
+        }
         return myId;
     }
 
@@ -75,6 +84,49 @@ public class DataAccessDerby implements DataAccess {
             logger.error(se.getMessage());
         }
         return;
+    }
+
+    @Override
+    public List<ReservedSeat> getReservedSeats(Reservation r) {
+        List<ReservedSeat> myList = new ArrayList<ReservedSeat>();
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM reserved_seats " +
+                    "WHERE reservationId='"+r.reservationId+"'");
+            while (rs.next()) {
+                Pattern pattern = Pattern.
+                        compile("^S(?<table>[0-9]+)-(?<seat>[0-9]+)$");
+                Matcher matcher = pattern.matcher(rs.getString("seatId"));
+                if(matcher.find()) {
+                    int table = Integer.parseInt(matcher.group("table"));
+                    int seat = Integer.parseInt(matcher.group("seat"));
+                    Seat mySeat = MyMessage.tables.get(table-1).seats[seat-1];
+                    myList.add(new ReservedSeat(
+                            r,
+                            mySeat,
+                            rs.getString("person"),
+                            MealType.valueOf(rs.getString("mealEnum"))
+                    ));
+                }
+            }
+        } catch (SQLException se) {
+            logger.error(se.getMessage());
+        }
+        return myList;
+    }
+
+    @Override
+    public List<String> getReservedSeatIds(Reservation r) {
+        List<String> myList = new ArrayList<String>();
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT seatId FROM reserved_seats " +
+                    "WHERE reservationId="+r.reservationId);
+            while (rs.next()) myList.add(rs.getString("seatId"));
+        } catch (SQLException se) {
+            logger.error(se.getMessage());
+        }
+        return myList;
     }
 
     private static Logger logger = LogManager.getLogger(App.class);

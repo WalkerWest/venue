@@ -10,4 +10,8 @@ public interface DataAccess {
 
     public void createReservedSeat(long resId, int tableNo, ReservedSeat rs);
 
+    public List<ReservedSeat> getReservedSeats(Reservation r);
+
+    public List<String> getReservedSeatIds(Reservation r);
+
 }

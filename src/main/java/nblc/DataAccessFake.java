@@ -23,4 +23,14 @@ public class DataAccessFake implements DataAccess {
 
     }
 
+    @Override
+    public List<ReservedSeat> getReservedSeats(Reservation r) {
+        return null;
+    }
+
+    @Override
+    public List<String> getReservedSeatIds(Reservation r) {
+        return null;
+    }
+
 }

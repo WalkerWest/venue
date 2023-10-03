@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var resSel = document.getElementById('reservation');
     var partyQty = document.getElementById('partyQty');
     var selectedQty = 1;
+    var reservedSeats = [];
 
     fetch(myHost+'/rest/reservation').then(response => {
       response.json().then(r2 => {
@@ -48,9 +49,15 @@ document.addEventListener('DOMContentLoaded', function() {
           opt.value=r.reservationId;
           opt.innerHTML = r.name;
           resSel.appendChild(opt);
+          r.reservedSeats.forEach(function (rs) {
+            reservedSeats.push(rs);
+            var seat = document.getElementById(rs);
+            seat.style.fill="red";
+          });
           //console.log(r.name)
         });
         console.log(JSON.stringify(reservations));
+        console.log(JSON.stringify(reservedSeats));
       });
     });
 
@@ -105,10 +112,14 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 	console.log("Started");
+
+    /*
 	var seat1 = document.getElementById('S1-1');
 	console.log(seat1);
 	seat1.style.fill="red";
 	document.getElementById('S1-6').style.fill="yellow";
+    */
+
 	var resBox = document.getElementById('reservation');
 	var addFormDiv = document.getElementById('addFormDiv');
 	var addForm = document.getElementById('addForm');

@@ -32,14 +32,13 @@ public class MyMessage {
     @Produces(MediaType.APPLICATION_JSON)
     public List<Reservation> getReservation() {
         List<Reservation> retList = da.getReservations();
-        //retList.add(new Reservation("Walker",4));
-        Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
-                "Serving: "+retList.get(0).reservationId);
-        //da.getReservations();
+        for (int i=0; i<retList.size(); i++) {
+            retList.set(i, retList.get(i).clone(da.getReservedSeatIds(retList.get(i))));
+        }
         return retList;
     }
 
-    List<Table> tables = new ArrayList<Table>() {{
+    public static List<Table> tables = new ArrayList<Table>() {{
 
         // parking lot side of sanctuary
         add(new Table( 1,TEN));
