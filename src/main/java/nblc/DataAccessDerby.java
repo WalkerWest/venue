@@ -42,9 +42,10 @@ public class DataAccessDerby implements DataAccess {
                         rs.getString("name"),
                         rs.getInt("seatQty")
                 ));
-                String logstr = String.format("%s\t%d",
+                String logstr = String.format("%s\t%d\t%d",
                         rs.getString("name"),
-                        rs.getInt("seatQty"));
+                        rs.getInt("seatQty"),
+                        rs.getLong("id"));
             }
         } catch (SQLException se) {
             logger.error(se.getMessage());

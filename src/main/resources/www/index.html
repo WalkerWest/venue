@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         reservations.forEach(function (r) {
           var opt = document.createElement('option');
-          opt.value=r.reservationId;
+          opt.value=r.resIdString;
           opt.innerHTML = r.name;
           resSel.appendChild(opt);
           r.reservedSeats.forEach(function (rs) {
@@ -146,6 +146,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("It's time to delete reservation "+resBox.value+"!");
         fetch(myHost+'/rest/deleteReservation?id='+resBox.value).then(response => {
           console.log("Back from delete routine");
+          setTimeout(function() {
+            location.reload(true);
+          },1500);
         });
     },false);
 	cancelAdd.addEventListener('click',function() {

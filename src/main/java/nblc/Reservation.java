@@ -13,6 +13,8 @@ public class Reservation implements Cloneable {
 	public int seatQty;
 	public long reservationId;
 
+	public String resIdString;
+
 	public ImmutableList<String> reservedSeats;
 
 	public String getName() { return name; }
@@ -34,6 +36,7 @@ public class Reservation implements Cloneable {
 		this.seatQty=seats;
 		if(resId!=null) this.reservationId = resId;
 		else this.reservationId = TSID.fast().toLong();
+		this.resIdString = Long.toString(this.reservationId);
 		if(seatList!=null) this.reservedSeats = ImmutableList.copyOf(seatList);
 	}
 
