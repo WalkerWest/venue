@@ -1,0 +1,21 @@
+{
+  "name": "venue-www",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^4.4.5"
+  },
+  "dependencies": {
+    "@ui5/webcomponents": "^1.18.0",
+    "@ui5/webcomponents-fiori": "^1.18.0",
+    "@ui5/webcomponents-icons": "^1.18.0",
+    "@ui5/webcomponents-icons-business-suite": "^1.18.0",
+    "@ui5/webcomponents-icons-tnt": "^1.18.0"
+  }
+}

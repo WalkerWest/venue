@@ -1,0 +1,80 @@
+import './style.css'
+import javascriptLogo from './javascript.svg'
+import viteLogo from '/vite.svg'
+import { setupCounter } from './counter.js'
+import "@ui5/webcomponents/dist/Button.js";
+import "@ui5/webcomponents-fiori/dist/Page.js"
+import "@ui5/webcomponents-fiori/dist/Bar.js";
+import "@ui5/webcomponents-icons/dist/AllIcons.js";
+import "@ui5/webcomponents-icons-tnt/dist/AllIcons.js";
+import "@ui5/webcomponents-icons-business-suite/dist/AllIcons.js";
+import "@ui5/webcomponents/dist/TabContainer"
+import "@ui5/webcomponents/dist/Tab"
+import "@ui5/webcomponents/dist/Label";
+import "@ui5/webcomponents/dist/Select";
+import "@ui5/webcomponents/dist/Option";
+
+/*
+document.querySelector('#app').innerHTML = `
+  <div>
+    <a href="https://vitejs.dev" target="_blank">
+      <img src="${viteLogo}" class="logo" alt="Vite logo" />
+    </a>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
+      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
+    </a>
+    <h1>Hello Vite!</h1>
+    <div class="card">
+      <button id="counter" type="button"></button>
+    </div>
+    <p class="read-the-docs">
+      Click on the Vite logo to learn more
+    </p>
+  </div>
+  <div>
+    <ui5-button>Hello UI5 Web Components</ui5-button>
+  </div>
+`
+setupCounter(document.querySelector('#counter'))
+*/
+
+document.querySelector('#app').innerHTML = `
+<body xmlns="http://www.w3.org/1999/xhtml">
+<ui5-page style="height: 500px; width:100%;" background-design="Solid">
+    <ui5-bar design="Header" slot="header" data-sap-ui-fastnavgroup="true">
+      <ui5-button
+        icon="home"
+        tooltip="Go home"
+        slot="startContent"
+        icon-only=""
+        has-icon=""
+      ></ui5-button>
+      <ui5-label slot="startContent">NBLC Christmas Tea</ui5-label>
+    </ui5-bar>
+    <div>
+    <ui5-tabcontainer fixed="" data-sap-ui-fastnavgroup="true">
+       <ui5-tab text="User" slot="default-1"></ui5-tab>
+       <ui5-tab text="Admin" slot="default-2" selected="">
+      <p class="content-paragraph">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Turpis massa sed
+        elementum tempus egestas sed sed risus pretium. Eget nullam non nisi est
+        sit amet facilisis. Imperdiet dui accumsan sit amet nulla facilisi
+        morbi. Sem viverra aliquet eget sit amet tellus cras adipiscing.
+        Faucibus purus in massa tempor nec. Egestas quis ipsum suspendisse
+        ultrices gravida dictum. Amet facilisis magna etiam tempor. Sapien et
+        ligula ullamcorper malesuada proin libero nunc consequat. Ac orci
+        phasellus egestas tellus. Quis imperdiet massa tincidunt nunc.
+      </p>
+          <ui5-label for="resSelect" show-colon>Selected Reservation</ui5-label>
+	  <ui5-select id="resSelect" style="--_ui5-v1-18-0-input-icons-count: 2;">
+	    <ui5-option icon="iphone">Phone</ui5-option>
+	    <ui5-option icon="ipad">Tablet</ui5-option>
+	    <ui5-option icon="laptop" selected="">Desktop</ui5-option>
+	  </ui5-select>           
+       </ui5-tab>
+    </ui5-tabcontainer>
+    </div>
+</ui5-page>
+</body>
+`

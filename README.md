@@ -111,3 +111,9 @@ Remember, to access Google Drive, this app requires the following environment va
 
 * Run:  `npm install -g browser-sync`
 
+## SAP UI5 Controls
+
+* [UI5 Web Components](https://sap.github.io/ui5-webcomponents/)
+* `npm run dev`
+* `npx vite build`
+

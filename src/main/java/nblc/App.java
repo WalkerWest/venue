@@ -40,12 +40,21 @@ public class App
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
 
-		// Setup context for static content
 		server.setDumpAfterStart(false);
+
+		// Setup context for static content
 		String webDir = App.class.getProtectionDomain().
 				getCodeSource().getLocation().toExternalForm();
 		logger.info("The webDir is: "+webDir);
 		WebAppContext webAppContext = new WebAppContext(webDir,"/");
+
+		// Setup context for responsive content
+		/*
+		String webDir2 = App.class.getProtectionDomain().
+				getCodeSource().getLocation().toExternalForm();
+		logger.info("The webDir is: "+webDir2);
+		WebAppContext webAppContext2 = new WebAppContext(webDir2,"/r");
+		*/
 
 		// Setup for RESTful calls
 		ServletContextHandler ctx =
@@ -53,7 +62,7 @@ public class App
 		ctx.setContextPath("/rest");
 
 		HandlerCollection handlerCollection = new HandlerCollection();
-		handlerCollection.setHandlers(new Handler[] {ctx, webAppContext});
+		handlerCollection.setHandlers(new Handler[] {ctx, webAppContext /*, webAppContext2*/});
 		server.setHandler(handlerCollection);
 
 		ServletHolder serHol = ctx.addServlet(ServletContainer.class, "/*");
@@ -73,6 +82,17 @@ public class App
 			webAppContext.setInitParameter(
 					"org.eclipse.jetty.servlet.Default.dirAllowed","false");
 		}
+
+		// Load static content for responsive website.
+		/*
+		URL webAppDir2 = App.class.getClassLoader().getResource("./venue-www");
+		if (webAppDir2!=null)
+			webAppContext2.setResourceBase(webAppDir2.toURI().toString());
+		else {
+			webAppContext2.setInitParameter(
+					"org.eclipse.jetty.servlet.Default.dirAllowed","false");
+		}
+		*/
 
 		// Start the server!
 		server.start();
