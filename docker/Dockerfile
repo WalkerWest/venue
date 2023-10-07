@@ -52,9 +52,28 @@ EXPOSE 8080
 RUN mkdir /app
 WORKDIR "/app"
 RUN git clone https://github.com/WalkerWest/venue.git
+
+WORKDIR "/app/venue/venue-www"
+
+RUN yum -y install tar
+
+ENV NVM_DIR /root/.nvm
+ENV NODE_VERSION v16.20.2
+
+RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.0/install.sh | bash \
+  && . $NVM_DIR/nvm.sh \
+  && nvm install $NODE_VERSION \
+  && nvm use $NODE_VERSION
+ENV NODE_PATH $NVM_DIR/$NODE_VERSION/lib/node_modules
+ENV PATH $NVM_DIR/versions/node/$NODE_VERSION/bin:$PATH
+
+RUN npm install
+RUN npx vite build
+
 WORKDIR "/app/venue"
 RUN mvn clean compile assembly:single
 
 # CMD /root/startup.sh
+
 WORKDIR "/app/venue"
 ENTRYPOINT ["java", "-jar", "target/tea-1.0-SNAPSHOT-jar-with-dependencies.jar"]

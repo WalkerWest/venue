@@ -47,6 +47,15 @@ document.querySelector('#app').innerHTML = `
 setupCounter(document.querySelector('#counter'))
 */
 
+if(!String.prototype.replaceAll) {
+    String.prototype.replaceAll = function(str, newStr) {
+        if(Object.prototype.toString.call(str).toLowerCase() === '[object regex]') {
+            return this.replace(str,newStr);
+        }
+        return this.replace(new RegExp(str,'g'),newStr);
+    }
+}
+
 document.querySelector('#app').innerHTML = `
 <body xmlns="http://www.w3.org/1999/xhtml">
 <ui5-page style="" background-design="Solid">
