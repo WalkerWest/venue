@@ -116,4 +116,6 @@ Remember, to access Google Drive, this app requires the following environment va
 * [UI5 Web Components](https://sap.github.io/ui5-webcomponents/)
 * `npm run dev`
 * `npx vite build`
+* [SVG Pan Zoom](https://github.com/bumbu/svg-pan-zoom)
+* [UI5 Wizard](https://sap.github.io/ui5-webcomponents/playground/?path=/story/fiori-wizard--page-mode)
 
