@@ -16,6 +16,7 @@
     "@ui5/webcomponents-fiori": "^1.18.0",
     "@ui5/webcomponents-icons": "^1.18.0",
     "@ui5/webcomponents-icons-business-suite": "^1.18.0",
-    "@ui5/webcomponents-icons-tnt": "^1.18.0"
+    "@ui5/webcomponents-icons-tnt": "^1.18.0",
+    "svg-pan-zoom": "^3.6.1"
   }
 }

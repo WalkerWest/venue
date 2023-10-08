@@ -22,6 +22,7 @@ import "@ui5/webcomponents/dist/Table.js";
 import "@ui5/webcomponents/dist/TableColumn.js";
 import "@ui5/webcomponents/dist/TableRow.js";
 import "@ui5/webcomponents/dist/TableCell.js";
+import "svg-pan-zoom/dist/svg-pan-zoom.js";
 
 /*
 document.querySelector('#app').innerHTML = `
@@ -55,6 +56,18 @@ if(!String.prototype.replaceAll) {
         return this.replace(new RegExp(str,'g'),newStr);
     }
 }
+
+window.onload = function() { 
+	svgPanZoom('#venue-layout',{ 
+		zoomEnabled: true, controlIconsEnabled: true,
+		fit: 1, center: 1 
+	}); 
+	$(window).resize(function() {
+		panZoom.resize();
+		panZoom.fit();
+		panZoom.center();
+	});
+};
 
 document.querySelector('#app').innerHTML = `
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -112,7 +125,8 @@ document.querySelector('#app').innerHTML = `
 							</ui5-table-row>
 					</ui5-card>
 					<div style="margin-top:15px;">
-						<img src="${sanctuary}" />
+						<object id="venue-layout" style="display: inline; width: 100%; height:100%;" data="${sanctuary}" version="1.1"/>
+						<!--<img src="${sanctuary}" />-->
 					</div>
 				</div>
 			</ui5-tab>
