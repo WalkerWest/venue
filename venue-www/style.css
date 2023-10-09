@@ -60,6 +60,8 @@ h1 {
   padding: 2em;
 }
 
+ui5-page::part(content) { padding-left:0px;padding-right:0px; }
+
 .read-the-docs {
   color: #888;
 }
