@@ -187,7 +187,7 @@ document.querySelector('#app').innerHTML = `
 						</div>
 						<div style="margin-top:10px;margin-left:15px;">
 							<ui5-label show-colon>Number in Party</ui5-label>
-							<ui5-slider min="1" max="18" label-interval="1" show-tickmarks="" style="height:75px;"></ui5-slider>
+							<ui5-slider min="1" max="18" label-interval="1" show-tickmarks="" show-tooltip="" style="height:75px;"></ui5-slider>
 						</div>
 						<ui5-table style="margin-block-end: 0.75rem;" data-sap-ui-fastnavgroup="true">
 							<ui5-table-column slot="columns" popin-display="Inline">
