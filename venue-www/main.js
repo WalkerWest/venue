@@ -22,39 +22,40 @@ import "@ui5/webcomponents/dist/Table.js";
 import "@ui5/webcomponents/dist/TableColumn.js";
 import "@ui5/webcomponents/dist/TableRow.js";
 import "@ui5/webcomponents/dist/TableCell.js";
+import "@ui5/webcomponents-fiori/dist/Wizard.js";
 import "svg-pan-zoom/dist/svg-pan-zoom.js";
 
 /*
 document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-  <div>
-    <ui5-button>Hello UI5 Web Components</ui5-button>
-  </div>
+	<div>
+		<a href="https://vitejs.dev" target="_blank">
+			<img src="${viteLogo}" class="logo" alt="Vite logo" />
+		</a>
+		<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
+			<img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
+		</a>
+		<h1>Hello Vite!</h1>
+		<div class="card">
+			<button id="counter" type="button"></button>
+		</div>
+		<p class="read-the-docs">
+		Click on the Vite logo to learn more
+		</p>
+	</div>
+	<div>
+		<ui5-button>Hello UI5 Web Components</ui5-button>
+	</div>
 `
 setupCounter(document.querySelector('#counter'))
 */
 
 if(!String.prototype.replaceAll) {
-    String.prototype.replaceAll = function(str, newStr) {
-        if(Object.prototype.toString.call(str).toLowerCase() === '[object regex]') {
-            return this.replace(str,newStr);
-        }
-        return this.replace(new RegExp(str,'g'),newStr);
-    }
+	String.prototype.replaceAll = function(str, newStr) {
+		if(Object.prototype.toString.call(str).toLowerCase() === '[object regex]') {
+			return this.replace(str,newStr);
+		}
+		return this.replace(new RegExp(str,'g'),newStr);
+	}
 }
 
 window.onload = function() { 
@@ -78,7 +79,45 @@ document.querySelector('#app').innerHTML = `
 	</ui5-bar>
 	<div>
 		<ui5-tabcontainer fixed="true" data-sap-ui-fastnavgroup="true" style="">
-			<ui5-tab text="User" slot="default-1"></ui5-tab>
+			<ui5-tab text="User" slot="default-1">
+				<ui5-wizard
+						content-layout="SingleStep"
+						id="wiz-1"
+						data-sap-ui-fastnavgroup="true"
+						width="0"
+						content-height="0">
+					<ui5-wizard-step
+							icon="email"
+							title-text="E-mail"
+							slot="default-1">
+					</ui5-wizard-step>
+					<ui5-wizard-step
+							icon="collaborate"
+							title-text="Party"
+							slot="default-2">
+					</ui5-wizard-step>
+					<ui5-wizard-step
+							icon="sys-find"
+							title-text="Seats"
+							slot="default-3">
+					</ui5-wizard-step>
+					<ui5-wizard-step
+							icon="hr-approval"
+							title-text="Assign"
+							slot="default-4">
+					</ui5-wizard-step>
+					<ui5-wizard-step
+							icon="credit-card"
+							title-text="Payment"
+							slot="default-5">
+					</ui5-wizard-step>
+					<!--<ui5-wizard-step
+							icon="decision"
+							title-text="Confirm"
+							slot="default-6">
+					</ui5-wizard-step>-->
+				</ui5-wizard>
+			</ui5-tab>
 			<ui5-tab text="Admin" slot="default-2" selected=""> 
 				<div> 
 					<div>
@@ -109,19 +148,19 @@ document.querySelector('#app').innerHTML = `
 								<ui5-label>Seat</ui5-label>
 							</ui5-table-column>
 							<ui5-table-row slot="default-1">
-		  						<ui5-table-cell slot="default-1">
+									<ui5-table-cell slot="default-1">
 									<ui5-input value="Name" style="--_ui5-v1-18-0-input-icons-count: 0;"></ui5-input>
-		  						</ui5-table-cell>
-		  						<ui5-table-cell slot="default-2">
+									</ui5-table-cell>
+									<ui5-table-cell slot="default-2">
 									<ui5-select style="--_ui5-v1-18-0-input-icons-count: 2;">
 										<ui5-option selected="">Select One</ui5-option>
 									</ui5-select>
-		  						</ui5-table-cell>
-		  						<ui5-table-cell slot="default-3">
+									</ui5-table-cell>
+									<ui5-table-cell slot="default-3">
 									<ui5-select style="--_ui5-v1-18-0-input-icons-count: 2;">
 										<ui5-option selected="">Select One</ui5-option>
 									</ui5-select>
-		  						</ui5-table-cell>
+									</ui5-table-cell>
 							</ui5-table-row>
 					</ui5-card>
 					<div style="margin-top:15px;">
@@ -135,3 +174,4 @@ document.querySelector('#app').innerHTML = `
 </ui5-page>
 </body>
 `
+
