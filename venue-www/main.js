@@ -59,74 +59,68 @@ if(!String.prototype.replaceAll) {
 	}
 }
 
+var eventsHandler;
+
 window.onload = function() { 
-	var eventsHandler;
-
-	eventsHandler = {
-	 haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel']
-	, init: function(options) {
-		var instance = options.instance
-		  , initialScale = 1
-		  , pannedX = 0
-		  , pannedY = 0
-
-		// Init Hammer
-		// Listen only for pointer and touch events
-		this.hammer = Hammer(options.svgElement, {
-		  inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
-		})
-
-		// Enable pinch
-		this.hammer.get('pinch').set({enable: true})
-
-		// Handle double tap
-		this.hammer.on('doubletap', function(ev){
-		  instance.zoomIn()
-		})
-
-		// Handle pan
-		this.hammer.on('panstart panmove', function(ev){
-		  // On pan start reset panned variables
-		  if (ev.type === 'panstart') {
-			 pannedX = 0
-			 pannedY = 0
-		  }
-
-		  // Pan only the difference
-		  instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY})
-		  pannedX = ev.deltaX
-		  pannedY = ev.deltaY
-		})
-
-		// Handle pinch
-		this.hammer.on('pinchstart pinchmove', function(ev){
-		  // On pinch start remember initial zoom
-		  if (ev.type === 'pinchstart') {
-			 initialScale = instance.getZoom()
-			 instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y})
-		  }
-
-		  instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y})
-		})
-
-		// Prevent moving the page on some devices when panning over SVG
-		options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
-	 }
-
-	, destroy: function(){
-		this.hammer.destroy()
-	 }
-	}
-	svgPanZoom('#venue-layout',{ 
+	setupPinchZoom();
+	var panZoom = window.panZoom = svgPanZoom('#venue-layout',{ 
 		zoomEnabled: true, controlIconsEnabled: true,
-		fit: 1, center: 1, customEventsHandler: eventsHandler 
+		fit: 1, center: 1, customEventsHandler: eventsHandler
 	}); 
-	$(window).resize(function() {
-		panZoom.resize();
-		panZoom.fit();
-		panZoom.center();
-	});
 };
+
+window.onresize = function() {
+	panZoom.resize();
+	panZoom.fit();
+	panZoom.center();
+};
+
+function setupPinchZoom() {
+	eventsHandler = {
+		haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel']
+		, init: function(options) {
+			var instance = options.instance, initialScale = 1, pannedX = 0, pannedY = 0
+
+			// Init Hammer
+			// Listen only for pointer and touch events
+			this.hammer = Hammer(options.svgElement, {
+				inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+			})
+
+			// Enable pinch
+			this.hammer.get('pinch').set({enable: true})
+
+			// Handle double tap
+			this.hammer.on('doubletap', function(ev){ instance.zoomIn(); })
+
+			// Handle pan
+			this.hammer.on('panstart panmove', function(ev){
+				// On pan start reset panned variables
+				if (ev.type === 'panstart') { pannedX = 0; pannedY = 0; }
+
+				// Pan only the difference
+				instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY})
+				pannedX = ev.deltaX; pannedY = ev.deltaY
+			})
+
+			// Handle pinch
+			this.hammer.on('pinchstart pinchmove', function(ev){
+				// On pinch start remember initial zoom
+				if (ev.type === 'pinchstart') {
+					initialScale = instance.getZoom()
+					instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y})
+				}
+				instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y})
+			})
+
+			// Prevent moving the page on some devices when panning over SVG
+			document.getElementById("venue-layout").addEventListener('touchmove', function(e){ e.preventDefault(); });
+		}, destroy: function(){
+			this.hammer.destroy()
+		}
+	}
+}
+
 
 document.querySelector('#app').innerHTML = `
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -193,7 +187,7 @@ document.querySelector('#app').innerHTML = `
 						</div>
 						<div style="margin-top:10px;margin-left:15px;">
 							<ui5-label show-colon>Number in Party</ui5-label>
-							<ui5-slider min="1" max="18" label-interval="1" show-tickmarks="" show-tooltip="" style="height:75px;"></ui5-slider>
+							<ui5-slider min="1" max="18" label-interval="1" show-tickmarks="" style="height:75px;"></ui5-slider>
 						</div>
 						<ui5-table style="margin-block-end: 0.75rem;" data-sap-ui-fastnavgroup="true">
 							<ui5-table-column slot="columns" popin-display="Inline">
