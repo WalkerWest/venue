@@ -17,6 +17,7 @@
     "@ui5/webcomponents-icons": "^1.18.0",
     "@ui5/webcomponents-icons-business-suite": "^1.18.0",
     "@ui5/webcomponents-icons-tnt": "^1.18.0",
+    "hammerjs": "^2.0.8",
     "svg-pan-zoom": "^3.6.1"
   }
 }
