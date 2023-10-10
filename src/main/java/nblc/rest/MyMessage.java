@@ -123,7 +123,7 @@ public class MyMessage {
         }
     }
 
-    public HashMap<String,Long> confirmCodeList = new HashMap<String,Long>();
+    public HashMap<Long,String> confirmCodeList = new HashMap<Long,String>();
 
     @POST
     @Produces(MediaType.TEXT_HTML)
@@ -136,6 +136,7 @@ public class MyMessage {
                 "Time to send an e-mail to "+emailAddr+"!");
         long myId = TSID.fast().toLong();
         SendMailTls.send(emailAddr,myId);
+        confirmCodeList.put(myId,emailAddr);
     }
 
     @POST
@@ -143,11 +144,16 @@ public class MyMessage {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("verifyConfirmCode")
     public void verifyConfirmCode(
-            @FormParam("emailAddr") Long emailAddr,
             @FormParam("confirmCode") Long confirmCode
     ) {
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                 "Verify the following code: "+confirmCode+"!");
+        if(confirmCodeList.containsKey(confirmCode))
+            Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
+                    "Welcome back: "+confirmCodeList.get(confirmCode)+"!");
+        else
+            Logger.getLogger(MyMessage.class.getName()).log(Level.SEVERE,
+                    "Invalid confirm code: "+confirmCode);
     }
 
 
