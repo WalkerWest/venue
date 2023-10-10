@@ -99,6 +99,13 @@ public class App
 		logger.info("Server started!");
 		logger.info("Serving from: "+webAppContext.getResourceBase());
 
+		EnvironmentProperties env =
+				new DefaultEnvironmentProperties();
+		String EMAIL_TEST =
+				env.getEnvironmentProperties("email.test");
+		SendMailTls sm = new SendMailTls();
+		sm.SendMailTls(EMAIL_TEST);
+
 		new App();
 
 		// Keep the main thread alive while the server is running.

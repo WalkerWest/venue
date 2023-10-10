@@ -130,6 +130,7 @@ public class MyMessage {
     ) {
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                 "Time to send an e-mail to "+emailAddr+"!");
+
     }
 
     @POST
