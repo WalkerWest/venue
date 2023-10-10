@@ -121,5 +121,28 @@ public class MyMessage {
         }
     }
 
+    @POST
+    @Produces(MediaType.TEXT_HTML)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("emailConfirmation")
+    public void emailConfirmation(
+            @FormParam("emailAddr") String emailAddr
+    ) {
+        Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
+                "Time to send an e-mail to "+emailAddr+"!");
+    }
+
+    @POST
+    @Produces(MediaType.TEXT_HTML)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("verifyConfirmCode")
+    public void verifyConfirmCode(
+            @FormParam("confirmCode") Long confirmCode
+    ) {
+        Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
+                "Verify the following code: "+confirmCode+"!");
+    }
+
+
 }
 

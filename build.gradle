@@ -53,6 +53,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation 'javax.mail:javax.mail-api:1.6.2'
 }
 
 group = 'nblc'

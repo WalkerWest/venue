@@ -24,6 +24,8 @@ import "@ui5/webcomponents/dist/TableRow.js";
 import "@ui5/webcomponents/dist/TableCell.js";
 import "@ui5/webcomponents-fiori/dist/Wizard.js";
 import "svg-pan-zoom/dist/svg-pan-zoom.js";
+import "@ui5/webcomponents/dist/Title";
+import "@ui5/webcomponents/dist/features/InputElementsFormSupport.js"
 import "hammerjs/hammer.js";
 
 /*
@@ -121,7 +123,6 @@ function setupPinchZoom() {
 	}
 }
 
-
 document.querySelector('#app').innerHTML = `
 <body xmlns="http://www.w3.org/1999/xhtml">
 <ui5-page style="" background-design="Solid">
@@ -139,32 +140,69 @@ document.querySelector('#app').innerHTML = `
 						width="0"
 						content-height="0">
 					<ui5-wizard-step
-							icon="email"
+							icon="email" selected=""
 							title-text="E-mail"
 							slot="default-1">
+						<form id="emailAddrForm" 
+							action="/rest/emailConfirmation" method="post">
+						<ui5-title level="H3">1.&nbsp;&nbsp;E-mail Address</ui5-title>
+						<ui5-label wrapping-type="Normal" 
+							style="padding-top:10px;padding-bottom:10px;">
+						Please enter a valid e-mail address below.  A 
+						confirmation code and link will be sent to the address
+						for you to begin the registration process.
+						</ui5-label>
+						<nobr>
+						<ui5-label show-colon="" for="emailAddr" required="">
+							E-mail Address</ui5-label>
+						<ui5-input name="emailAddr" id="emailAddr" required="" 
+							type="Email" placeholder="Enter your e-mail address">
+						</ui5-input>
+						</nobr>
+						<div style="padding-top:20px" id="toConfirmDiv">
+						<ui5-button design="Emphasized" id="wiz-1-toConfirm" 
+							type="Submit">E-mail Code
+						</ui5-button>
+						</div>
+						</form>
+						<form id="confirmCodeForm" style="display:none;"
+								action="/rest/verifyConfirmCode" method="post">
+							<nobr>
+							<ui5-label show-colon="" for="confirmCode" required="">
+								Confirmation Code</ui5-label>
+							<ui5-input name="confirmCode" id="confirmCode" required="" 
+								type="Number" placeholder="Enter code sent to your e-mail">
+							</ui5-input>
+							</nobr>
+							<div style="padding-top:20px" id="toStep2Div">
+							<ui5-button design="Emphasized" id="wiz-1-toStep2" 
+								type="Submit">Step 2
+							</ui5-button>
+							</div>
+						</form>
 					</ui5-wizard-step>
 					<ui5-wizard-step
-							icon="collaborate"
+							icon="collaborate" disabled=""
 							title-text="Party"
 							slot="default-2">
 					</ui5-wizard-step>
 					<ui5-wizard-step
-							icon="sys-find"
+							icon="sys-find" disabled=""
 							title-text="Seats"
 							slot="default-3">
 					</ui5-wizard-step>
 					<ui5-wizard-step
-							icon="hr-approval"
+							icon="hr-approval" disabled=""
 							title-text="Assign"
 							slot="default-4">
 					</ui5-wizard-step>
 					<ui5-wizard-step
-							icon="credit-card"
+							icon="credit-card" disabled=""
 							title-text="Payment"
 							slot="default-5">
 					</ui5-wizard-step>
 					<!--<ui5-wizard-step
-							icon="decision"
+							icon="decision" disabled=""
 							title-text="Confirm"
 							slot="default-6">
 					</ui5-wizard-step>-->
@@ -227,3 +265,21 @@ document.querySelector('#app').innerHTML = `
 </body>
 `
 
+document.getElementById('emailAddrForm').
+		addEventListener('submit',function(event) {
+	if(window.location.href.includes(5173)) event.preventDefault();
+	var mailAddr = document.getElementById("emailAddr");
+	mailAddr.disabled=true;
+	document.getElementById("toConfirmDiv").hidden=true;
+	document.getElementById("confirmCodeForm").style.display="block";
+	console.log("Ready to send an e-mail to "+mailAddr.value+"!");
+},false);
+
+/*
+document.getElementById("wiz-1-toStep2").onclick = function() {
+	this.dis
+	var mailAddr = document.getElementById("emailAddr").value;
+	mailAddr.disable=true;
+	console.log("Ready to send an e-mail to "+mailAddr+"!");
+};
+*/
