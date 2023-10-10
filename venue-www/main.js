@@ -126,15 +126,15 @@ function setupPinchZoom() {
 }
 
 var modifyInProgress= false;
-var svgTagged = false;
+//var svgTagged = false;
 
 function testNotify(e) {
-	if(!modifyInProgress && !svgTagged) {
+	if(!modifyInProgress && document.querySelector('#venue-layout')!=null) {
 		modifyInProgress=true;
 		setTimeout(function() {
 			console.log("Dom modified!");
 			modifyInProgress=false;
-			svgTagged=true;
+			//svgTagged=true;
 			tagSvg();
 		},1000);
 	}
