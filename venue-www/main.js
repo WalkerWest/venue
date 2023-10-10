@@ -63,9 +63,9 @@ if(!String.prototype.replaceAll) {
 
 var eventsHandler;
 
-window.onload = function() { 
+window.onload = function() {
 	setupPinchZoom();
-	var panZoom = window.panZoom = svgPanZoom('#venue-layout',{ 
+	var panZoom = window.panZoom = svgPanZoom('#venue-layout',{
 		zoomEnabled: true, controlIconsEnabled: true,
 		fit: 1, center: 1, customEventsHandler: eventsHandler
 	});
@@ -178,7 +178,7 @@ document.querySelector('#app').innerHTML = `
 							</nobr>
 							<div style="padding-top:20px" id="toStep2Div">
 							<ui5-button design="Emphasized" id="wiz-1-toStep2" 
-								type="Submit">Step 2
+								type="Button">Step 2
 							</ui5-button>
 							</div>
 						</form>
@@ -268,7 +268,7 @@ document.querySelector('#app').innerHTML = `
 `
 
 document.getElementById('emailAddrForm').
-		addEventListener('submit',function(event) {
+addEventListener('submit',function(event) {
 	if(window.location.href.includes(5173)) event.preventDefault();
 	var mailAddr = document.getElementById("emailAddr");
 	mailAddr.disabled=true;
@@ -277,11 +277,20 @@ document.getElementById('emailAddrForm').
 	console.log("Ready to send an e-mail to "+mailAddr.value+"!");
 },false);
 
-/*
+var myHost = window.location.origin;
+
 document.getElementById("wiz-1-toStep2").onclick = function() {
-	this.dis
-	var mailAddr = document.getElementById("emailAddr").value;
-	mailAddr.disable=true;
-	console.log("Ready to send an e-mail to "+mailAddr+"!");
+	var confirmCode = document.getElementById("confirmCode").value;
+	console.log("Ready to verify confirmation code "+confirmCode+"!");
+	fetch(myHost+'/rest/checkConfirmation?code='+confirmCode).then(response => {
+		response.json().then(r2 => {
+			if(r2==true) {
+				console.log("Code confirmed!");
+			} else {
+				console.log(r2);
+				console.log("Code denied!");
+			}
+		});
+	});
 };
-*/
+

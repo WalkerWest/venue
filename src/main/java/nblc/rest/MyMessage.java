@@ -143,19 +143,39 @@ public class MyMessage {
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("verifyConfirmCode")
-    public void verifyConfirmCode(
+    public boolean verifyConfirmCode(
             @FormParam("confirmCode") Long confirmCode
     ) {
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                 "Verify the following code: "+confirmCode+"!");
-        if(confirmCodeList.containsKey(confirmCode))
+        if(confirmCodeList.containsKey(confirmCode)) {
             Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                     "Welcome back: "+confirmCodeList.get(confirmCode)+"!");
-        else
+            return true;
+        }
+        else {
             Logger.getLogger(MyMessage.class.getName()).log(Level.SEVERE,
                     "Invalid confirm code: "+confirmCode);
+            return false;
+        }
     }
 
+    @Path("checkConfirmation") @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public boolean checkConfirmation(@QueryParam("code") long confirmCode) {
+        Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
+                "Verify the following code: "+confirmCode+"!");
+        if(confirmCodeList.containsKey(confirmCode)) {
+            Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
+                    "Welcome back: "+confirmCodeList.get(confirmCode)+"!");
+            return true;
+        }
+        else {
+            Logger.getLogger(MyMessage.class.getName()).log(Level.SEVERE,
+                    "Invalid confirm code: "+confirmCode);
+            return false;
+        }
+    }
 
 }
 
