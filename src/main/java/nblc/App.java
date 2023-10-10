@@ -103,8 +103,7 @@ public class App
 				new DefaultEnvironmentProperties();
 		String EMAIL_TEST =
 				env.getEnvironmentProperties("email.test");
-		SendMailTls sm = new SendMailTls();
-		sm.SendMailTls(EMAIL_TEST);
+		SendMailTls.send(EMAIL_TEST);
 
 		new App();
 

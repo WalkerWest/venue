@@ -6,12 +6,14 @@ import javax.ws.rs.core.MediaType;
 import javax.inject.Inject;
 import javax.ws.rs.core.MultivaluedMap;
 
+import io.hypersistence.tsid.TSID;
 import nblc.*;
 import static nblc.TableType.*;
 
 import org.glassfish.hk2.api.Immediate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -121,6 +123,8 @@ public class MyMessage {
         }
     }
 
+    public HashMap<String,Long> confirmCodeList = new HashMap<String,Long>();
+
     @POST
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -130,7 +134,8 @@ public class MyMessage {
     ) {
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                 "Time to send an e-mail to "+emailAddr+"!");
-
+        long myId = TSID.fast().toLong();
+        SendMailTls.send(emailAddr,myId);
     }
 
     @POST
@@ -138,6 +143,7 @@ public class MyMessage {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("verifyConfirmCode")
     public void verifyConfirmCode(
+            @FormParam("emailAddr") Long emailAddr,
             @FormParam("confirmCode") Long confirmCode
     ) {
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,

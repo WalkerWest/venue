@@ -68,13 +68,15 @@ window.onload = function() {
 	var panZoom = window.panZoom = svgPanZoom('#venue-layout',{ 
 		zoomEnabled: true, controlIconsEnabled: true,
 		fit: 1, center: 1, customEventsHandler: eventsHandler
-	}); 
-};
-
-window.onresize = function() {
-	panZoom.resize();
-	panZoom.fit();
-	panZoom.center();
+	});
+	window.onresize = function() {
+		var tryCount=0;
+		setTimeout(function() {
+			panZoom.resize();
+			panZoom.fit();
+			panZoom.center();
+		},100);
+	};
 };
 
 function setupPinchZoom() {

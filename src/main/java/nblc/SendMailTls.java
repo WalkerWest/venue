@@ -1,5 +1,8 @@
 package nblc;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.mail.*;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -9,6 +12,7 @@ import java.security.Security;
 import java.util.Properties;
 
 public class SendMailTls {
+    private static Logger logger = LogManager.getLogger(App.class);
     private static final EnvironmentProperties env =
             new DefaultEnvironmentProperties();
     private static final String EMAIL_ADDR =
@@ -18,7 +22,10 @@ public class SendMailTls {
     private static final String EMAIL_PASSWD =
             env.getEnvironmentProperties("email.passwd");
 
-    public void SendMailTls(String emailTo) {
+    public static void send(String emailTo) {
+        send(emailTo,null);
+    }
+    public static void send(String emailTo, Long confirmCode) {
         Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
         final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
 
@@ -35,36 +42,45 @@ public class SendMailTls {
                 "javax.net.ssl.SSLSocketFactory");
         prop.put("mail.smtp.auth", "true");
 
-        Session session = Session.getInstance(prop,
-                    new Authenticator() {
-                        protected PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(EMAIL_USERID, EMAIL_PASSWD);
-                        }
-                    });
+        int tryCount=0;
+        while(tryCount<=3) {
+            try {
+                if(tryCount>0) {
+                    logger.info("Trying email again...");
+                    Thread.sleep(1000);
+                }
+                tryCount++;
+                Session session = Session.getInstance(prop,
+                        new Authenticator() {
+                            protected PasswordAuthentication getPasswordAuthentication() {
+                                return new PasswordAuthentication(EMAIL_USERID, EMAIL_PASSWD);
+                            }
+                        });
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(EMAIL_ADDR));
+                message.setRecipients(
+                        Message.RecipientType.TO,
+                        InternetAddress.parse(emailTo)
+                );
+                if(confirmCode!=null) {
+                    message.setSubject("NBLC Tea Registration Code");
+                    message.setText("Dear Attendee,"
+                            + "\n\n Your registration code is: "+confirmCode);
+                } else {
+                    message.setSubject("Testing Gmail TLS");
+                    message.setText("Dear Mail Crawler,"
+                            + "\n\n Please do not spam my email!");
+                }
 
-        try {
+                Transport.send(message);
+                logger.info("Done sending email!");
 
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(EMAIL_ADDR));
-            message.setRecipients(
-                    Message.RecipientType.TO,
-                    InternetAddress.parse(emailTo)
-            );
-            message.setSubject("Testing Gmail TLS");
-            message.setText("Dear Mail Crawler,"
-                    + "\n\n Please do not spam my email!");
-
-            Transport.send(message);
-
-            System.out.println("Done");
-
-        } catch (AddressException e) {
-            throw new RuntimeException(e);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            } catch (MessagingException | InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+            break;
         }
-
     }
 
 
