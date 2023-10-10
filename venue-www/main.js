@@ -60,12 +60,12 @@ if(!String.prototype.replaceAll) {
 		return this.replace(new RegExp(str,'g'),newStr);
 	}
 }
-
 var eventsHandler;
 
-window.onload = function() {
+function tagSvg() {
+	console.log("Mutation observed!");
 	setupPinchZoom();
-	var panZoom = window.panZoom = svgPanZoom('#venue-layout',{
+	var panZoom = window.panZoom = svgPanZoom(document.querySelector('#venue-layout'),{
 		zoomEnabled: true, controlIconsEnabled: true,
 		fit: 1, center: 1, customEventsHandler: eventsHandler
 	});
@@ -124,6 +124,25 @@ function setupPinchZoom() {
 		}
 	}
 }
+
+var modifyInProgress= false;
+var svgTagged = false;
+
+function testNotify(e) {
+	if(!modifyInProgress && !svgTagged) {
+		modifyInProgress=true;
+		setTimeout(function() {
+			console.log("Dom modified!");
+			modifyInProgress=false;
+			svgTagged=true;
+			tagSvg();
+		},1000);
+	}
+}
+//window.onload = function() {
+var elementToObserve = document.getElementById('app');
+elementToObserve.addEventListener('DOMSubtreeModified',testNotify);
+//}
 
 document.querySelector('#app').innerHTML = `
 <body xmlns="http://www.w3.org/1999/xhtml">
