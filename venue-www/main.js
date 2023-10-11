@@ -160,7 +160,7 @@ document.querySelector('#app').innerHTML = `
 						data-sap-ui-fastnavgroup="true"
 						width="0"
 						content-height="0">
-					<ui5-wizard-step
+					<ui5-wizard-step id="step1"
 							icon="email" selected=""
 							title-text="E-mail"
 							slot="default-1">
@@ -173,28 +173,28 @@ document.querySelector('#app').innerHTML = `
 						confirmation code and link will be sent to the address
 						for you to begin the registration process.
 						</ui5-label>
-						<nobr>
-						<ui5-label show-colon="" for="emailAddr" required="">
-							E-mail Address</ui5-label>
-						<ui5-input name="emailAddr" id="emailAddr" required="" 
-							type="Email" placeholder="Enter your e-mail address">
-						</ui5-input>
-						</nobr>
+						<div style="margin-top:10px;margin-left:15px;">
+							<ui5-label show-colon="" for="emailAddr" required="">
+								E-mail</ui5-label>
+							<ui5-input name="emailAddr" id="emailAddr" required="" 
+								type="Email" placeholder="Enter your e-mail address">
+							</ui5-input>
+						</div>
 						<div style="padding-top:20px" id="toConfirmDiv">
-						<ui5-button design="Emphasized" id="wiz-1-toConfirm" 
-							type="Submit">E-mail Code
-						</ui5-button>
+							<ui5-button design="Emphasized" id="wiz-1-toConfirm" 
+								type="Submit">E-mail Code
+							</ui5-button>
 						</div>
 						</form>
 						<form id="confirmCodeForm" style="display:none;"
 								action="/rest/verifyConfirmCode" method="post">
-							<nobr>
-							<ui5-label show-colon="" for="confirmCode" required="">
-								Confirmation Code</ui5-label>
-							<ui5-input name="confirmCode" id="confirmCode" required="" 
-								type="Number" placeholder="Enter code sent to your e-mail">
-							</ui5-input>
-							</nobr>
+							<div style="margin-top:10px;margin-left:15px;">
+								<ui5-label show-colon="" for="confirmCode" required="">
+									Code</ui5-label>
+								<ui5-input name="confirmCode" id="confirmCode" required="" 
+									type="Number" placeholder="Enter code sent to your e-mail">
+								</ui5-input>
+							</div>
 							<div style="padding-top:20px" id="toStep2Div">
 							<ui5-button design="Emphasized" id="wiz-1-toStep2" 
 								type="Button">Step 2
@@ -203,9 +203,27 @@ document.querySelector('#app').innerHTML = `
 						</form>
 					</ui5-wizard-step>
 					<ui5-wizard-step
+							id="step2"
 							icon="collaborate" disabled=""
 							title-text="Party"
 							slot="default-2">
+						<ui5-title level="H3">2.&nbsp;&nbsp;Party Identification</ui5-title>
+						<div style="margin-top:10px;margin-left:15px;">
+							<ui5-label show-colon>Number in Party</ui5-label>
+							<ui5-slider min="1" max="18" label-interval="1" 
+								show-tickmarks="" show-tooltip="" id="partyNum" 
+								style="height:75px;"></ui5-slider>
+							<div style="margin-top:10px;margin-left:15px;" id="peopleList">
+								<ui5-label show-colon>Person #1</ui5-label>
+								<ui5-input placeholder="First and last name" 
+									style="--_ui5-v1-18-0-input-icons-count: 0;">
+								</ui5-input>
+							</div>
+						</div>
+						<div style="padding-top:20px" id="toStep3Div">
+						<ui5-button design="Emphasized" id="wiz-2-toStep3" 
+							type="Button">Step 3</ui5-button>
+						</div>
 					</ui5-wizard-step>
 					<ui5-wizard-step
 							icon="sys-find" disabled=""
@@ -301,10 +319,12 @@ var myHost = window.location.origin;
 document.getElementById("wiz-1-toStep2").onclick = function() {
 	var confirmCode = document.getElementById("confirmCode").value;
 	console.log("Ready to verify confirmation code "+confirmCode+"!");
+	if(window.location.href.includes(5173)) { gotoPanel2(); return; }
 	fetch(myHost+'/rest/checkConfirmation?code='+confirmCode).then(response => {
 		response.json().then(r2 => {
 			if(r2==true) {
 				console.log("Code confirmed!");
+				gotoPanel2();
 			} else {
 				console.log(r2);
 				console.log("Code denied!");
@@ -312,4 +332,44 @@ document.getElementById("wiz-1-toStep2").onclick = function() {
 		});
 	});
 };
+
+function gotoPanel2() {
+	document.getElementById("confirmCode").disabled=true;
+	document.getElementById("step2").disabled=false;
+	document.getElementById("step1").selected=false;
+	document.getElementById("step2").selected=true;
+}
+
+var selectedNum = 1;
+var partyNum = document.getElementById('partyNum');
+partyNum.addEventListener('change',function() {
+	console.log("Party number changed to "+partyNum.value);
+	while(partyNum.value>selectedNum) {
+		console.log('append clone');
+		cloneName(); selectedNum++;
+	}
+	while(partyNum.value<selectedNum) { deleteRow(); selectedNum--; }
+	selectedNum=Number(partyNum.value);
+},false);
+
+function cloneName() {
+	var myDiv = document.getElementById("peopleList"); // find table to append to
+
+	var myBr = document.createElement("br");
+
+	var myLabel = document.createElement("ui5-label");
+	myLabel.setAttribute("show-colon","");
+	myLabel.innerText="Person #"+(Number(selectedNum)+1);
+
+	var myInput = document.createElement("ui5-input");
+	myInput.setAttribute("placeholder","First and last name");
+	myInput.setAttribute("style","--_ui5-v1-18-0-input-icons-count: 0;");
+
+	myDiv.appendChild(myBr);
+	myDiv.appendChild(myLabel).insertAdjacentHTML('afterend',"&nbsp;");
+	myDiv.appendChild(myInput);
+}
+
+
+
 
