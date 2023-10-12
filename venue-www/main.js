@@ -2,6 +2,7 @@ import './style.css'
 import javascriptLogo from './javascript.svg'
 import viteLogo from '/vite.svg'
 import sanctuary from '/sanctuary.svg'
+import sanctuary2 from '/sanctuary.svg'
 import { setupCounter } from './counter.js'
 import "@ui5/webcomponents/dist/Button.js";
 import "@ui5/webcomponents-fiori/dist/Page.js"
@@ -65,7 +66,7 @@ var eventsHandler;
 function tagSvg() {
 	console.log("Mutation observed!");
 	setupPinchZoom();
-	var panZoom = window.panZoom = svgPanZoom(document.querySelector('#venue-layout'),{
+	var panZoom = window.panZoom = svgPanZoom('#venue-layout',{
 		zoomEnabled: true, controlIconsEnabled: true,
 		fit: 1, center: 1, customEventsHandler: eventsHandler
 	});
@@ -208,7 +209,7 @@ document.querySelector('#app').innerHTML = `
 							title-text="Party"
 							slot="default-2">
 						<ui5-title level="H3">2.&nbsp;&nbsp;Party Identification</ui5-title>
-						<form>
+						<form id="partyIdForm">
 						<div style="margin-top:10px;margin-left:15px;">
 							<ui5-label show-colon>Number in Party</ui5-label>
 							<ui5-slider min="1" max="18" label-interval="1" 
@@ -229,6 +230,7 @@ document.querySelector('#app').innerHTML = `
 						</form>
 					</ui5-wizard-step>
 					<ui5-wizard-step
+							id="step3"
 							icon="sys-find" disabled=""
 							title-text="Seats"
 							slot="default-3">
@@ -377,3 +379,11 @@ function cloneName() {
 function deleteName() {
 	document.getElementById("personDiv"+selectedNum).remove();
 }
+
+document.getElementById('partyIdForm').
+addEventListener('submit',function(event) {
+	event.preventDefault();
+	document.getElementById("step3").disabled=false;
+	document.getElementById("step2").selected=false;
+	document.getElementById("step3").selected=true;
+},false);
