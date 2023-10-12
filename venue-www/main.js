@@ -208,22 +208,25 @@ document.querySelector('#app').innerHTML = `
 							title-text="Party"
 							slot="default-2">
 						<ui5-title level="H3">2.&nbsp;&nbsp;Party Identification</ui5-title>
+						<form>
 						<div style="margin-top:10px;margin-left:15px;">
 							<ui5-label show-colon>Number in Party</ui5-label>
 							<ui5-slider min="1" max="18" label-interval="1" 
 								show-tickmarks="" show-tooltip="" id="partyNum" 
 								style="height:75px;"></ui5-slider>
 							<div style="margin-top:10px;margin-left:15px;" id="peopleList">
-								<ui5-label show-colon>Person #1</ui5-label>
-								<ui5-input placeholder="First and last name" 
+								<ui5-label required show-colon>Person #1</ui5-label>
+								<ui5-input id="person1" placeholder="First and last name"
+									required="" 
 									style="--_ui5-v1-18-0-input-icons-count: 0;">
 								</ui5-input>
 							</div>
 						</div>
 						<div style="padding-top:20px" id="toStep3Div">
 						<ui5-button design="Emphasized" id="wiz-2-toStep3" 
-							type="Button">Step 3</ui5-button>
+							type="Submit">Step 3</ui5-button>
 						</div>
+						</form>
 					</ui5-wizard-step>
 					<ui5-wizard-step
 							icon="sys-find" disabled=""
@@ -348,28 +351,29 @@ partyNum.addEventListener('change',function() {
 		console.log('append clone');
 		cloneName(); selectedNum++;
 	}
-	while(partyNum.value<selectedNum) { deleteRow(); selectedNum--; }
+	while(partyNum.value<selectedNum) { deleteName(); selectedNum--; }
 	selectedNum=Number(partyNum.value);
 },false);
 
 function cloneName() {
-	var myDiv = document.getElementById("peopleList"); // find table to append to
-
-	var myBr = document.createElement("br");
+	var newDiv = document.createElement("div");
+	newDiv.setAttribute("id","personDiv"+(Number(selectedNum)+1));
 
 	var myLabel = document.createElement("ui5-label");
 	myLabel.setAttribute("show-colon","");
+	myLabel.setAttribute("required","");
 	myLabel.innerText="Person #"+(Number(selectedNum)+1);
 
 	var myInput = document.createElement("ui5-input");
+	myInput.setAttribute("id","person"+(Number(selectedNum)+1));
+	myInput.setAttribute("required","");
 	myInput.setAttribute("placeholder","First and last name");
 	myInput.setAttribute("style","--_ui5-v1-18-0-input-icons-count: 0;");
 
-	myDiv.appendChild(myBr);
-	myDiv.appendChild(myLabel).insertAdjacentHTML('afterend',"&nbsp;");
-	myDiv.appendChild(myInput);
+	newDiv.appendChild(myLabel).insertAdjacentHTML('afterend',"&nbsp;");
+	newDiv.appendChild(myInput);
+	document.getElementById("peopleList").appendChild(newDiv);
 }
-
-
-
-
+function deleteName() {
+	document.getElementById("personDiv"+selectedNum).remove();
+}
