@@ -29,30 +29,6 @@ import "@ui5/webcomponents/dist/Title";
 import "@ui5/webcomponents/dist/features/InputElementsFormSupport.js"
 import "hammerjs/hammer.js";
 
-/*
-document.querySelector('#app').innerHTML = `
-	<div>
-		<a href="https://vitejs.dev" target="_blank">
-			<img src="${viteLogo}" class="logo" alt="Vite logo" />
-		</a>
-		<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-			<img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-		</a>
-		<h1>Hello Vite!</h1>
-		<div class="card">
-			<button id="counter" type="button"></button>
-		</div>
-		<p class="read-the-docs">
-		Click on the Vite logo to learn more
-		</p>
-	</div>
-	<div>
-		<ui5-button>Hello UI5 Web Components</ui5-button>
-	</div>
-`
-setupCounter(document.querySelector('#counter'))
-*/
-
 if(!String.prototype.replaceAll) {
 	String.prototype.replaceAll = function(str, newStr) {
 		if(Object.prototype.toString.call(str).toLowerCase() === '[object regex]') {
@@ -61,24 +37,13 @@ if(!String.prototype.replaceAll) {
 		return this.replace(new RegExp(str,'g'),newStr);
 	}
 }
-var eventsHandler;
 
-function tagSvg() {
-	console.log("Mutation observed!");
-	setupPinchZoom();
-	var panZoom = window.panZoom = svgPanZoom('#venue-layout',{
-		zoomEnabled: true, controlIconsEnabled: true,
-		fit: 1, center: 1, customEventsHandler: eventsHandler
-	});
-	window.onresize = function() {
-		var tryCount=0;
-		setTimeout(function() {
-			panZoom.resize();
-			panZoom.fit();
-			panZoom.center();
-		},100);
-	};
-};
+var myHost = window.location.origin;
+var eventsHandler;
+var modifyInProgress= false;
+var lastEmbed = null;
+var lastEventListener = null;
+var lastEmbedDiv = null;
 
 function setupPinchZoom() {
 	eventsHandler = {
@@ -119,31 +84,12 @@ function setupPinchZoom() {
 			})
 
 			// Prevent moving the page on some devices when panning over SVG
-			document.getElementById("venue-layout").addEventListener('touchmove', function(e){ e.preventDefault(); });
+			document.getElementById("sanctuary-layout").addEventListener('touchmove', function(e){ e.preventDefault(); });
 		}, destroy: function(){
 			this.hammer.destroy()
 		}
 	}
 }
-
-var modifyInProgress= false;
-//var svgTagged = false;
-
-function testNotify(e) {
-	if(!modifyInProgress && document.querySelector('#venue-layout')!=null) {
-		modifyInProgress=true;
-		setTimeout(function() {
-			console.log("Dom modified!");
-			modifyInProgress=false;
-			//svgTagged=true;
-			tagSvg();
-		},1000);
-	}
-}
-//window.onload = function() {
-var elementToObserve = document.getElementById('app');
-elementToObserve.addEventListener('DOMSubtreeModified',testNotify);
-//}
 
 document.querySelector('#app').innerHTML = `
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -153,7 +99,7 @@ document.querySelector('#app').innerHTML = `
 		<ui5-label slot="startContent">NBLC Christmas Tea</ui5-label>
 	</ui5-bar>
 	<div>
-		<ui5-tabcontainer fixed="true" data-sap-ui-fastnavgroup="true" style="">
+		<ui5-tabcontainer fixed="true" data-sap-ui-fastnavgroup="true" style="" id="tabs">
 			<ui5-tab text="User" slot="default-1">
 				<ui5-wizard
 						content-layout="SingleStep"
@@ -234,6 +180,7 @@ document.querySelector('#app').innerHTML = `
 							icon="sys-find" disabled=""
 							title-text="Seats"
 							slot="default-3">
+						<div style="margin-top:15px;" id="userSanctuaryLayoutContainer"></div>
 					</ui5-wizard-step>
 					<ui5-wizard-step
 							icon="hr-approval" disabled=""
@@ -297,9 +244,7 @@ document.querySelector('#app').innerHTML = `
 									</ui5-table-cell>
 							</ui5-table-row>
 					</ui5-card>
-					<div style="margin-top:15px;">
-						<object id="venue-layout" style="display: inline; width: 100%; height:100%;" data="${sanctuary}" version="1.1"/>
-						<!--<img src="${sanctuary}" />-->
+					<div style="margin-top:15px;" id="sanctuaryLayoutContainer">
 					</div>
 				</div>
 			</ui5-tab>
@@ -309,17 +254,19 @@ document.querySelector('#app').innerHTML = `
 </body>
 `
 
-document.getElementById('emailAddrForm').
-addEventListener('submit',function(event) {
-	if(window.location.href.includes(5173)) event.preventDefault();
+createNewEmbed("sanctuaryLayoutContainer");
+
+document.getElementById('emailAddrForm').addEventListener('submit',function(event) {
+	if(window.location.href.includes(5173)) {
+		console.log("Prevent form submission!");
+		event.preventDefault();
+	}
 	var mailAddr = document.getElementById("emailAddr");
 	mailAddr.disabled=true;
 	document.getElementById("toConfirmDiv").hidden=true;
 	document.getElementById("confirmCodeForm").style.display="block";
 	console.log("Ready to send an e-mail to "+mailAddr.value+"!");
 },false);
-
-var myHost = window.location.origin;
 
 document.getElementById("wiz-1-toStep2").onclick = function() {
 	var confirmCode = document.getElementById("confirmCode").value;
@@ -347,6 +294,7 @@ function gotoPanel2() {
 
 var selectedNum = 1;
 var partyNum = document.getElementById('partyNum');
+
 partyNum.addEventListener('change',function() {
 	console.log("Party number changed to "+partyNum.value);
 	while(partyNum.value>selectedNum) {
@@ -376,14 +324,83 @@ function cloneName() {
 	newDiv.appendChild(myInput);
 	document.getElementById("peopleList").appendChild(newDiv);
 }
+
 function deleteName() {
 	document.getElementById("personDiv"+selectedNum).remove();
 }
 
-document.getElementById('partyIdForm').
-addEventListener('submit',function(event) {
+document.getElementById('partyIdForm').addEventListener('submit',function(event) {
 	event.preventDefault();
 	document.getElementById("step3").disabled=false;
 	document.getElementById("step2").selected=false;
 	document.getElementById("step3").selected=true;
+	removeEmbed("sanctuaryLayoutContainer");
+	createNewEmbed("userSanctuaryLayoutContainer");
 },false);
+
+
+document.getElementById('tabs').addEventListener("tab-select", (e) => {
+	if(e.detail.tab.text=='Admin') {
+		console.log("Admin tab was clicked");
+		removeEmbed("userSanctuaryLayoutContainer");
+		createNewEmbed("sanctuaryLayoutContainer");
+	} else if(e.detail.tab.text=='User') {
+		console.log("User tab was clicked");
+		removeEmbed("sanctuaryLayoutContainer");
+		createNewEmbed("userSanctuaryLayoutContainer");
+	}
+},false);
+
+document.getElementById('wiz-1').addEventListener("step-change", (e) => {
+	if(e.detail.step.titleText=='Seats') {
+		console.log("Seats wizard step was clicked!");
+		removeEmbed("sanctuaryLayoutContainer");
+		createNewEmbed("userSanctuaryLayoutContainer");
+	}
+},false);
+
+function removeEmbed(src) {
+	if(lastEmbedDiv==src) {
+		console.log("Removing "+src+"; "+lastEmbed.src);
+		// Destroy svgpanzoom
+		svgPanZoom(lastEmbed).destroy();
+		// Remove event listener
+		lastEmbed.removeEventListener('load', lastEventListener);
+		// Null last event listener
+		lastEventListener = null
+		// Remove embed element
+		document.getElementById(src).removeChild(lastEmbed);
+		// Null reference to embed
+		lastEmbed = null;
+	}
+}
+
+function createNewEmbed(src) {
+	if(lastEmbedDiv==null || lastEmbedDiv!=src) {
+		lastEmbedDiv=src;
+		
+		var embed = document.createElement('embed');
+		embed.setAttribute('style','display: inline; width: 100%; height:100%;');
+		embed.setAttribute('id','sanctuary-layout');
+		embed.setAttribute('version','1.1');
+		embed.setAttribute('src','/sanctuary.svg');
+		document.getElementById(src).appendChild(embed);
+		lastEventListener = function() {
+			setupPinchZoom();
+			var panZoom = window.panZoom = svgPanZoom('#sanctuary-layout',{
+				zoomEnabled: true, controlIconsEnabled: true,
+				fit: 1, center: 1, customEventsHandler: eventsHandler
+			});
+			window.onresize = function() {
+				var tryCount=0;
+				setTimeout(function() {
+					panZoom.resize();
+					panZoom.fit();
+					panZoom.center();
+				},100);
+			};
+		};
+		embed.addEventListener('load',lastEventListener);
+		lastEmbed=embed;
+	}
+}
