@@ -28,6 +28,7 @@ import "svg-pan-zoom/dist/svg-pan-zoom.js";
 import "@ui5/webcomponents/dist/Title";
 import "@ui5/webcomponents/dist/features/InputElementsFormSupport.js"
 import "hammerjs/hammer.js";
+import '/ReservationSelector.js';
 
 if(!String.prototype.replaceAll) {
 	String.prototype.replaceAll = function(str, newStr) {
@@ -84,7 +85,9 @@ function setupPinchZoom() {
 			})
 
 			// Prevent moving the page on some devices when panning over SVG
-			document.getElementById("sanctuary-layout").addEventListener('touchmove', function(e){ e.preventDefault(); });
+			document.getElementById("sanctuary-layout").addEventListener('touchmove', function(e){
+				e.preventDefault();
+			});
 		}, destroy: function(){
 			this.hammer.destroy()
 		}
@@ -203,10 +206,11 @@ document.querySelector('#app').innerHTML = `
 				<div> 
 					<div>
 						<ui5-label for="resSelect" show-colon>Selected Reservation</ui5-label>
-						<ui5-select id="resSelect" style="--_ui5-v1-18-0-input-icons-count: 2;">
+						<!--<ui5-select id="resSelect" style="--_ui5-v1-18-0-input-icons-count: 2;">
 							<ui5-option selected="">Select One</ui5-option>
 							<ui5-option>Add New</ui5-option>
-						</ui5-select>
+						</ui5-select>-->
+						<reservation-selector/>
 					</div>
 					<ui5-card style="margin-top:15px;">
 						<ui5-card-header slot="header" title-text="Add Reservation"></ui5-card-header>
@@ -344,7 +348,7 @@ document.getElementById('tabs').addEventListener("tab-select", (e) => {
 		console.log("Admin tab was clicked");
 		removeEmbed("userSanctuaryLayoutContainer");
 		createNewEmbed("sanctuaryLayoutContainer");
-	} else if(e.detail.tab.text=='User') {
+	} else if(e.detail.tab.text=='User' && document.getElementById("step3").disabled==false) {
 		console.log("User tab was clicked");
 		removeEmbed("sanctuaryLayoutContainer");
 		createNewEmbed("userSanctuaryLayoutContainer");
