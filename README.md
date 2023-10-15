@@ -110,6 +110,16 @@ Remember, to access Google Drive, this app requires the following environment va
 ## Debugging Web Pages
 
 * Run:  `npm install -g browser-sync`
+* Run:  `npm install -g rollup`
+* Download package: `npm install --save @vaadin/router`
+* `wget --no-check-certificate https://sap.github.io/ui5-webcomponents/assets/js/ui5-webcomponents/bundle.esm-587a83d6.mjs`
+* Get docs:  `mdn htmlelement`; offline: `devdocs.io`
+* `https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js`
+* Copies lit, moment, and tables are on web server
+* `mdn resource hints`
+* `mdn fetch using`
+* `npm install --prefix . @ui5/webcomponents`
+
 
 ## SAP UI5 Controls
 
