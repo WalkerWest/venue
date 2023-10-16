@@ -1,9 +1,4 @@
 import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import sanctuary from '/sanctuary.svg'
-import sanctuary2 from '/sanctuary.svg'
-import { setupCounter } from './counter.js'
 import "@ui5/webcomponents/dist/Button.js";
 import "@ui5/webcomponents-fiori/dist/Page.js"
 import "@ui5/webcomponents-fiori/dist/Bar.js";
@@ -387,7 +382,7 @@ function createNewEmbed(src) {
 		embed.setAttribute('style','display: inline; width: 100%; height:100%;');
 		embed.setAttribute('id','sanctuary-layout');
 		embed.setAttribute('version','1.1');
-		embed.setAttribute('src','/sanctuary.svg');
+		embed.setAttribute('src','./sanctuary.svg');
 		document.getElementById(src).appendChild(embed);
 		lastEventListener = function() {
 			setupPinchZoom();
