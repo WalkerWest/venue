@@ -342,7 +342,7 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 	document.getElementById("step2").selected=false;
 	document.getElementById("step3").selected=true;
 	removeEmbed("sanctuaryLayoutContainer");
-	document.getElementsById("adminPicker").setAttribute("activated",0);
+	document.getElementById("adminPicker").setAttribute("activated",0);
 	document.getElementById("adminPicker").remove();
 	createNewEmbed("userSanctuaryLayoutContainer");
 },false);
