@@ -257,17 +257,11 @@ document.querySelector('#app').innerHTML = `
 
 createNewEmbed("sanctuaryLayoutContainer");
 
-//document.getElementsByTagName("seat-picker")[0].setAttribute("activated",1);
-// var element = document.createElement("seat-picker");
-// document.getElementById("adminPickerDiv").appendChild(element);
-// element.setAttribute("id","adminPicker");
-
 document.getElementById("adminPickerDiv").appendChild(
 	Object.assign(document.createElement("seat-picker"), {
 		id: "adminPicker"
 	})
 );
-
 
 document.getElementById('emailAddrForm').addEventListener('submit',function(event) {
 	if(window.location.href.includes(5173)) {
@@ -348,7 +342,7 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 	document.getElementById("step2").selected=false;
 	document.getElementById("step3").selected=true;
 	removeEmbed("sanctuaryLayoutContainer");
-	document.getElementsByTagName("seat-picker")[0].setAttribute("activated",0);
+	document.getElementsById("adminPicker").setAttribute("activated",0);
 	document.getElementById("adminPicker").remove();
 	createNewEmbed("userSanctuaryLayoutContainer");
 },false);
@@ -360,7 +354,6 @@ document.getElementById('tabs').addEventListener("tab-select", (e) => {
 		removeEmbed("userSanctuaryLayoutContainer");
 		createNewEmbed("sanctuaryLayoutContainer");
 
-		//document.getElementsByTagName("seat-picker")[0].setAttribute("activated",1);
 		document.getElementById("adminPickerDiv").appendChild(
 			Object.assign(document.createElement("seat-picker"), {
 				id: "adminPicker"
@@ -370,7 +363,7 @@ document.getElementById('tabs').addEventListener("tab-select", (e) => {
 	} else if(e.detail.tab.text=='User' && document.getElementById("step3").disabled==false) {
 		console.log("User tab was clicked");
 		removeEmbed("sanctuaryLayoutContainer");
-		document.getElementsByTagName("seat-picker")[0].setAttribute("activated",0);
+		document.getElementById("adminPicker").setAttribute("activated",0);
 		document.getElementById("adminPicker").remove();
 		createNewEmbed("userSanctuaryLayoutContainer");
 	}
@@ -380,7 +373,7 @@ document.getElementById('wiz-1').addEventListener("step-change", (e) => {
 	if(e.detail.step.titleText=='Seats') {
 		console.log("Seats wizard step was clicked!");
 		removeEmbed("sanctuaryLayoutContainer");
-		document.getElementsByTagName("seat-picker")[0].setAttribute("activated",0);
+		document.getElementById("adminPicker").setAttribute("activated",0);
 		document.getElementById("adminPicker").remove();
 		createNewEmbed("userSanctuaryLayoutContainer");
 	}
