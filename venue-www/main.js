@@ -342,8 +342,8 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 	document.getElementById("step2").selected=false;
 	document.getElementById("step3").selected=true;
 	removeEmbed("sanctuaryLayoutContainer");
-	document.getElementById("adminPicker").setAttribute("activated",0);
-	document.getElementById("adminPicker").remove();
+	document.getElementById("adminPicker")?.setAttribute("activated",0);
+	document.getElementById("adminPicker")?.remove();
 	createNewEmbed("userSanctuaryLayoutContainer");
 },false);
 
@@ -363,8 +363,8 @@ document.getElementById('tabs').addEventListener("tab-select", (e) => {
 	} else if(e.detail.tab.text=='User' && document.getElementById("step3").disabled==false) {
 		console.log("User tab was clicked");
 		removeEmbed("sanctuaryLayoutContainer");
-		document.getElementById("adminPicker").setAttribute("activated",0);
-		document.getElementById("adminPicker").remove();
+		document.getElementById("adminPicker")?.setAttribute("activated",0);
+		document.getElementById("adminPicker")?.remove();
 		createNewEmbed("userSanctuaryLayoutContainer");
 	}
 },false);
@@ -373,8 +373,8 @@ document.getElementById('wiz-1').addEventListener("step-change", (e) => {
 	if(e.detail.step.titleText=='Seats') {
 		console.log("Seats wizard step was clicked!");
 		removeEmbed("sanctuaryLayoutContainer");
-		document.getElementById("adminPicker").setAttribute("activated",0);
-		document.getElementById("adminPicker").remove();
+		document.getElementById("adminPicker")?.setAttribute("activated",0);
+		document.getElementById("adminPicker")?.remove();
 		createNewEmbed("userSanctuaryLayoutContainer");
 	}
 },false);
