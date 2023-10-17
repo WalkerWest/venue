@@ -40,6 +40,19 @@ public class MyMessage {
         return retList;
     }
 
+    @Path("reservedSeats") @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<String> getReservedSeats() {
+        List<String> seats = new ArrayList<String>();
+        List<Reservation> reservationList = da.getReservations();
+        for (int i=0; i<reservationList.size(); i++) {
+            for(String seat : da.getReservedSeatIds(reservationList.get(i))) {
+                seats.add(seat);
+            }
+        }
+        return seats;
+    }
+
     @Path("deleteReservation") @GET
     @Produces(MediaType.APPLICATION_JSON)
     public void deleteReservation(@QueryParam("id") long resId) {
