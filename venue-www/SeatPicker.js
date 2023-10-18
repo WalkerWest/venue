@@ -17,13 +17,13 @@ class SeatPicker extends HTMLElement {
 	connectedCallback() {
 		window.addEventListener('seatsReceived', e => this.onSeatsReceived(e));
 		fetchSeats();
-				console.log("Seat picker (new) just got connected for "+this.elementId+"!");
-				const template = html`
-					<embed style="display: inline; width: 100%; height: 100%;"
-						id=${this.elementId} version="1.1" src="./sanctuary.svg"
-						@load=${_=>this.onEmbedLoad()}>
-				`;
-				render(template,this);
+		console.log("Seat picker (new) just got connected for "+this.elementId+"!");
+		const template = html`
+			<embed style="display: inline; width: 100%; height: 100%;"
+				id=${this.elementId} version="1.1" src="./sanctuary.svg"
+				@load=${_=>this.onEmbedLoad()}>
+		`;
+		render(template,this);
 	}
 
 	static observedAttributes = ["activated","id"];
@@ -61,7 +61,8 @@ class SeatPicker extends HTMLElement {
 
 	onEmbedLoad() {
 		if(this.elementId!=null) {
-			this.setupPinchZoom();
+			console.log("Enhancing svg for "+this.elementId);
+			this.setupPinchZoom(this.elementId);
 			var panZoom = window.panZoom = svgPanZoom('#'+this.elementId,{
 				zoomEnabled: true, controlIconsEnabled: true,
 				fit: 1, center: 1, customEventsHandler: this.eventsHandler
@@ -97,7 +98,7 @@ class SeatPicker extends HTMLElement {
 		console.log(detail);
 	}
 
-	setupPinchZoom() {
+	setupPinchZoom(myElementId) {
 		this.eventsHandler = {
 			haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel']
 			, init: function(options) {
@@ -136,7 +137,7 @@ class SeatPicker extends HTMLElement {
 				})
 
 				// Prevent moving the page on some devices when panning over SVG
-				document.getElementById("sanctuary-layout").addEventListener('touchmove', function(e){
+				document.getElementById(myElementId).addEventListener('touchmove', function(e){
 					e.preventDefault();
 				});
 			}, destroy: function(){

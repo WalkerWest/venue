@@ -36,59 +36,6 @@ if(!String.prototype.replaceAll) {
 }
 
 var myHost = window.location.origin;
-var eventsHandler;
-var modifyInProgress= false;
-var lastEmbed = null;
-var lastEventListener = null;
-var lastEmbedDiv = null;
-
-function setupPinchZoom() {
-	eventsHandler = {
-		haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel']
-		, init: function(options) {
-			var instance = options.instance, initialScale = 1, pannedX = 0, pannedY = 0
-
-			// Init Hammer
-			// Listen only for pointer and touch events
-			this.hammer = Hammer(options.svgElement, {
-				inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
-			})
-
-			// Enable pinch
-			this.hammer.get('pinch').set({enable: true})
-
-			// Handle double tap
-			this.hammer.on('doubletap', function(ev){ instance.zoomIn(); })
-
-			// Handle pan
-			this.hammer.on('panstart panmove', function(ev){
-				// On pan start reset panned variables
-				if (ev.type === 'panstart') { pannedX = 0; pannedY = 0; }
-
-				// Pan only the difference
-				instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY})
-				pannedX = ev.deltaX; pannedY = ev.deltaY
-			})
-
-			// Handle pinch
-			this.hammer.on('pinchstart pinchmove', function(ev){
-				// On pinch start remember initial zoom
-				if (ev.type === 'pinchstart') {
-					initialScale = instance.getZoom()
-					instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y})
-				}
-				instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y})
-			})
-
-			// Prevent moving the page on some devices when panning over SVG
-			document.getElementById("sanctuary-layout").addEventListener('touchmove', function(e){
-				e.preventDefault();
-			});
-		}, destroy: function(){
-			this.hammer.destroy()
-		}
-	}
-}
 
 document.querySelector('#app').innerHTML = `
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -179,7 +126,6 @@ document.querySelector('#app').innerHTML = `
 							icon="sys-find" disabled=""
 							title-text="Seats"
 							slot="default-3">
-						<div style="margin-top:15px;" id="userSanctuaryLayoutContainer"></div>
 						<div style="margin-top:15px;" id="userPickerDiv"></div>
 					</ui5-wizard-step>
 					<ui5-wizard-step
@@ -245,9 +191,7 @@ document.querySelector('#app').innerHTML = `
 									</ui5-table-cell>
 							</ui5-table-row>
 					</ui5-card>
-					<div style="margin-top:15px;" id="sanctuaryLayoutContainer">
-					</div>
-					<div style="margin-top:15px;" id="adminPickerDiv"/>
+					<div style="margin-top:15px;" id="adminPickerDiv"></div>
 				</div>
 			</ui5-tab>
 		</ui5-tabcontainer>
@@ -255,8 +199,6 @@ document.querySelector('#app').innerHTML = `
 </ui5-page>
 </body>
 `
-
-createNewEmbed("sanctuaryLayoutContainer");
 
 document.getElementById("adminPickerDiv").appendChild(
 	Object.assign(document.createElement("seat-picker"), {
@@ -343,11 +285,8 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 	document.getElementById("step2").selected=false;
 	document.getElementById("step3").selected=true;
 
-	removeEmbed("sanctuaryLayoutContainer");
 	document.getElementById("adminPicker")?.setAttribute("activated",0);
 	document.getElementById("adminPicker")?.remove();
-
-	createNewEmbed("userSanctuaryLayoutContainer");
 	document.getElementById("userPickerDiv").appendChild(
 		Object.assign(document.createElement("seat-picker"), {
 			id: "userPicker"
@@ -356,16 +295,11 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 
 },false);
 
-
 document.getElementById('tabs').addEventListener("tab-select", (e) => {
 	if(e.detail.tab.text=='Admin') {
 		console.log("Admin tab was clicked");
-
-		removeEmbed("userSanctuaryLayoutContainer");
 		document.getElementById("userPicker")?.setAttribute("activated",0);
 		document.getElementById("userPicker")?.remove();
-
-		createNewEmbed("sanctuaryLayoutContainer");
 		document.getElementById("adminPickerDiv").appendChild(
 			Object.assign(document.createElement("seat-picker"), {
 				id: "adminPicker"
@@ -374,11 +308,8 @@ document.getElementById('tabs').addEventListener("tab-select", (e) => {
 
 	} else if(e.detail.tab.text=='User' && document.getElementById("step3").disabled==false) {
 		console.log("User tab was clicked");
-		removeEmbed("sanctuaryLayoutContainer");
 		document.getElementById("adminPicker")?.setAttribute("activated",0);
 		document.getElementById("adminPicker")?.remove();
-
-		createNewEmbed("userSanctuaryLayoutContainer");
 		document.getElementById("userPickerDiv").appendChild(
 			Object.assign(document.createElement("seat-picker"), {
 				id: "userPicker"
@@ -391,10 +322,6 @@ document.getElementById('tabs').addEventListener("tab-select", (e) => {
 document.getElementById('wiz-1').addEventListener("step-change", (e) => {
 	if(e.detail.step.titleText=='Seats') {
 		console.log("Seats wizard step was clicked!");
-
-		removeEmbed("sanctuaryLayoutContainer");
-		createNewEmbed("userSanctuaryLayoutContainer");
-
 		if(document.getElementById("userPicker")==null) {
 			document.getElementById("adminPicker")?.setAttribute("activated",0);
 			document.getElementById("adminPicker")?.remove();
@@ -404,52 +331,6 @@ document.getElementById('wiz-1').addEventListener("step-change", (e) => {
 				})
 			);
 		}
-
 	}
 },false);
 
-function removeEmbed(src) {
-	if(lastEmbedDiv==src) {
-		console.log("Removing "+src+"; "+lastEmbed.src);
-		// Destroy svgpanzoom
-		svgPanZoom(lastEmbed).destroy();
-		// Remove event listener
-		lastEmbed.removeEventListener('load', lastEventListener);
-		// Null last event listener
-		lastEventListener = null
-		// Remove embed element
-		document.getElementById(src).removeChild(lastEmbed);
-		// Null reference to embed
-		lastEmbed = null;
-	}
-}
-
-function createNewEmbed(src) {
-	if(lastEmbedDiv==null || lastEmbedDiv!=src) {
-		lastEmbedDiv=src;
-		
-		var embed = document.createElement('embed');
-		embed.setAttribute('style','display: inline; width: 100%; height:100%;');
-		embed.setAttribute('id','sanctuary-layout');
-		embed.setAttribute('version','1.1');
-		embed.setAttribute('src','./sanctuary.svg');
-		document.getElementById(src).appendChild(embed);
-		lastEventListener = function() {
-			setupPinchZoom();
-			var panZoom = window.panZoom = svgPanZoom('#sanctuary-layout',{
-				zoomEnabled: true, controlIconsEnabled: true,
-				fit: 1, center: 1, customEventsHandler: eventsHandler
-			});
-			window.onresize = function() {
-				var tryCount=0;
-				setTimeout(function() {
-					panZoom.resize();
-					panZoom.fit();
-					panZoom.center();
-				},100);
-			};
-		};
-		embed.addEventListener('load',lastEventListener);
-		lastEmbed=embed;
-	}
-}
