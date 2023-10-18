@@ -298,14 +298,15 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 document.getElementById('tabs').addEventListener("tab-select", (e) => {
 	if(e.detail.tab.text=='Admin') {
 		console.log("Admin tab was clicked");
-		document.getElementById("userPicker")?.setAttribute("activated",0);
-		document.getElementById("userPicker")?.remove();
-		document.getElementById("adminPickerDiv").appendChild(
-			Object.assign(document.createElement("seat-picker"), {
-				id: "adminPicker"
-			})
-		);
-
+		if(document.getElementById("adminPicker")==null) {
+			document.getElementById("userPicker")?.setAttribute("activated",0);
+			document.getElementById("userPicker")?.remove();
+			document.getElementById("adminPickerDiv").appendChild(
+				Object.assign(document.createElement("seat-picker"), {
+					id: "adminPicker"
+				})
+			);
+		}
 	} else if(e.detail.tab.text=='User' && document.getElementById("step3").disabled==false) {
 		console.log("User tab was clicked");
 		document.getElementById("adminPicker")?.setAttribute("activated",0);

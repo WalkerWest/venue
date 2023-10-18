@@ -12,19 +12,34 @@ class SeatPicker extends HTMLElement {
 		}
 		else this.elementId=null;
 		this.onWinResize = function() {};
+		this.initialized=false;
+		this.seatsListener=null;
 	}
 
 	connectedCallback() {
-		window.addEventListener('seatsReceived', e => this.onSeatsReceived(e));
-		fetchSeats();
 		console.log("Seat picker (new) just got connected for "+this.elementId+"!");
+		//this.observer=new MutationObserver(this.onMutation);
+		//this.observer.observe(this,{childList: true});
 		const template = html`
 			<embed style="display: inline; width: 100%; height: 100%;"
 				id=${this.elementId} version="1.1" src="./sanctuary.svg"
-				@load=${_=>this.onEmbedLoad()}>
+				@load=${_=>this.onEmbedLoad()} @unload=${_=>this.onEmbedUnload()}
+			>
 		`;
 		render(template,this);
 	}
+
+	/*
+	onMutation(mutations) {
+		const added=[];
+		for (const mutation of mutations) {
+			added.push(...mutation.addedNodes);
+		}
+		console.log({
+			added: added.filter(el=>el.nodeType===Node.ELEMENT_NODE)
+		});
+	}
+	*/
 
 	static observedAttributes = ["activated","id"];
 
@@ -36,19 +51,21 @@ class SeatPicker extends HTMLElement {
 				const template = html`
 					<embed style="display: inline; width: 100%; height: 100%;"
 						id=${this.elementId} version="1.1" src="./sanctuary.svg"
-						@load=${_=>this.onEmbedLoad()}>
+						@load=${_=>this.onEmbedLoad()} @unload=${_=>this.onEmbedUnload()}>
 				`;
 				render(template,this);
-			} else if(newValue==0 && oldValue!=0) { 
+			} else if(newValue==0 && oldValue!=0) {
 				console.log("Seat picker (new) just got deactivated for "+this.elementId+"!");
-				var lastEmbed = document.getElementById(this.elementId);
 				svgPanZoom('#'+this.elementId).destroy();
 				window.removeEventListener('resize', this.onWinResize,true);
+				window.removeEventListener('seatsReceived', this.seatsListener, true);
 			}
 		}
 		else if(name=="id") {
 			this.elementId=this.getAttribute("id")+"Svg";
 			console.log("The picker's id is "+this.elementId);
+			this.seatsListener=this.outerSeatsReceived(this.elementId);
+			window.addEventListener('seatsReceived', this.seatsListener,true);
 		}
 		else console.log("Attribute "+name+" was changed!");
 	}
@@ -59,14 +76,26 @@ class SeatPicker extends HTMLElement {
 		//	removeChild(lastEmbed);
 	}
 
+	onEmbedUnload() {
+		console.log("Unloading "+this.elementId);
+	}
+
 	onEmbedLoad() {
 		if(this.elementId!=null) {
+			if(this.initialized) {
+				console.log("Re-executing onEmbed load for "+this.elementId);
+				window.removeEventListener('resize', this.onWinResize,true);
+				//window.removeEventListener('seatsReceived', this.seatsListener, true);
+				svgPanZoom('#'+this.elementId).destroy();
+			}
 			console.log("Enhancing svg for "+this.elementId);
 			this.setupPinchZoom(this.elementId);
+			console.log("Pinch zoom finished");
 			var panZoom = window.panZoom = svgPanZoom('#'+this.elementId,{
 				zoomEnabled: true, controlIconsEnabled: true,
 				fit: 1, center: 1, customEventsHandler: this.eventsHandler
 			});
+			console.log("Pan zoom finished");
 			this.onWinResize = function() {
 				var tryCount=0;
 				setTimeout(function() {
@@ -76,26 +105,58 @@ class SeatPicker extends HTMLElement {
 				},100);
 			};
 			window.addEventListener('resize', this.onWinResize, true);
+			console.log("Done with onEmbedLoad");
+			this.initialized=true;
+			fetchSeats();
 		}
 	}
 
-	onSeatsReceived({detail}) {
-		console.log("Got seats!");
-		const itemTemplates = [];
-		/*
-		for(var i=0; i<detail.payload.length; i++) {
-			itemTemplates.push(html`<ui5-option>${detail.payload[i].name}</ui5-option>`);
-		}
-		const template = html`
-			<ui5-select id="resSelect" style="--_ui5-v1-18-0-input-icons-count: 2;">
-				<ui5-option selected="">Select One</ui5-option>
-				<ui5-option>Add New</ui5-option>
-				${itemTemplates}
-			</ui5-select>
-		`;
-		render(template,this);
-		*/
-		console.log(detail);
+	outerSeatsReceived = function(myElement) {
+		return function	onSeatsReceived(event) {
+			console.log("Got seats!");
+			const itemTemplates = [];
+			/*
+            for(var i=0; i<detail.payload.length; i++) {
+                itemTemplates.push(html`<ui5-option>${detail.payload[i].name}</ui5-option>`);
+            }
+            const template = html`
+                <ui5-select id="resSelect" style="--_ui5-v1-18-0-input-icons-count: 2;">
+                    <ui5-option selected="">Select One</ui5-option>
+                    <ui5-option>Add New</ui5-option>
+                    ${itemTemplates}
+                </ui5-select>
+            `;
+            render(template,this);
+            */
+			const detail=event.detail;
+			console.log(detail);
+			console.log("Attempting to lookup "+myElement);
+			setTimeout(function(myParam) {
+				console.log("Attempting to lookup "+myParam);
+				const myEle=document.getElementById(myParam);
+				const myDoc = myEle?.getSVGDocument();
+				if(myEle == null) {
+					//console.log(this.elementId);
+					console.log("Couldn't retrieve SVG");
+					console.log(document.getFirstElementChild);
+					console.log(document);
+				}
+				for(var t=1; t<30; t++) {
+					for (var s = 1; s < 20; s++) {
+						var seatString = 'S' + t + '-' + s;
+						if (myDoc?.getElementById(seatString) != null) {
+							var seat = myDoc?.getElementById(seatString);
+							if(seat!=null) seat.style.fill = "green";
+						}
+						/*
+                        else {
+                            console.log("Couldn't find seat "+seatString+"!");
+                        }
+                        */
+					}
+				}
+			}.bind(null, myElement),10);
+		};
 	}
 
 	setupPinchZoom(myElementId) {
