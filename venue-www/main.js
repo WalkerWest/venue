@@ -180,6 +180,7 @@ document.querySelector('#app').innerHTML = `
 							title-text="Seats"
 							slot="default-3">
 						<div style="margin-top:15px;" id="userSanctuaryLayoutContainer"></div>
+						<div style="margin-top:15px;" id="userPickerDiv"></div>
 					</ui5-wizard-step>
 					<ui5-wizard-step
 							icon="hr-approval" disabled=""
@@ -341,19 +342,30 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 	document.getElementById("step3").disabled=false;
 	document.getElementById("step2").selected=false;
 	document.getElementById("step3").selected=true;
+
 	removeEmbed("sanctuaryLayoutContainer");
 	document.getElementById("adminPicker")?.setAttribute("activated",0);
 	document.getElementById("adminPicker")?.remove();
+
 	createNewEmbed("userSanctuaryLayoutContainer");
+	document.getElementById("userPickerDiv").appendChild(
+		Object.assign(document.createElement("seat-picker"), {
+			id: "userPicker"
+		})
+	);
+
 },false);
 
 
 document.getElementById('tabs').addEventListener("tab-select", (e) => {
 	if(e.detail.tab.text=='Admin') {
 		console.log("Admin tab was clicked");
-		removeEmbed("userSanctuaryLayoutContainer");
-		createNewEmbed("sanctuaryLayoutContainer");
 
+		removeEmbed("userSanctuaryLayoutContainer");
+		document.getElementById("userPicker")?.setAttribute("activated",0);
+		document.getElementById("userPicker")?.remove();
+
+		createNewEmbed("sanctuaryLayoutContainer");
 		document.getElementById("adminPickerDiv").appendChild(
 			Object.assign(document.createElement("seat-picker"), {
 				id: "adminPicker"
@@ -365,17 +377,34 @@ document.getElementById('tabs').addEventListener("tab-select", (e) => {
 		removeEmbed("sanctuaryLayoutContainer");
 		document.getElementById("adminPicker")?.setAttribute("activated",0);
 		document.getElementById("adminPicker")?.remove();
+
 		createNewEmbed("userSanctuaryLayoutContainer");
+		document.getElementById("userPickerDiv").appendChild(
+			Object.assign(document.createElement("seat-picker"), {
+				id: "userPicker"
+			})
+		);
+
 	}
 },false);
 
 document.getElementById('wiz-1').addEventListener("step-change", (e) => {
 	if(e.detail.step.titleText=='Seats') {
 		console.log("Seats wizard step was clicked!");
+
 		removeEmbed("sanctuaryLayoutContainer");
-		document.getElementById("adminPicker")?.setAttribute("activated",0);
-		document.getElementById("adminPicker")?.remove();
 		createNewEmbed("userSanctuaryLayoutContainer");
+
+		if(document.getElementById("userPicker")==null) {
+			document.getElementById("adminPicker")?.setAttribute("activated",0);
+			document.getElementById("adminPicker")?.remove();
+			document.getElementById("userPickerDiv").appendChild(
+				Object.assign(document.createElement("seat-picker"), {
+					id: "userPicker"
+				})
+			);
+		}
+
 	}
 },false);
 

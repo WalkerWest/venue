@@ -17,7 +17,7 @@ class SeatPicker extends HTMLElement {
 	connectedCallback() {
 		window.addEventListener('seatsReceived', e => this.onSeatsReceived(e));
 		fetchSeats();
-				console.log("Seat picker (new) just got activated!");
+				console.log("Seat picker (new) just got connected for "+this.elementId+"!");
 				const template = html`
 					<embed style="display: inline; width: 100%; height: 100%;"
 						id=${this.elementId} version="1.1" src="./sanctuary.svg"
@@ -32,7 +32,7 @@ class SeatPicker extends HTMLElement {
 		console.log("Attribute "+name+" was changed!");
 		if(name=="activated" && this.elementId!=null) {
 			if(newValue==1 && oldValue!=1) {
-				console.log("Seat picker (new) just got activated!");
+				console.log("Seat picker (new) just got activated for "+this.elementId+"!");
 				const template = html`
 					<embed style="display: inline; width: 100%; height: 100%;"
 						id=${this.elementId} version="1.1" src="./sanctuary.svg"
@@ -40,7 +40,7 @@ class SeatPicker extends HTMLElement {
 				`;
 				render(template,this);
 			} else if(newValue==0 && oldValue!=0) { 
-				console.log("Seat picker (new) just got deactivated!");
+				console.log("Seat picker (new) just got deactivated for "+this.elementId+"!");
 				var lastEmbed = document.getElementById(this.elementId);
 				svgPanZoom('#'+this.elementId).destroy();
 				window.removeEventListener('resize', this.onWinResize,true);
@@ -54,7 +54,7 @@ class SeatPicker extends HTMLElement {
 	}
 
 	disconnectedCallback() {
-		console.log("Seat picker (new) just got disconnected!");
+		console.log("Seat picker (new) just got disconnected for "+this.elementId+"!");
 		//document.getElementById(this.elementId.slice(0,-3)).
 		//	removeChild(lastEmbed);
 	}
