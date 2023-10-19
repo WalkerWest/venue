@@ -285,20 +285,22 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 	document.getElementById("step2").selected=false;
 	document.getElementById("step3").selected=true;
 
-	document.getElementById("adminPicker")?.setAttribute("activated",0);
-	document.getElementById("adminPicker")?.remove();
-	document.getElementById("userPickerDiv").appendChild(
-		Object.assign(document.createElement("seat-picker"), {
-			id: "userPicker"
-		})
-	);
-
+	if(document.getElementById("userPicker")==null) {
+		document.getElementById("adminPicker")?.setAttribute("activated",0);
+		document.getElementById("adminPicker")?.remove();
+		document.getElementById("userPickerDiv").appendChild(
+			Object.assign(document.createElement("seat-picker"), {
+				id: "userPicker"
+			})
+		);
+	}
 },false);
 
 document.getElementById('tabs').addEventListener("tab-select", (e) => {
 	if(e.detail.tab.text=='Admin') {
 		console.log("Admin tab was clicked");
 		if(document.getElementById("adminPicker")==null) {
+			console.log("Admin picker is null");
 			document.getElementById("userPicker")?.setAttribute("activated",0);
 			document.getElementById("userPicker")?.remove();
 			document.getElementById("adminPickerDiv").appendChild(
@@ -307,15 +309,18 @@ document.getElementById('tabs').addEventListener("tab-select", (e) => {
 				})
 			);
 		}
-	} else if(e.detail.tab.text=='User' && document.getElementById("step3").disabled==false) {
+	} else if(e.detail.tab.text=='User' && document.getElementById("step3").selected==true) {
 		console.log("User tab was clicked");
-		document.getElementById("adminPicker")?.setAttribute("activated",0);
-		document.getElementById("adminPicker")?.remove();
-		document.getElementById("userPickerDiv").appendChild(
-			Object.assign(document.createElement("seat-picker"), {
-				id: "userPicker"
-			})
-		);
+		if(document.getElementById("userPicker")==null) {
+			console.log("User picker is null");
+			document.getElementById("adminPicker")?.setAttribute("activated",0);
+			document.getElementById("adminPicker")?.remove();
+			document.getElementById("userPickerDiv").appendChild(
+				Object.assign(document.createElement("seat-picker"), {
+					id: "userPicker"
+				})
+			);
+		}
 
 	}
 },false);
