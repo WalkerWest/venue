@@ -205,6 +205,13 @@ document.getElementById("adminPickerDiv").appendChild(
 		id: "adminPicker"
 	})
 );
+document.getElementById("adminPicker").addEventListener('seatSelected',function(e) {
+	console.log("Within the picker, the user chose ... "+e.detail.payload.id);
+},true);
+document.getElementById("adminPicker").addEventListener('seatUnselected',function(e) {
+	console.log("Within the picker, the user unclicked  ... "+e.detail.payload.id);
+},true);
+
 
 document.getElementById('emailAddrForm').addEventListener('submit',function(event) {
 	if(window.location.href.includes(5173)) {
@@ -285,15 +292,20 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 	document.getElementById("step2").selected=false;
 	document.getElementById("step3").selected=true;
 
-	if(document.getElementById("userPicker")==null) {
-		document.getElementById("adminPicker")?.setAttribute("activated",0);
-		document.getElementById("adminPicker")?.remove();
-		document.getElementById("userPickerDiv").appendChild(
-			Object.assign(document.createElement("seat-picker"), {
-				id: "userPicker"
-			})
-		);
-	}
+	document.getElementById("adminPicker")?.setAttribute("activated",0);
+	document.getElementById("adminPicker")?.remove();
+	document.getElementById("userPickerDiv").appendChild(
+		Object.assign(document.createElement("seat-picker"), {
+			id: "userPicker"
+		})
+	);
+	document.getElementById("userPicker").addEventListener('seatSelected',function(e) {
+		console.log("Within the picker, the user chose ... "+e.detail.payload.id);
+	},true);
+	document.getElementById("userPicker").addEventListener('seatUnselected',function(e) {
+		console.log("Within the picker, the user unclicked  ... "+e.detail.payload.id);
+	},true);
+
 },false);
 
 document.getElementById('tabs').addEventListener("tab-select", (e) => {

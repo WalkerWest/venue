@@ -14,6 +14,8 @@ class SeatPicker extends HTMLElement {
 		this.onWinResize = function() {};
 		this.initialized=false;
 		this.seatsListener=null;
+		this.selectedSeats=[];
+		this.reservedSeats=[];
 	}
 
 	connectedCallback() {
@@ -41,19 +43,10 @@ class SeatPicker extends HTMLElement {
 
 	attributeChangedCallback(name, oldValue, newValue) {
 		console.log("Attribute "+name+" was changed!");
-		if(name=="activated" && this.elementId!=null) {
+		if(name==="activated" && this.elementId!=null) {
 			if(newValue==1 && oldValue!=1) {
 				console.log("Seat picker (new) just got activated for "+
 					this.elementId+"!");
-				/*
-				const template = html`
-					<embed style="display: inline; width: 100%; height: 100%;"
-						id=${this.elementId} version="1.1" src="./sanctuary.svg"
-						@load=${_=>this.onEmbedLoad()}
-						@unload=${_=>this.onEmbedUnload()}>
-				`;
-				render(template,this);
-				*/
 			} else if(newValue==0 && oldValue!=0) {
 				console.log("Seat picker (new) just got deactivated for "+
 					this.elementId+"!");
@@ -62,12 +55,14 @@ class SeatPicker extends HTMLElement {
 					this.onWinResize,true);
 				window.removeEventListener('seatsReceived',
 					this.seatsListener, true);
+				this.selectedSeats=[];
+				this.reservedSeats=[];
 			}
 		}
-		else if(name=="id" && oldValue==null) {
+		else if(name==="id" && oldValue==null) {
 			this.elementId=this.getAttribute("id")+"Svg";
 			console.log("The picker's id is "+this.elementId);
-			this.seatsListener=this.outerSeatsReceived(this.elementId);
+			this.seatsListener=this.outerSeatsReceived(this);
 			window.addEventListener('seatsReceived',
 				this.seatsListener,true);
 		}
@@ -79,9 +74,7 @@ class SeatPicker extends HTMLElement {
 			this.elementId+"!");
 	}
 
-	onEmbedUnload() {
-		console.log("Unloading "+this.elementId);
-	}
+	onEmbedUnload() { console.log("Unloading "+this.elementId); }
 
 	onSlotChange(e) {
 		console.log("Reserved seat added to slot!");
@@ -93,6 +86,8 @@ class SeatPicker extends HTMLElement {
 				console.log("Re-executing onEmbed load for "+this.elementId);
 				window.removeEventListener('resize', this.onWinResize,true);
 				svgPanZoom('#'+this.elementId).destroy();
+				this.selectedSeats=[];
+				this.reservedSeats=[];
 			}
 			console.log("Enhancing svg for "+this.elementId);
 			this.setupPinchZoom(this.elementId);
@@ -117,33 +112,36 @@ class SeatPicker extends HTMLElement {
 		}
 	}
 
-	outerSeatsReceived = function(myElement) {
+	outerSeatsReceived = function(picker) {
 		return function	onSeatsReceived(event) {
 			console.log("Got seats!");
 			const itemTemplates = [];
 			const detail=event.detail;
 			console.log(detail);
-			console.log("Attempting to lookup "+myElement);
-			setTimeout(function(myParam) {
-				console.log("Attempting to lookup "+myParam);
-				const myEle=document.getElementById(myParam);
+			console.log("Attempting to lookup "+picker.elementId);
+			setTimeout(function(p) {
+				const myEle=document.getElementById(p.elementId);
 				const myDoc = myEle?.getSVGDocument();
 				if(myEle == null) {
-					//console.log(this.elementId);
 					console.log("Couldn't retrieve SVG");
-					console.log(document.getFirstElementChild);
-					console.log(document);
 				}
 				for(var t=1; t<30; t++) {
 					for (var s = 1; s < 20; s++) {
 						var seatString = 'S' + t + '-' + s;
 						if (myDoc?.getElementById(seatString) != null) {
 							var seat = myDoc?.getElementById(seatString);
-							if(seat!=null) seat.style.fill = "green";
+							if(seat!=null) {
+								if(detail.payload.includes(seatString)) {
+									picker.reservedSeats.push(seat);
+									seat.style.fill = "red";
+								}
+								else seat.style.fill = "green";
+							}
+							seat.addEventListener("click",p.seatClicked);
 						}
 					}
 				}
-			}.bind(null, myElement),10);
+			}.bind(null, picker),10);
 		};
 	}
 
@@ -200,6 +198,34 @@ class SeatPicker extends HTMLElement {
 			}
 		}
 	}
+	seatClicked = e => {
+		let seat=e.srcElement;
+		let mySeat = e.srcElement.id;
+		if (!this.selectedSeats.includes(mySeat) && !this.reservedSeats.includes(seat)) {
+			seat.style.fill = "cyan";
+			this.selectedSeats.push(mySeat);
+			const seatSelected = new CustomEvent('seatSelected',{
+				detail: {
+					payload: seat
+				},
+				bubbles: true
+			});
+			this.dispatchEvent(seatSelected);
+		} else if (this.selectedSeats.includes(mySeat)) {
+			const index = this.selectedSeats.indexOf(mySeat);
+			this.selectedSeats.splice(index,1);
+			seat.style.fill = "green";
+			const seatUnselected = new CustomEvent('seatUnselected',{
+				detail: {
+					payload: seat
+				},
+				bubbles: true
+			});
+			this.dispatchEvent(seatUnselected);
+		}
+		console.log('selectedSeat array: '+this.selectedSeats);
+	}
+
 }
 
 customElements.define('seat-picker',SeatPicker);
