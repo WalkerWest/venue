@@ -8,9 +8,14 @@ class SeatPicker extends HTMLElement {
 		this.eventsHandler=[];
 		if(this.getAttribute("id")!=null) {
 			this.elementId=this.getAttribute("id")+"Svg";
-			console.log("The picker's id is "+this.elementId);
+			console.log("The picker's id in constructor is "+this.elementId);
 		}
 		else this.elementId=null;
+		/*
+		if(this.getAttribute("maxselect")!=null) {
+			console.log("The maxselect is "+this.getAttribute("maxselect"));
+		}
+		*/
 		this.onWinResize = function() {};
 		this.initialized=false;
 		this.seatsListener=null;
@@ -44,11 +49,13 @@ class SeatPicker extends HTMLElement {
 		render(rootTemplate,this.root);
 	}
 
-	static observedAttributes = ["activated","id"];
+	static observedAttributes = ["maxselect","activated","id"];
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		console.log("Attribute "+name+" was changed!");
-		if(name==="activated" && this.elementId!=null) {
+		if(name==="maxselect") {
+			console.log("User must pick "+newValue+" seats!");
+		}
+		else if(name==="activated" && this.elementId!=null) {
 			if(newValue==1 && oldValue!=1) {
 				console.log("Seat picker (new) just got activated for "+
 					this.elementId+"!");
@@ -66,7 +73,7 @@ class SeatPicker extends HTMLElement {
 		}
 		else if(name==="id" && oldValue==null) {
 			this.elementId=this.getAttribute("id")+"Svg";
-			console.log("The picker's id is "+this.elementId);
+			console.log("The picker's id in changed attribute is "+this.elementId);
 			this.seatsListener=this.outerSeatsReceived(this);
 			window.addEventListener('seatsReceived',
 				this.seatsListener,true);
@@ -205,10 +212,10 @@ class SeatPicker extends HTMLElement {
 	}
 	seatClicked = e => {
 		let seat=e.srcElement;
-		let mySeat = e.srcElement.id;
-		if (!this.selectedSeats.includes(mySeat) && !this.reservedSeats.includes(seat)) {
+		if (!this.selectedSeats.includes(seat) && !this.reservedSeats.includes(seat) &&
+				this.selectedSeats.length<this.getAttribute('maxselect')) {
 			seat.style.fill = "cyan";
-			this.selectedSeats.push(mySeat);
+			this.selectedSeats.push(seat);
 			const seatSelected = new CustomEvent('seatSelected',{
 				detail: {
 					payload: seat
@@ -216,8 +223,8 @@ class SeatPicker extends HTMLElement {
 				bubbles: true
 			});
 			this.dispatchEvent(seatSelected);
-		} else if (this.selectedSeats.includes(mySeat)) {
-			const index = this.selectedSeats.indexOf(mySeat);
+		} else if (this.selectedSeats.includes(seat)) {
+			const index = this.selectedSeats.indexOf(seat);
 			this.selectedSeats.splice(index,1);
 			seat.style.fill = "green";
 			const seatUnselected = new CustomEvent('seatUnselected',{
@@ -228,7 +235,7 @@ class SeatPicker extends HTMLElement {
 			});
 			this.dispatchEvent(seatUnselected);
 		}
-		console.log('selectedSeat array: '+this.selectedSeats);
+		//console.log('selectedSeat array: '+this.selectedSeats);
 	}
 
 }

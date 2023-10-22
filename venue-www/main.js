@@ -26,6 +26,7 @@ import "hammerjs/hammer.js";
 import '/ReservationSelector.js';
 import '/SeatPicker.js';
 import "@ui5/webcomponents/dist/Popover.js";
+import {html,render} from "./lit-all.min.js";
 
 if(!String.prototype.replaceAll) {
 	String.prototype.replaceAll = function(str, newStr) {
@@ -205,7 +206,6 @@ document.querySelector('#app').innerHTML = `
 		<div class="flex-column">
 		<ui5-label for="assignee" required="" show-color="">Person</ui5-label>
 		<ui5-select id="assignee" style="--_ui5-v1-18-0-input-icons-count: 2;">
-			<ui5-option selected="">Select One</ui5-option>
 		</ui5-select>
 		</div>
 	</div>
@@ -219,11 +219,9 @@ document.querySelector('#app').innerHTML = `
 </body>
 `
 
-document.getElementById("adminPickerDiv").appendChild(
-	Object.assign(document.createElement("seat-picker"), {
-		id: "adminPicker"
-	})
-);
+const PickerType = { ADMIN: 0, USER:1 }
+setPicker(PickerType.ADMIN);
+
 document.getElementById("adminPicker").addEventListener('seatSelected',function(e) {
 	console.log("Within the picker, the user chose ... "+e.detail.payload.id);
 },true);
@@ -313,24 +311,7 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 
 	document.getElementById("adminPicker")?.setAttribute("activated",0);
 	document.getElementById("adminPicker")?.remove();
-	document.getElementById("userPickerDiv").appendChild(
-		Object.assign(document.createElement("seat-picker"), {
-			id: "userPicker"
-		})
-	);
-	document.getElementById("userPicker").addEventListener('seatSelected',function(e) {
-		console.log("Within the picker, the user chose ... "+e.detail.payload.id);
-		let popover = document.querySelector("ui5-popover");
-		let popoverCloser = document.getElementById("closePopoverButton");
-		let popoverOpener = document.getElementById('userPickerDiv');
-		popover.showAt(popoverOpener);
-		popoverCloser.addEventListener("click",() => {
-			popover.close();
-		});
-	},true);
-	document.getElementById("userPicker").addEventListener('seatUnselected',function(e) {
-		console.log("Within the picker, the user unclicked  ... "+e.detail.payload.id);
-	},true);
+	setPicker(PickerType.USER);
 
 	/*
 	window.addEventListener('seatsReceived',() => {
@@ -360,11 +341,7 @@ document.getElementById('tabs').addEventListener("tab-select", (e) => {
 			console.log("Admin picker is null");
 			document.getElementById("userPicker")?.setAttribute("activated",0);
 			document.getElementById("userPicker")?.remove();
-			document.getElementById("adminPickerDiv").appendChild(
-				Object.assign(document.createElement("seat-picker"), {
-					id: "adminPicker"
-				})
-			);
+			setPicker(PickerType.ADMIN);
 		}
 	} else if(e.detail.tab.text=='User' && document.getElementById("step3").selected==true) {
 		console.log("User tab was clicked");
@@ -372,11 +349,7 @@ document.getElementById('tabs').addEventListener("tab-select", (e) => {
 			console.log("User picker is null");
 			document.getElementById("adminPicker")?.setAttribute("activated",0);
 			document.getElementById("adminPicker")?.remove();
-			document.getElementById("userPickerDiv").appendChild(
-				Object.assign(document.createElement("seat-picker"), {
-					id: "userPicker"
-				})
-			);
+			setPicker(PickerType.USER);
 		}
 
 	}
@@ -388,12 +361,77 @@ document.getElementById('wiz-1').addEventListener("step-change", (e) => {
 		if(document.getElementById("userPicker")==null) {
 			document.getElementById("adminPicker")?.setAttribute("activated",0);
 			document.getElementById("adminPicker")?.remove();
-			document.getElementById("userPickerDiv").appendChild(
-				Object.assign(document.createElement("seat-picker"), {
-					id: "userPicker"
-				})
-			);
+			setPicker(PickerType.USER);
+		}
+	}
+	else {
+		if(document.getElementById("userPicker")!=null) {
+			document.getElementById("userPicker")?.setAttribute("activated",0);
+			document.getElementById("userPicker")?.remove();
 		}
 	}
 },false);
+
+var seatAssignments=[];
+function setPicker(pickerType) {
+	switch(pickerType) {
+		case PickerType.ADMIN:
+			let adminPicker = Object.assign(document.
+				createElement("seat-picker"), {id: "adminPicker"});
+			document.getElementById("adminPickerDiv").appendChild(adminPicker);
+			adminPicker.setAttribute("maxselect","1");
+			break;
+		case PickerType.USER:
+			seatAssignments = [];
+			for(const child of document.getElementById("assignee").children) {
+				child.disabled=false;
+			}
+			let userPicker = Object.assign(document.
+				createElement("seat-picker"), {id: "userPicker"});
+			document.getElementById("userPickerDiv").appendChild(userPicker);
+			userPicker.setAttribute("maxselect",partyNum.value.toString());
+
+			const assigneeSelect = document.getElementById("assignee");
+			const personTemplates = [];
+			for(var i=1; i<=partyNum.value; i++) {
+				personTemplates.push(html`<ui5-option id="${'optPerson'+i.toString()}">${document.getElementById('person' + i.toString()).value}</ui5-option>`);
+			}
+			render(html`${personTemplates}`,assigneeSelect);
+
+			document.getElementById("userPicker").addEventListener('seatSelected',function(e) {
+				//console.log("Within the picker, the user chose ... "+e.detail.payload.id);
+				let popover = document.querySelector("ui5-popover");
+				let popoverCloser = document.getElementById("closePopoverButton");
+				let popoverOpener = document.getElementById('userPickerDiv');
+				let selectedSeat = e.detail.payload;
+				popover.showAt(popoverOpener);
+				popoverCloser.onclick = _ => {
+					const assigneeSelect = document.getElementById("assignee");
+					//console.log(selectedSeat);
+					//console.log(assigneeSelect.selectedOption);
+					seatAssignments.push({
+						"seatId":selectedSeat.id,
+						"personName":assigneeSelect.selectedOption.innerText,
+						"seat":selectedSeat,
+						"person":assigneeSelect.selectedOption
+					});
+					console.log('Assigned '+selectedSeat.id+' to '+assigneeSelect.selectedOption.innerText);
+					document.getElementById(assigneeSelect.selectedOption.id).disabled=true;
+					popover.close();
+				};
+			},true);
+			document.getElementById("userPicker").addEventListener('seatUnselected',function(e) {
+				//console.log("Within the picker, the user unclicked  ... "+e.detail.payload.id);
+				seatAssignments.forEach(function(assign) {
+					if(assign.seat===e.detail.payload) {
+						document.getElementById(assign.person.id).disabled=false;
+						seatAssignments.splice(seatAssignments.indexOf(assign),1);
+						console.log('Seat '+assign.seat.id+' is open; '+assign.person.innerText+' needs a seat!');
+					}
+				});
+			},true);
+
+			break;
+	}
+}
 
