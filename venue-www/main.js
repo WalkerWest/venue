@@ -25,6 +25,7 @@ import "@ui5/webcomponents/dist/features/InputElementsFormSupport.js"
 import "hammerjs/hammer.js";
 import '/ReservationSelector.js';
 import '/SeatPicker.js';
+import "@ui5/webcomponents/dist/Popover.js";
 
 if(!String.prototype.replaceAll) {
 	String.prototype.replaceAll = function(str, newStr) {
@@ -197,6 +198,24 @@ document.querySelector('#app').innerHTML = `
 		</ui5-tabcontainer>
 	</div>
 </ui5-page>
+<ui5-popover header-text="Assign Seat"
+		style="z-index: 110; display: none;" 
+		media-range="S" allow-target-overlap="" hide-arrow="" modal="">
+	<div class="popover-content">
+		<div class="flex-column">
+		<ui5-label for="assignee" required="" show-color="">Person</ui5-label>
+		<ui5-select id="assignee" style="--_ui5-v1-18-0-input-icons-count: 2;">
+			<ui5-option selected="">Select One</ui5-option>
+		</ui5-select>
+		</div>
+	</div>
+	<div class="footer">
+		<div style="flex: 1;"></div>
+		<ui5-button id="closePopoverButton" design="Emphasized">
+			Assign
+		</ui5-button>
+	</div>
+</ui5-popover>
 </body>
 `
 
@@ -301,10 +320,36 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 	);
 	document.getElementById("userPicker").addEventListener('seatSelected',function(e) {
 		console.log("Within the picker, the user chose ... "+e.detail.payload.id);
+		let popover = document.querySelector("ui5-popover");
+		let popoverCloser = document.getElementById("closePopoverButton");
+		let popoverOpener = document.getElementById('userPickerDiv');
+		popover.showAt(popoverOpener);
+		popoverCloser.addEventListener("click",() => {
+			popover.close();
+		});
 	},true);
 	document.getElementById("userPicker").addEventListener('seatUnselected',function(e) {
 		console.log("Within the picker, the user unclicked  ... "+e.detail.payload.id);
 	},true);
+
+	/*
+	window.addEventListener('seatsReceived',() => {
+		setTimeout(function() {
+			var myEle = document.getElementById('userPickerSvg');
+			var myDoc = myEle.getSVGDocument();
+			var popoverOpener=myDoc.getElementById("S1-1");
+			popoverOpener = document.getElementById('userPicker');
+			var popover = document.querySelector("ui5-popover");
+			var popoverCloser = document.getElementById("closePopoverButton");
+			popoverOpener.addEventListener("click",() => {
+				popover.showAt(popoverOpener);
+			});
+			popoverCloser.addEventListener("click",() => {
+				popover.close();
+			});
+		},1500);
+	});
+	*/
 
 },false);
 

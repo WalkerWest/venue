@@ -25,6 +25,11 @@ class SeatPicker extends HTMLElement {
 		div.setAttribute("slot","venue-layout")
 		div.innerHTML =`<embed style="display: inline; width: 100%; height: 100%;"
 				id=${this.elementId} version="1.1" src="./sanctuary.svg"/>`;
+		/*
+		div.innerHTML =`<object style="display: inline; width: 100%; height: 100%;"
+				id=${this.elementId} type="image/svg+xml" data="./sanctuary.svg"/>`;
+		*/
+
 		document.getElementById(this.getAttribute("id")).appendChild(div);
 		document.getElementById(this.elementId).
 			addEventListener("load",_=>this.onEmbedLoad());
