@@ -118,7 +118,7 @@ document.querySelector('#app').innerHTML = `
 							</div>
 						</div>
 						<div style="padding-top:20px" id="toStep3Div">
-						<ui5-button design="Emphasized" id="wiz-2-toStep3" 
+						<ui5-button design="Emphasized" id="wiz-1-toStep3" 
 							type="Submit">Step 3</ui5-button>
 						</div>
 						</form>
@@ -129,9 +129,13 @@ document.querySelector('#app').innerHTML = `
 							title-text="Seats"
 							slot="default-3">
 						<div style="margin-top:15px;" id="userPickerDiv"></div>
+						<ui5-button design="Emphasized" id="wiz-1-toStep4" disabled="" 
+							type="Submit">Step 4</ui5-button>
 					</ui5-wizard-step>
+					<!-- hr-approval -->
 					<ui5-wizard-step
-							icon="hr-approval" disabled=""
+							id="step4"
+							icon="meal" disabled=""
 							title-text="Assign"
 							slot="default-4">
 					</ui5-wizard-step>
@@ -309,30 +313,33 @@ document.getElementById('partyIdForm').addEventListener('submit',function(event)
 	document.getElementById("step2").selected=false;
 	document.getElementById("step3").selected=true;
 
-	document.getElementById("adminPicker")?.setAttribute("activated",0);
-	document.getElementById("adminPicker")?.remove();
-	setPicker(PickerType.USER);
-
-	/*
-	window.addEventListener('seatsReceived',() => {
-		setTimeout(function() {
-			var myEle = document.getElementById('userPickerSvg');
-			var myDoc = myEle.getSVGDocument();
-			var popoverOpener=myDoc.getElementById("S1-1");
-			popoverOpener = document.getElementById('userPicker');
-			var popover = document.querySelector("ui5-popover");
-			var popoverCloser = document.getElementById("closePopoverButton");
-			popoverOpener.addEventListener("click",() => {
-				popover.showAt(popoverOpener);
-			});
-			popoverCloser.addEventListener("click",() => {
-				popover.close();
-			});
-		},1500);
-	});
-	*/
-
+	if(document.getElementById("userPicker")==null) {
+		document.getElementById("adminPicker")?.setAttribute("activated",0);
+		document.getElementById("adminPicker")?.remove();
+		setPicker(PickerType.USER);
+	} else refreshPeoplePicker();
 },false);
+
+function refreshPeoplePicker() {
+	document.getElementById("userPicker").setAttribute("maxselect",partyNum.value.toString());
+	const assigneeSelect = document.getElementById("assignee");
+	const personTemplates = [];
+	for(var i=1; i<=partyNum.value; i++) {
+		var foundEntry=false;
+		seatAssignments.forEach(function(assign) {
+			if(assign.personId==='optPerson'+i.toString()) {
+				assign.person.innerText=document.getElementById('person' + i.toString()).value;
+				personTemplates.push(assign.person);
+				foundEntry=true;
+			}
+		});
+		if(!foundEntry)	personTemplates.push(html`<ui5-option id="${'optPerson'+i.toString()}">${document.getElementById('person' + i.toString()).value}</ui5-option>`);
+	}
+	render(html`${personTemplates}`,assigneeSelect);
+	if(seatAssignments.length==Number(document.getElementById("userPicker").getAttribute("maxselect")))
+		document.getElementById("wiz-1-toStep4").disabled=false;
+	else document.getElementById("wiz-1-toStep4").disabled=true;
+}
 
 document.getElementById('tabs').addEventListener("tab-select", (e) => {
 	if(e.detail.tab.text=='Admin') {
@@ -362,14 +369,10 @@ document.getElementById('wiz-1').addEventListener("step-change", (e) => {
 			document.getElementById("adminPicker")?.setAttribute("activated",0);
 			document.getElementById("adminPicker")?.remove();
 			setPicker(PickerType.USER);
-		}
+		} else refreshPeoplePicker();
 	}
-	else {
-		if(document.getElementById("userPicker")!=null) {
-			document.getElementById("userPicker")?.setAttribute("activated",0);
-			document.getElementById("userPicker")?.remove();
-		}
-	}
+	else if(document.getElementById("step3").disabled==false && e.detail.step.titleText=='Party')
+		document.getElementById("step3").disabled=true;
 },false);
 
 var seatAssignments=[];
@@ -399,7 +402,6 @@ function setPicker(pickerType) {
 			render(html`${personTemplates}`,assigneeSelect);
 
 			document.getElementById("userPicker").addEventListener('seatSelected',function(e) {
-				//console.log("Within the picker, the user chose ... "+e.detail.payload.id);
 				let popover = document.querySelector("ui5-popover");
 				let popoverCloser = document.getElementById("closePopoverButton");
 				let popoverOpener = document.getElementById('userPickerDiv');
@@ -407,21 +409,22 @@ function setPicker(pickerType) {
 				popover.showAt(popoverOpener);
 				popoverCloser.onclick = _ => {
 					const assigneeSelect = document.getElementById("assignee");
-					//console.log(selectedSeat);
-					//console.log(assigneeSelect.selectedOption);
 					seatAssignments.push({
 						"seatId":selectedSeat.id,
+						"personId": assigneeSelect.selectedOption.id,
 						"personName":assigneeSelect.selectedOption.innerText,
 						"seat":selectedSeat,
 						"person":assigneeSelect.selectedOption
 					});
 					console.log('Assigned '+selectedSeat.id+' to '+assigneeSelect.selectedOption.innerText);
 					document.getElementById(assigneeSelect.selectedOption.id).disabled=true;
+					if(seatAssignments.length==Number(document.getElementById("userPicker").getAttribute("maxselect")))
+						document.getElementById("wiz-1-toStep4").disabled=false;
+					else document.getElementById("wiz-1-toStep4").disabled=true;
 					popover.close();
 				};
 			},true);
 			document.getElementById("userPicker").addEventListener('seatUnselected',function(e) {
-				//console.log("Within the picker, the user unclicked  ... "+e.detail.payload.id);
 				seatAssignments.forEach(function(assign) {
 					if(assign.seat===e.detail.payload) {
 						document.getElementById(assign.person.id).disabled=false;
@@ -434,4 +437,10 @@ function setPicker(pickerType) {
 			break;
 	}
 }
+
+document.getElementById("wiz-1-toStep4").onclick = function() {
+	document.getElementById("step3").selected=false;
+	document.getElementById("step4").disabled=false;
+	document.getElementById("step4").selected=true;
+};
 
