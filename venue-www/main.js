@@ -41,6 +41,11 @@ var myHost = window.location.origin;
 
 document.querySelector('#app').innerHTML = `
 <body xmlns="http://www.w3.org/1999/xhtml">
+<style>
+ui5-table ui5-table-column.table-header-text-alignment::part(column) {
+    text-align: end;
+}
+</style>
 <ui5-page style="" background-design="Solid">
 	<ui5-bar design="Header" slot="header" data-sap-ui-fastnavgroup="true" media-range="XL">
 		<ui5-button icon="home" tooltip="Go home" slot="startContent" icon-only="" has-icon=""></ui5-button>
@@ -199,7 +204,66 @@ document.querySelector('#app').innerHTML = `
 						party.  The total due is calculated.  Enter payment
 						information in the fields provided.
 						</ui5-label>
-							
+						<form id="paymentForm">
+						<div style="margin-top:10px;margin-left:15px;margin-right:15px;">
+							<ui5-label show-colon>"Little Ladies" Attending</ui5-label>
+							<ui5-slider min="0" max="5" label-interval="1" 
+								show-tickmarks="" show-tooltip="" id="littleNum" 
+								style="height:75px;"></ui5-slider>
+						</div>
+						<ui5-title level="H4">Total Donation</ui5-title>
+						<ui5-table>
+							<ui5-table-column slot="columns-1" first="">
+								<span>Item</span>
+							</ui5-table-column>
+							<ui5-table-column class="table-header-text-alignment" slot="columns-2">
+								<span>Qty</span>
+							</ui5-table-column>
+							<ui5-table-column class="table-header-text-alignment" slot="columns-3">
+								<span>Unit Price</span>
+							</ui5-table-column>
+							<ui5-table-column class="table-header-text-alignment" slot="columns-4" last="">
+								<span>Ext Price</span>
+							</ui5-table-column>
+							<ui5-table-row slot="default-1">
+								<ui5-table-cell slot="default-1">
+									<span>Adult attendees</span>
+								</ui5-table-cell>
+								<ui5-table-cell style="text-align: right" slot="default-2">
+									<span>2</span>
+								</ui5-table-cell>
+								<ui5-table-cell style="text-align: right" slot="default-3">
+									<span>$15.00</span>
+								</ui5-table-cell>
+								<ui5-table-cell style="text-align: right" slot="default-4">
+									<span>$30.00</span>
+								</ui5-table-cell>
+							</ui5-table-row>
+							<ui5-table-row slot="default-2">
+								<ui5-table-cell slot="default-1">
+									<span>"Little Ladies"</span>
+								</ui5-table-cell>
+								<ui5-table-cell style="text-align: right" slot="default-2">
+									<span>3</span>
+								</ui5-table-cell>
+								<ui5-table-cell style="text-align: right" slot="default-3">
+									<span>$7.00</span>
+								</ui5-table-cell>
+								<ui5-table-cell style="text-align: right" slot="default-4">
+									<span>$21.00</span>
+								</ui5-table-cell>
+							</ui5-table-row>
+						</ui5-table>
+						<div style="width:100%;height:100%;">
+							<span style="padding-left:16px;float:left;"><b>Total</b></span>
+							<span style="float:right;padding-right:8px;"><b>$36.00</b></span>
+						</div>
+						<br>
+						<div style="padding-top:20px" id="finalDiv">
+						<ui5-button design="Emphasized" id="finalButton" 
+							type="Submit">Finalize</ui5-button>
+						</div>
+						</form>
 					</ui5-wizard-step>
 					<!--<ui5-wizard-step
 							icon="decision" disabled=""
@@ -541,5 +605,10 @@ document.getElementById("wiz-1-toStep5").onclick = function() {
 	document.getElementById("step5").disabled=false;
 	document.getElementById("step5").selected=true;
 };
+
+document.getElementById('paymentForm').addEventListener('submit',function(event) {
+	event.preventDefault();
+});
+
 
 
