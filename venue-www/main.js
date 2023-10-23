@@ -55,6 +55,8 @@ document.querySelector('#app').innerHTML = `
 						data-sap-ui-fastnavgroup="true"
 						width="0"
 						content-height="0">
+						
+					<!-- ************ STEP #1: E-MAIL ADDRESS ************ -->
 					<ui5-wizard-step id="step1"
 							icon="email" selected=""
 							title-text="E-mail"
@@ -97,12 +99,20 @@ document.querySelector('#app').innerHTML = `
 							</div>
 						</form>
 					</ui5-wizard-step>
+					
+					<!-- ************* STEP #2: PARTY IDENT  ************* -->
 					<ui5-wizard-step
 							id="step2"
 							icon="collaborate" disabled=""
 							title-text="Party"
 							slot="default-2">
 						<ui5-title level="H3">2.&nbsp;&nbsp;Party Identification</ui5-title>
+						<ui5-label wrapping-type="Normal" 
+							style="padding-top:10px;padding-bottom:10px;">
+						Choose the number of people in your dinner party.
+						Enter first and last names for each attendee in the
+						boxes below.
+						</ui5-label>
 						<form id="partyIdForm">
 						<div style="margin-top:10px;margin-left:15px;">
 							<ui5-label show-colon>Number in Party</ui5-label>
@@ -123,26 +133,73 @@ document.querySelector('#app').innerHTML = `
 						</div>
 						</form>
 					</ui5-wizard-step>
+					
+					<!-- ************** STEP #3: PICK SEATS ************** -->
 					<ui5-wizard-step
 							id="step3"
 							icon="sys-find" disabled=""
 							title-text="Seats"
 							slot="default-3">
+						<ui5-title level="H3">3.&nbsp;&nbsp;Seat Assignment</ui5-title>
+						<ui5-label wrapping-type="Normal" 
+							style="padding-top:10px;padding-bottom:10px;">
+						In the diagram below, red boxes represent seats that
+						are taken and green ones represent available seats.  
+						As you click green boxes, they change colors and prompt 
+						for which attendee is assigned to the seat.
+						</ui5-label>
 						<div style="margin-top:15px;" id="userPickerDiv"></div>
 						<ui5-button design="Emphasized" id="wiz-1-toStep4" disabled="" 
 							type="Submit">Step 4</ui5-button>
 					</ui5-wizard-step>
+					
+					<!-- ************ STEP #4: MEAL SELECTION ************ -->
 					<!-- hr-approval -->
 					<ui5-wizard-step
 							id="step4"
 							icon="meal" disabled=""
-							title-text="Assign"
+							title-text="Meals"
 							slot="default-4">
+						<ui5-title level="H3">4.&nbsp;&nbsp;Meal Selection</ui5-title>
+						<ui5-label wrapping-type="Normal" 
+							style="padding-top:10px;padding-bottom:10px;">
+						It is time to pick the meal(s).<br>  
+						<b>NOTE:</b> Both options are gluten-free.
+						<form id="mealForm">
+						<div style="margin-top:10px;margin-left:15px;">
+							<div style="margin-top:10px;margin-left:15px;" id="mealList">
+								<ui5-label required show-colon>Meal #1 (for ...)</ui5-label>
+								<ui5-select id="meal1" style="--_ui5-v1-18-0-input-icons-count: 2;">
+									<ui5-option value="REGULAR" selected="">Regular</ui5-option>
+									<ui5-option value="VEGAN">Vegan/Dairy-Free</ui5-option>
+								</ui5-select>
+							</div>
+						</div>
+						<div style="padding-top:20px" id="toStep5Div">
+						<ui5-button design="Emphasized" id="wiz-1-toStep5" 
+							type="Submit">Step 5</ui5-button>
+						</div>
+						</form>
+						
+						</ui5-label>
+
 					</ui5-wizard-step>
+					
+					<!-- *************** STEP #5: PAYMENT  *************** -->
 					<ui5-wizard-step
+							id="step5"
 							icon="credit-card" disabled=""
 							title-text="Payment"
 							slot="default-5">
+						<ui5-title level="H3">5.&nbsp;&nbsp;Payment</ui5-title>
+						<ui5-label wrapping-type="Normal" 
+							style="padding-top:10px;padding-bottom:10px;">
+						Use the slider below to select the number of "Little
+						Ladies" (ages 5-12) that will be attending with the 
+						party.  The total due is calculated.  Enter payment
+						information in the fields provided.
+						</ui5-label>
+							
 					</ui5-wizard-step>
 					<!--<ui5-wizard-step
 							icon="decision" disabled=""
@@ -339,6 +396,7 @@ function refreshPeoplePicker() {
 	if(seatAssignments.length==Number(document.getElementById("userPicker").getAttribute("maxselect")))
 		document.getElementById("wiz-1-toStep4").disabled=false;
 	else document.getElementById("wiz-1-toStep4").disabled=true;
+	document.getElementById("userPicker").setAttribute("activated","2");
 }
 
 document.getElementById('tabs').addEventListener("tab-select", (e) => {
@@ -363,7 +421,7 @@ document.getElementById('tabs').addEventListener("tab-select", (e) => {
 },false);
 
 document.getElementById('wiz-1').addEventListener("step-change", (e) => {
-	if(e.detail.step.titleText=='Seats') {
+	if(e.detail.step.titleText==='Seats') {
 		console.log("Seats wizard step was clicked!");
 		if(document.getElementById("userPicker")==null) {
 			document.getElementById("adminPicker")?.setAttribute("activated",0);
@@ -371,8 +429,9 @@ document.getElementById('wiz-1').addEventListener("step-change", (e) => {
 			setPicker(PickerType.USER);
 		} else refreshPeoplePicker();
 	}
-	else if(document.getElementById("step3").disabled==false && e.detail.step.titleText=='Party')
+	else if(document.getElementById("step3").disabled===false && e.detail.step.titleText==='Party') {
 		document.getElementById("step3").disabled=true;
+	}
 },false);
 
 var seatAssignments=[];
@@ -442,5 +501,34 @@ document.getElementById("wiz-1-toStep4").onclick = function() {
 	document.getElementById("step3").selected=false;
 	document.getElementById("step4").disabled=false;
 	document.getElementById("step4").selected=true;
+	const mealDiv = document.getElementById("mealList");
+	const mealTemplates = [];
+	mealDiv.innerHTML="";
+	for(let i=1; i<=partyNum.value; i++) {
+		mealTemplates.push(html`
+			<div>
+			<ui5-label required show-colon>${
+				'Meal #'+i.toString()+' (for '+
+				document.getElementById('person' + i.toString()).value+')'}
+			</ui5-label>
+			<ui5-select id="${'meal'+i.toString()}" style="--_ui5-v1-18-0-input-icons-count: 2;">
+				<ui5-option value="REGULAR" selected="">Regular</ui5-option>
+				<ui5-option value="VEGAN">Vegan/Dairy-Free</ui5-option>
+			</ui5-select>
+			</div>
+		`);
+	}
+	render(html`${mealTemplates}`,mealDiv);
 };
+
+document.getElementById('mealForm').addEventListener('submit',function(event) {
+	event.preventDefault();
+});
+
+document.getElementById("wiz-1-toStep5").onclick = function() {
+	document.getElementById("step4").selected=false;
+	document.getElementById("step5").disabled=false;
+	document.getElementById("step5").selected=true;
+};
+
 

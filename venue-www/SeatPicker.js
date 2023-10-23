@@ -56,19 +56,28 @@ class SeatPicker extends HTMLElement {
 			console.log("User must pick "+newValue+" seats!");
 		}
 		else if(name==="activated" && this.elementId!=null) {
-			if(newValue==1 && oldValue!=1) {
-				console.log("Seat picker (new) just got activated for "+
-					this.elementId+"!");
-			} else if(newValue==0 && oldValue!=0) {
-				console.log("Seat picker (new) just got deactivated for "+
-					this.elementId+"!");
-				svgPanZoom('#'+this.elementId).destroy();
+			if (newValue == 1 && oldValue != 1) {
+				console.log("Seat picker (new) just got activated for " +
+					this.elementId + "!");
+			} else if (newValue == 0 && oldValue != 0) {
+				console.log("Seat picker (new) just got deactivated for " +
+					this.elementId + "!");
+				svgPanZoom('#' + this.elementId).destroy();
 				window.removeEventListener('resize',
-					this.onWinResize,true);
+					this.onWinResize, true);
 				window.removeEventListener('seatsReceived',
 					this.seatsListener, true);
-				this.selectedSeats=[];
-				this.reservedSeats=[];
+				this.selectedSeats = [];
+				this.reservedSeats = [];
+			} else if (newValue == 2 && oldValue != 2) {
+				console.log("Seat picker (new) just got re-activated for " +
+					this.elementId + "!");
+				setTimeout(function () {
+					panZoom.resize();
+					panZoom.fit();
+					panZoom.center();
+				}, 100);
+				this.setAttribute("activated", "1");
 			}
 		}
 		else if(name==="id" && oldValue==null) {
@@ -101,16 +110,17 @@ class SeatPicker extends HTMLElement {
 				this.selectedSeats=[];
 				this.reservedSeats=[];
 			}
+			console.log("Seat picker (new) just got activated for "+
+				this.elementId+"!");
 			console.log("Enhancing svg for "+this.elementId);
 			this.setupPinchZoom(this.elementId);
 			console.log("Pinch zoom finished");
-			var panZoom = window.panZoom = svgPanZoom('#'+this.elementId,{
+			let panZoom = window.panZoom = svgPanZoom('#'+this.elementId,{
 				zoomEnabled: true, controlIconsEnabled: true,
 				fit: 1, center: 1, customEventsHandler: this.eventsHandler
 			});
 			console.log("Pan zoom finished");
 			this.onWinResize = function() {
-				var tryCount=0;
 				setTimeout(function() {
 					panZoom.resize();
 					panZoom.fit();
@@ -206,6 +216,7 @@ class SeatPicker extends HTMLElement {
 					e.preventDefault();
 				});
 			}, destroy: function(){
+				console.log("Destroying custom events handler (pinch/zoom).");
 				this.hammer.destroy()
 			}
 		}
