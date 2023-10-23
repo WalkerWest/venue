@@ -431,6 +431,8 @@ document.getElementById('wiz-1').addEventListener("step-change", (e) => {
 	}
 	else if(document.getElementById("step3").disabled===false && e.detail.step.titleText==='Party') {
 		document.getElementById("step3").disabled=true;
+		document.getElementById("step4").disabled=true;
+		document.getElementById("step5").disabled=true;
 	}
 },false);
 
@@ -497,26 +499,35 @@ function setPicker(pickerType) {
 	}
 }
 
+var mealListRendered=false;
+var mealTemplates = [];
+
 document.getElementById("wiz-1-toStep4").onclick = function() {
 	document.getElementById("step3").selected=false;
 	document.getElementById("step4").disabled=false;
 	document.getElementById("step4").selected=true;
 	const mealDiv = document.getElementById("mealList");
-	const mealTemplates = [];
-	mealDiv.innerHTML="";
-	for(let i=1; i<=partyNum.value; i++) {
+	if(!mealListRendered) {
+		while(mealDiv.firstChild) mealDiv.removeChild(mealDiv.lastChild);
+		// mealDiv.innerHTML="";
+		mealListRendered=true;
+	}
+	console.log("The selectedNum is "+selectedNum);
+	while(mealTemplates.length>0) mealTemplates.pop();
+	for(let i=1; i<=selectedNum; i++) {
+		console.log("The i var is "+i);
 		mealTemplates.push(html`
 			<div>
 			<ui5-label required show-colon>${
-				'Meal #'+i.toString()+' (for '+
-				document.getElementById('person' + i.toString()).value+')'}
+			'Meal #'+i.toString()+' (for '+
+			document.getElementById('person' + i.toString()).value+')'}
 			</ui5-label>
 			<ui5-select id="${'meal'+i.toString()}" style="--_ui5-v1-18-0-input-icons-count: 2;">
 				<ui5-option value="REGULAR" selected="">Regular</ui5-option>
 				<ui5-option value="VEGAN">Vegan/Dairy-Free</ui5-option>
 			</ui5-select>
 			</div>
-		`);
+			`);
 	}
 	render(html`${mealTemplates}`,mealDiv);
 };
