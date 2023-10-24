@@ -148,7 +148,12 @@ public class MyMessage {
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                 "Time to send an e-mail to "+emailAddr+"!");
         long myId = TSID.fast().toLong();
-        SendMailTls.send(emailAddr,myId);
+        try {
+            SendMailTls.send(emailAddr, myId);
+        } catch (Exception ex) {
+            Logger.getLogger(MyMessage.class.getName()).log(Level.SEVERE,
+                    "Unable to email to "+emailAddr+": "+ex.getMessage());
+        }
         confirmCodeList.put(myId,emailAddr);
     }
 

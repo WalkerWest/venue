@@ -75,7 +75,7 @@ public class App
 				"org.apache.logging.log4j.jul.LogManager");
 
 		// Load static content from the top level directory.
-		URL webAppDir = App.class.getClassLoader().getResource("./www");
+		URL webAppDir = App.class.getClassLoader().getResource("./www/r");
 		if (webAppDir!=null)
 			webAppContext.setResourceBase(webAppDir.toURI().toString());
 		else {
