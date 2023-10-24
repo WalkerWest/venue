@@ -52,6 +52,8 @@ public class DriveQuickstart {
             env.getEnvironmentProperties("private.key.2");
     private static final String CLIENT_EMAIL =
             env.getEnvironmentProperties("client.email");
+    private static final String UPLOADDB =
+            env.getEnvironmentProperties("uploaddb");
 
     private static Credential getCredentials(
             final NetHttpTransport HTTP_TRANSPORT)
@@ -142,6 +144,10 @@ public class DriveQuickstart {
 
     public static String Upload(String inFilePath, Properties prop)
             throws IOException, GeneralSecurityException {
+        if(UPLOADDB.equals("0")) {
+            logger.warn("Database upload is OFF!");
+            return null;
+        }
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT =
                 GoogleNetHttpTransport.newTrustedTransport();

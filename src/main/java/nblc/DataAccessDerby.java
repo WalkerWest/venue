@@ -261,7 +261,10 @@ public class DataAccessDerby implements DataAccess {
             env.getEnvironmentProperties("uploaddb");
 
     public void uploadDb() {
-        if(UPLOADDB.equals("0")) return;
+        if(UPLOADDB.equals("0")) {
+            logger.warn("Database upload is OFF!");
+            return;
+        }
         try {
             //String tarFileName = source.getFileName().toString() + ".tar.gz";
             Files.walkFileTree(Paths.get(dbPath),
@@ -279,6 +282,9 @@ public class DataAccessDerby implements DataAccess {
     }
 
     public void downloadDb() throws GeneralSecurityException, IOException {
+        if(UPLOADDB.equals("0")) {
+            logger.warn("Database upload is OFF!");
+        }
         ByteArrayOutputStream fileId = DriveQuickstart.Download();
         if(fileId!=null) {
             logger.info("Successfully downloaded attendees.tar.gz!");

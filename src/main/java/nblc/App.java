@@ -111,6 +111,11 @@ public class App
 		server.join();
     }
 
+	private static final EnvironmentProperties env =
+			new DefaultEnvironmentProperties();
+	private static final String UPLOADDB =
+			env.getEnvironmentProperties("uploaddb");
+
     public App() {
 		Thread shutdownListener = new Thread(){
 			public void run() {
@@ -121,6 +126,11 @@ public class App
 					throw new RuntimeException(e);
 				}
 				logger.warn("Server stopped.");
+
+				if(UPLOADDB.equals("0")) {
+					logger.warn("Database upload is OFF!");
+					return;
+				}
 
 				logger.info("The start dir is "+System.getProperty("user.dir"));
 
