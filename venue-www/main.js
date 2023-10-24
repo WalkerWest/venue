@@ -297,7 +297,7 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 					</ui5-wizard-step>-->
 				</ui5-wizard>
 			</ui5-tab>
-			<ui5-tab text="Admin" slot="default-2"> 
+			<ui5-tab text="Admin" slot="default-2" disabled=""> 
 				<div> 
 					<div>
 						<ui5-label for="resSelect" show-colon>Selected Reservation</ui5-label>
