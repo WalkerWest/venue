@@ -206,7 +206,7 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 						</ui5-label>
 						<form id="paymentForm">
 						<div style="margin-top:10px;margin-left:15px;margin-right:15px;">
-							<ui5-label show-colon>"Little Ladies" Attending</ui5-label>
+							<ui5-label show-colon>"Little Ladies" Attendees</ui5-label>
 							<ui5-slider min="0" max="5" label-interval="1" 
 								show-tickmarks="" show-tooltip="" id="littleNum" 
 								style="height:75px;"></ui5-slider>
@@ -230,13 +230,13 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 									<span>Adult attendees</span>
 								</ui5-table-cell>
 								<ui5-table-cell style="text-align: right" slot="default-2">
-									<span>2</span>
+									<span id="qtyAdults">2</span>
 								</ui5-table-cell>
 								<ui5-table-cell style="text-align: right" slot="default-3">
 									<span>$15.00</span>
 								</ui5-table-cell>
 								<ui5-table-cell style="text-align: right" slot="default-4">
-									<span>$30.00</span>
+									<span id="dollarsAdults">$30.00</span>
 								</ui5-table-cell>
 							</ui5-table-row>
 							<ui5-table-row slot="default-2">
@@ -244,19 +244,19 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 									<span>"Little Ladies"</span>
 								</ui5-table-cell>
 								<ui5-table-cell style="text-align: right" slot="default-2">
-									<span>3</span>
+									<span id="qtyLittles">0</span>
 								</ui5-table-cell>
 								<ui5-table-cell style="text-align: right" slot="default-3">
-									<span>$7.00</span>
+									<span>$0.00</span>
 								</ui5-table-cell>
 								<ui5-table-cell style="text-align: right" slot="default-4">
-									<span>$21.00</span>
+									<span id="dollarsLittles">$0.00</span>
 								</ui5-table-cell>
 							</ui5-table-row>
 						</ui5-table>
 						<div style="width:100%;height:100%;">
 							<span style="padding-left:16px;float:left;"><b>Total</b></span>
-							<span style="float:right;padding-right:8px;"><b>$36.00</b></span>
+							<span id="grandTotal" style="float:right;padding-right:8px;"><b>$36.00</b></span>
 						</div>
 						<br>
 						<div style="padding-top:20px" id="finalDiv">
@@ -600,14 +600,71 @@ document.getElementById('mealForm').addEventListener('submit',function(event) {
 	event.preventDefault();
 });
 
+var totalAdults=0;
+
 document.getElementById("wiz-1-toStep5").onclick = function() {
 	document.getElementById("step4").selected=false;
 	document.getElementById("step5").disabled=false;
 	document.getElementById("step5").selected=true;
+	document.getElementById("qtyAdults").innerText=selectedNum.toString();
+	let USDollar = new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency: 'USD',
+	});
+	totalAdults=selectedNum*15;
+	document.getElementById("dollarsAdults").innerText=USDollar.format(totalAdults);
+	document.getElementById("grandTotal").innerText=USDollar.format(totalAdults+totalLittles);
 };
+
+var littles = 1;
+var littleNum = document.getElementById('littleNum');
+var totalLittles=0;
+
+littleNum.addEventListener('change',function() {
+	console.log("Littles number changed to "+littleNum.value);
+	littles=Number(littleNum.value);
+	document.getElementById("qtyLittles").innerText=littles.toString();
+	let USDollar = new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency: 'USD',
+	});
+	totalLittles = littles*7;
+	document.getElementById("dollarsLittles").innerText=USDollar.format(totalLittles);
+	document.getElementById("grandTotal").innerText=USDollar.format(totalAdults+totalLittles);
+},false);
+
 
 document.getElementById('paymentForm').addEventListener('submit',function(event) {
 	event.preventDefault();
+	// Fields for database write
+	// -------------------------
+	// partyName
+	// partyQty
+	// seatHolder1-19
+	// seatSelect1-19
+	// mealSelect1-19
+	var registration={};
+	registration.partyName=document.getElementById("emailAddr").value;
+	registration.partyQty=document.getElementById('partyNum').value;
+	for(let i=1; i<=Number(registration.partyQty); i++) {
+		registration['seatHolder'+i.toString()]=document.getElementById('person' + i.toString()).value;
+		registration['mealSelect'+i.toString()]=document.getElementById('meal' + i.toString()).selectedOption.value;
+		// seatAssignments structure
+		// -------------------------
+		// seatAssignments.push({
+		// 		"seatId":selectedSeat.id,
+		// 		"personId": assigneeSelect.selectedOption.id,
+		//	 	"personName":assigneeSelect.selectedOption.innerText,
+		// 		"seat":selectedSeat,
+		// 		"person":assigneeSelect.selectedOption
+		// });
+		seatAssignments.forEach(function(assign) {
+			if (assign.personId === 'optPerson' + i.toString()) {
+				registration['seatSelect' + i.toString()] = assign.seatId;
+			}
+		});
+	}
+	console.log(registration);
 });
 
 

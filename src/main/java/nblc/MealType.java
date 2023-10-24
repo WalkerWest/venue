@@ -1,5 +1,5 @@
 package nblc;
 
 public enum MealType {
-    CHICKEN, FISH, STEAK
+    CHICKEN, FISH, STEAK, REGULAR, VEGAN
 }
