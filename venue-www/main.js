@@ -53,7 +53,7 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 	</ui5-bar>
 	<div>
 		<ui5-tabcontainer fixed="true" data-sap-ui-fastnavgroup="true" style="" id="tabs">
-			<ui5-tab text="User" slot="default-1">
+			<ui5-tab text="User" slot="default-1" selected="">
 				<ui5-wizard
 						content-layout="SingleStep"
 						id="wiz-1"
@@ -103,6 +103,21 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 							</ui5-button>
 							</div>
 						</form>
+						<form id="confirmAdminForm" style="display:none;"
+								action="/rest/verifyAdminPasswd" method="post">
+							<div style="margin-top:10px;margin-left:15px;">
+								<ui5-label show-colon="" for="adminPasswd" required="">
+									Password</ui5-label>
+								<ui5-input name="adminPasswd" id="adminPasswd" required="" 
+									type="Password" placeholder="Enter the admin password">
+								</ui5-input>
+							</div>
+							<div style="padding-top:20px" id="toStep2Div">
+							<ui5-button design="Emphasized" type="Submit">Logon
+							</ui5-button>
+							</div>
+						</form>
+						
 					</ui5-wizard-step>
 					
 					<!-- ************* STEP #2: PARTY IDENT  ************* -->
@@ -153,9 +168,11 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 						As you click green boxes, they change colors and prompt 
 						for which attendee is assigned to the seat.
 						</ui5-label>
-						<div style="margin-top:15px;" id="userPickerDiv"></div>
+						<div style="width:100%;text-align:right;">
 						<ui5-button design="Emphasized" id="wiz-1-toStep4" disabled="" 
 							type="Submit">Step 4</ui5-button>
+						</div>
+						<div style="margin-top:15px;" id="userPickerDiv"></div>
 					</ui5-wizard-step>
 					
 					<!-- ************ STEP #4: MEAL SELECTION ************ -->
@@ -209,7 +226,7 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 							<ui5-label show-colon>"Little Ladies" Attendees</ui5-label>
 							<ui5-slider min="0" max="5" label-interval="1" 
 								show-tickmarks="" show-tooltip="" id="littleNum" 
-								style="height:75px;"></ui5-slider>
+								style="height:75px;width:95%;"></ui5-slider>
 						</div>
 						<ui5-title level="H4">Total Donation</ui5-title>
 						<ui5-table>
@@ -264,6 +281,14 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 							type="Submit">Finalize</ui5-button>
 						</div>
 						</form>
+						<div id="confirmDiv" style="display:none;">
+							<ui5-title level="H4">Order Confirmed</ui5-title>
+							<ui5-label wrapping-type="Normal" id="confirmLabel"
+								style="padding-top:10px;padding-bottom:10px;" >
+							Confirmation Number:  
+							<b><span id="confirmNumber"></span></b>
+							</ui5-label>
+						</div>
 					</ui5-wizard-step>
 					<!--<ui5-wizard-step
 							icon="decision" disabled=""
@@ -272,7 +297,7 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 					</ui5-wizard-step>-->
 				</ui5-wizard>
 			</ui5-tab>
-			<ui5-tab text="Admin" slot="default-2" selected=""> 
+			<ui5-tab text="Admin" slot="default-2"> 
 				<div> 
 					<div>
 						<ui5-label for="resSelect" show-colon>Selected Reservation</ui5-label>
@@ -363,8 +388,14 @@ document.getElementById('emailAddrForm').addEventListener('submit',function(even
 	var mailAddr = document.getElementById("emailAddr");
 	mailAddr.disabled=true;
 	document.getElementById("toConfirmDiv").hidden=true;
-	document.getElementById("confirmCodeForm").style.display="block";
-	console.log("Ready to send an e-mail to "+mailAddr.value+"!");
+	if(mailAddr.value==='admin') {
+		event.preventDefault();
+		document.getElementById("confirmAdminForm").style.display="block";
+		console.log("Prompt for admin password!");
+	} else {
+		document.getElementById("confirmCodeForm").style.display="block";
+		console.log("Ready to send an e-mail to "+mailAddr.value+"!");
+	}
 },false);
 
 document.getElementById("wiz-1-toStep2").onclick = function() {
@@ -633,38 +664,93 @@ littleNum.addEventListener('change',function() {
 	document.getElementById("grandTotal").innerText=USDollar.format(totalAdults+totalLittles);
 },false);
 
+var alreadySubmitted=false;
 
 document.getElementById('paymentForm').addEventListener('submit',function(event) {
 	event.preventDefault();
-	// Fields for database write
-	// -------------------------
-	// partyName
-	// partyQty
-	// seatHolder1-19
-	// seatSelect1-19
-	// mealSelect1-19
-	var registration={};
-	registration.partyName=document.getElementById("emailAddr").value;
-	registration.partyQty=document.getElementById('partyNum').value;
-	for(let i=1; i<=Number(registration.partyQty); i++) {
-		registration['seatHolder'+i.toString()]=document.getElementById('person' + i.toString()).value;
-		registration['mealSelect'+i.toString()]=document.getElementById('meal' + i.toString()).selectedOption.value;
-		// seatAssignments structure
-		// -------------------------
-		// seatAssignments.push({
-		// 		"seatId":selectedSeat.id,
-		// 		"personId": assigneeSelect.selectedOption.id,
-		//	 	"personName":assigneeSelect.selectedOption.innerText,
-		// 		"seat":selectedSeat,
-		// 		"person":assigneeSelect.selectedOption
-		// });
-		seatAssignments.forEach(function(assign) {
-			if (assign.personId === 'optPerson' + i.toString()) {
-				registration['seatSelect' + i.toString()] = assign.seatId;
-			}
-		});
+	if(!alreadySubmitted) {
+		let registration={};
+		const form = document.createElement('form');
+		form.method="post";
+		form.action="/rest/postReservation";
+
+		registration.partyName=document.getElementById("emailAddr").value;
+		form.appendChild(Object.assign(document.createElement("input"), {
+			type: "hidden",
+			name: "partyName",
+			value: registration.partyName
+		}));
+
+		registration.partyQty=document.getElementById('partyNum').value;
+		form.appendChild(Object.assign(document.createElement("input"), {
+			type: "hidden",
+			name: "partyQty",
+			value: registration.partyQty
+		}));
+
+		for(let i=1; i<=Number(registration.partyQty); i++) {
+
+			registration['seatHolder'+i.toString()]=document.getElementById('person' + i.toString()).value;
+			form.appendChild(Object.assign(document.createElement("input"), {
+				type: "hidden",
+				name: 'seatHolder'+i.toString(),
+				value: registration['seatHolder'+i.toString()]
+			}));
+
+			registration['mealSelect'+i.toString()]=document.getElementById('meal' + i.toString()).selectedOption.value;
+			form.appendChild(Object.assign(document.createElement("input"), {
+				type: "hidden",
+				name: 'mealSelect'+i.toString(),
+				value: registration['mealSelect'+i.toString()]
+			}));
+
+			seatAssignments.forEach(function(assign) {
+				if (assign.personId === 'optPerson' + i.toString()) {
+					registration['seatSelect' + i.toString()] = assign.seatId;
+					form.appendChild(Object.assign(document.createElement("input"), {
+						type: "hidden",
+						name: 'seatSelect' + i.toString(),
+						value: registration['seatSelect' + i.toString()]
+					}));
+				}
+			});
+		}
+		console.log(registration);
+		document.body.appendChild(form);
+		if(!window.location.href.includes(5173)) form.submit();
+		document.getElementById("step1").disabled=true;
+		document.getElementById("step2").disabled=true;
+		document.getElementById("step3").disabled=true;
+		document.getElementById("step4").disabled=true;
+		littleNum.disabled=true;
+		document.getElementById("finalButton").hidden=true;
+		document.getElementById("confirmDiv").style.display="block";
+		document.getElementById("confirmNumber").innerText=document.getElementById("confirmCode").value;
 	}
-	console.log(registration);
+});
+
+document.getElementById('confirmAdminForm').addEventListener('submit',function(event) {
+	event.preventDefault();
+	console.log("Check password");
+	let passwd = document.getElementById("adminPasswd").value;
+	if(window.location.href.includes(5173)) {
+		window.location = "admin.html";
+	}
+	else {
+		fetch(myHost+'/rest/checkAdminPassword?passwd='+passwd).then(response => {
+			response.json().then(r2 => {
+				if(r2==true) {
+					console.log("Password confirmed!");
+					window.location = "admin.html";
+					//gotoPanel2();
+				} else {
+					console.log(r2);
+					console.log("Access denied!");
+				}
+			});
+		});
+
+	}
 });
 
 

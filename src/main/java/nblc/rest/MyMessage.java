@@ -190,5 +190,27 @@ public class MyMessage {
         }
     }
 
+    private static final EnvironmentProperties env =
+            new DefaultEnvironmentProperties();
+    private static final String ADMINPASSWD =
+            env.getEnvironmentProperties("adminpasswd");
+
+    @Path("checkAdminPassword") @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public boolean checkAdminPassword(@QueryParam("passwd") String adminPasswd) {
+        Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
+                "Verify the admin password.");
+        if(adminPasswd.equals(ADMINPASSWD)) {
+            Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
+                    "Welcome back: admin!");
+            return true;
+        }
+        else {
+            Logger.getLogger(MyMessage.class.getName()).log(Level.SEVERE,
+                    "Invalid admin password!");
+            return false;
+        }
+    }
+
 }
 
