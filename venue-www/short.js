@@ -73,6 +73,12 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 				As you click green boxes, they change colors and prompt 
 				for which attendee is assigned to the seat.
 				</ui5-label>
+				<ui5-label wrapping-type="Normal" 
+					style="padding-top:10px;padding-bottom:20px;">
+				Please only choose seats for adults that you registered 
+				and do not include "Little Ladies."
+				</ui5-label>
+				
 				<form id="paymentForm">
 				<ui5-label required show-colon>Party Identification</ui5-label>
 				<ui5-input id="partyId" placeholder="Horner Party of 5"
