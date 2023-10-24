@@ -255,7 +255,13 @@ public class DataAccessDerby implements DataAccess {
         if(needsUploading) uploadDb();
     }
 
+    private static final EnvironmentProperties env =
+            new DefaultEnvironmentProperties();
+    private static final String UPLOADDB =
+            env.getEnvironmentProperties("uploaddb");
+
     public void uploadDb() {
+        if(UPLOADDB.equals("0")) return;
         try {
             //String tarFileName = source.getFileName().toString() + ".tar.gz";
             Files.walkFileTree(Paths.get(dbPath),
