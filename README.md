@@ -129,3 +129,6 @@ Remember, to access Google Drive, this app requires the following environment va
 * [SVG Pan Zoom](https://github.com/bumbu/svg-pan-zoom)
 * [UI5 Wizard](https://sap.github.io/ui5-webcomponents/playground/?path=/story/fiori-wizard--page-mode)
 
+## Maven Notes
+
+* Download dependences:  `mvn dependency:copy-dependencies`
