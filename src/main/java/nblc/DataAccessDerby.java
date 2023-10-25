@@ -106,7 +106,7 @@ public class DataAccessDerby implements DataAccess {
                     myList.add(new ReservedSeat(
                             r,
                             mySeat,
-                            rs.getString("person"),
+                            rs.getString("name"),
                             MealType.valueOf(rs.getString("mealEnum"))
                     ));
                 }

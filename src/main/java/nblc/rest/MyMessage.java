@@ -96,6 +96,15 @@ public class MyMessage {
         add(new Table(25,TEN));
     }};
 
+    public static int getTable(Seat sIn) {
+        for(Table t : MyMessage.tables) {
+            for(Seat s : t.seats) {
+                if(sIn==s) return t.num; 
+            }
+        }
+        return -1;
+    }
+
     @POST
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
