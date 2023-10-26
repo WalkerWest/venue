@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				then(blob => {
 					var file = window.URL.createObjectURL(blob);
 					const link = document.createElement('a');
-					link href = file;
+					link.href = file;
 					link.download = "attendees.csv";
 					link.dispatchEvent(
 						new MouseEvent('click',{
