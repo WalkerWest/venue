@@ -133,14 +133,28 @@ document.addEventListener('DOMContentLoaded', function() {
 			console.log('Time to display ADD form!');
 			//addFormDiv.style.display='block';
 			//delRes.style.display='none';
-			window.location("./short.html");
+			window.location="./short.html";
 		}
 		else if(resBox.value==='998') {
 			console.log('Time to download CSV!');
 			fetch(myHost+'/rest/attendees').then(res => res.blob()).
 				then(blob => {
 					var file = window.URL.createObjectURL(blob);
-					window.location.assign(file);
+					const link = document.createElement('a');
+					link href = file;
+					link.download = "attendees.csv";
+					link.dispatchEvent(
+						new MouseEvent('click',{
+							bubbles: true,
+							cancelable: true,
+							view: window
+						})
+					);
+					setTimeout(() => {
+						window.URL.revokeObjectURL(file);
+						link.remove();
+					}, 100);
+					//window.location.assign(file);
 				});;
 		}
 		else if (!isNaN(resBox.value)) {
