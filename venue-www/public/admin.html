@@ -133,13 +133,14 @@ document.addEventListener('DOMContentLoaded', function() {
 			console.log('Time to display ADD form!');
 			//addFormDiv.style.display='block';
 			//delRes.style.display='none';
-			window.location.replace("./short.html");
+			window.location("./short.html");
 		}
 		else if(resBox.value==='998') {
 			console.log('Time to download CSV!');
 			fetch(myHost+'/rest/attendees').then(res => res.blob()).
 				then(blob => {
 					var file = window.URL.createObjectURL(blob);
+					window.location.assign(file);
 				});;
 		}
 		else if (!isNaN(resBox.value)) {
