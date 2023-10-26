@@ -98,12 +98,12 @@ button:focus-visible {
   }
 }
 
-ui5-wizard::part(div).ui5-wiz-content {
+ui5-wizard::part(navigator) {
   padding-left:30px !important;
   padding-right:30px !important;
 }
 
-ui5-wizard::part(nav).ui5-wiz-nav {
+ui5-wizard::part(step-content) {
   padding-left:30px !important;
   padding-right:30px !important;
 }
