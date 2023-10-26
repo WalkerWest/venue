@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch(myHost+'/rest/reservation').then(response => {
       response.json().then(r2 => {
         reservations=r2;
-        for (var i=resSel.length; i>1; i--) {
+        for (var i=resSel.length; i>2; i--) {
           resSel.remove(i);
         }
         reservations.forEach(function (r) {
@@ -132,16 +132,19 @@ document.addEventListener('DOMContentLoaded', function() {
 		if(resBox.value==='999') {
 			console.log('Time to display ADD form!');
 			addFormDiv.style.display='block';
-            delRes.style.display='none';
+			delRes.style.display='none';
 		}
-        else if (!isNaN(resBox.value)) {
-          delRes.style.display='inline-block';
-          addFormDiv.style.display='none';
-        }
-        else {
-          delRes.style.display='none';
-          addFormDiv.style.display='none';
-        }
+		else if(resBox.value==='998') {
+			console.log('Time to download CSV!');
+		}
+		else if (!isNaN(resBox.value)) {
+			delRes.style.display='inline-block';
+			addFormDiv.style.display='none';
+		}
+		else {
+			delRes.style.display='none';
+			addFormDiv.style.display='none';
+		}
 	},false);
     delRes.addEventListener('click',function() {
         console.log("It's time to delete reservation "+resBox.value+"!");
@@ -223,8 +226,9 @@ function createRow() {
 	<div>
 	<b>Selected reservation:</b>
 	<select id="reservation">
-		<option value="0">--SELECT ONE--</option>
-        <option value="999">--ADD NEW--</option>
+		<option value="0"  >----SELECT ONE----</option>
+		<option value="999">-----ADD NEW------</option>
+		<option value="998">-- DOWNLOAD CSV --</option>
 		<option value="1">HORNER, JESSICA</option>
 		<option value="2">REIDFORD, SHARRON</option>
 		<option value="3">WEST, JUDY</option>

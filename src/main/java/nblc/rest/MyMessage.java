@@ -120,8 +120,9 @@ public class MyMessage {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuuMMddHHmmss");
             LocalDateTime localTime = LocalDateTime.now();
             String filename = "attendees-"+dtf.format(localTime)+".csv";
-            DataAccess da = new DataAccessDerby();
             List<Reservation> lr = da.getReservations();
+            String header = "\"Party\",\"Seat\",\"Person\"\n";
+            baos.write(header.getBytes());
             for (Reservation r : lr) {
                 List<ReservedSeat> sl = da.getReservedSeats(r);
                 for (ReservedSeat s : sl) {
