@@ -94,7 +94,7 @@ public class DataAccessDerby implements DataAccess {
         try {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM reserved_seats " +
-                    "WHERE reservationId='"+r.reservationId+"'");
+                    "WHERE reservationId="+r.reservationId+"");
             while (rs.next()) {
                 Pattern pattern = Pattern.
                         compile("^S(?<table>[0-9]+)-(?<seat>[0-9]+)$");
@@ -123,7 +123,7 @@ public class DataAccessDerby implements DataAccess {
         try {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT seatId FROM reserved_seats " +
-                    "WHERE reservationId="+r.reservationId);
+                    "WHERE reservationId="+r.reservationId+"");
             while (rs.next()) myList.add(rs.getString("seatId"));
         } catch (SQLException se) {
             logger.error(se.getMessage());

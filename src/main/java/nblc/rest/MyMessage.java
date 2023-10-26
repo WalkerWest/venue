@@ -20,6 +20,12 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.io.ByteArrayOutputStream;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+
 @Path("") @Immediate
 public class MyMessage {
 
@@ -103,6 +109,35 @@ public class MyMessage {
             }
         }
         return -1;
+    }
+
+    @GET
+    @Path("attendees")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getAttendees() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuuMMddHHmmss");
+            LocalDateTime localTime = LocalDateTime.now();
+            String filename = "attendees-"+dtf.format(localTime)+".csv";
+            DataAccess da = new DataAccessDerby();
+            List<Reservation> lr = da.getReservations();
+            for (Reservation r : lr) {
+                List<ReservedSeat> sl = da.getReservedSeats(r);
+                for (ReservedSeat s : sl) {
+                    String seat = "T"+String.format("%02d",
+                        MyMessage.getTable(s.seat))+"-S"+
+                        String.format("%02d",s.seat.number);
+                    String line = "\""+r.name+"\",\""+seat+"\",\""+s.person;
+                }
+            }
+            ResponseBuilder builder = Response.ok(baos.toByteArray());
+	    builder.header("Content-Disposition", "attachment; filename=" + filename);
+            return builder.build();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @POST

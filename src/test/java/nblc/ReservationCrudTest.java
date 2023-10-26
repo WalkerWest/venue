@@ -31,9 +31,6 @@ public class ReservationCrudTest
     @Test
     public void testRetrieve() {
 	try {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuuMMddHHmmss");
-            LocalDateTime localTime = LocalDateTime.now();
-            System.out.println(dtf.format(localTime)); 
             DataAccess da = new DataAccessDerby();		
 	    List<Reservation> lr = da.getReservations();
 	    System.out.println("Size of list is "+lr.size());
