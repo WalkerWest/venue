@@ -51,52 +51,49 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 		<ui5-button icon="home" tooltip="Go home" slot="startContent" icon-only="" has-icon=""></ui5-button>
 		<ui5-label slot="startContent">NBLC Christmas Tea</ui5-label>
 	</ui5-bar>
-	<div>
-		<ui5-wizard
-				content-layout="SingleStep"
-				id="wiz-1"
-				data-sap-ui-fastnavgroup="true"
-				width="0"
-				content-height="0">
-				
-			<!-- ************** STEP #3: PICK SEATS ************** -->
-			<ui5-wizard-step
-					id="step3"
-					icon="sys-find" disabled=""
-					title-text="Seats"
-					slot="default-3">
-				<ui5-title level="H3">Pick Your Seats</ui5-title>
-				<ui5-label wrapping-type="Normal" 
-					style="padding-top:10px;padding-bottom:10px;">
-				In the diagram below, red boxes represent seats that
-				are taken and green ones represent available seats.  
-				As you click green boxes, they change colors and prompt 
-				for which attendee is assigned to the seat.
-				</ui5-label>
-				<ui5-label wrapping-type="Normal" 
-					style="padding-top:10px;padding-bottom:20px;">
-				Please only choose seats for adults that you registered 
-				and do not include "Little Ladies."
-				</ui5-label>
-				
-				<form id="paymentForm">
-				<ui5-label required show-colon>Party Identification</ui5-label>
-				<ui5-input id="partyId" placeholder="Horner Party of 5"
-					required="" 
-					style="--_ui5-v1-18-0-input-icons-count: 0;">
-				</ui5-input>
-				<div style="width:100%;text-align:right;" id="finalDiv">
-				<ui5-button design="Emphasized" id="finalButton" disabled="" 
-					type="Submit">Finalize</ui5-button>
-				</div>
-				</form>
-				<div id="confirmDiv" style="width:100%;text-align:right;display:none;">
-					<ui5-title level="H4">Seats booked!</ui5-title>
-				</div>
-				<div style="margin-top:15px;" id="userPickerDiv"></div>
-			</ui5-wizard-step>
-		</ui5-wizard>
-	</div>
+	<ui5-wizard
+			content-layout="SingleStep"
+			id="wiz-1"
+			data-sap-ui-fastnavgroup="true"
+			width="0"
+			content-height="0">
+			
+		<ui5-wizard-step
+				id="step3"
+				icon="sys-find" disabled=""
+				title-text="Seats"
+				slot="default-3">
+			<ui5-title level="H3">Pick Your Seats</ui5-title>
+			<ui5-label wrapping-type="Normal" 
+				style="padding-top:10px;padding-bottom:10px;">
+			In the diagram below, red boxes represent seats that
+			are taken and green ones represent available seats.  
+			As you click green boxes, they change colors and prompt 
+			for which attendee is assigned to the seat.
+			</ui5-label>
+			<ui5-label wrapping-type="Normal" 
+				style="padding-top:10px;padding-bottom:20px;">
+			Please only choose seats for adults that you registered 
+			and do not include "Little Ladies."
+			</ui5-label>
+			
+			<form id="paymentForm">
+			<ui5-label required show-colon>Party Identification</ui5-label>
+			<ui5-input id="partyId" placeholder="Horner Party of 5"
+				required="" 
+				style="--_ui5-v1-18-0-input-icons-count: 0;">
+			</ui5-input>
+			<div style="width:100%;text-align:right;" id="finalDiv">
+			<ui5-button design="Emphasized" id="finalButton" disabled="" 
+				type="Submit">Finalize</ui5-button>
+			</div>
+			</form>
+			<div id="confirmDiv" style="width:100%;text-align:right;display:none;">
+				<ui5-title level="H4">Seats booked!</ui5-title>
+			</div>
+			<div style="margin-top:15px;" id="userPickerDiv"></div>
+		</ui5-wizard-step>
+	</ui5-wizard>
 </ui5-page>
 <ui5-popover header-text="Assign Seat"
 		style="z-index: 110; display: none;" 
