@@ -98,12 +98,12 @@ button:focus-visible {
   }
 }
 
-div.ui5-wiz-content {
-  padding-left:30px;
-  padding-right:30px;
+ui5-wizard::part(div).ui5-wiz-content {
+  padding-left:30px !important;
+  padding-right:30px !important;
 }
 
-nav.ui5-wiz-nav {
-  padding-left:30px;
-  padding-right:30px;
+ui5-wizard::part(nav).ui5-wiz-nav {
+  padding-left:30px !important;
+  padding-right:30px !important;
 }
