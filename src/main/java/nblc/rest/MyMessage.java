@@ -129,6 +129,7 @@ public class MyMessage {
                         MyMessage.getTable(s.seat))+"-S"+
                         String.format("%02d",s.seat.number);
                     String line = "\""+r.name+"\",\""+seat+"\",\""+s.person;
+		    baos.write(line.getBytes());
                 }
             }
             ResponseBuilder builder = Response.ok(baos.toByteArray());
