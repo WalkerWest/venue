@@ -137,7 +137,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 		else if(resBox.value==='998') {
 			console.log('Time to download CSV!');
-    			fetch(myHost+'/rest/attendees');
+			fetch(myHost+'/rest/attendees').then(res => res.blob()).
+				then(blob => {
+					var file = window.URL.createObjectURL(blob);
+				});;
 		}
 		else if (!isNaN(resBox.value)) {
 			delRes.style.display='inline-block';
