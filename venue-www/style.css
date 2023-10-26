@@ -97,3 +97,13 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+div.ui5-wiz-content {
+  padding-left:30px;
+  padding-right:30px;
+}
+
+nav.ui5-wiz-nav {
+  padding-left:30px;
+  padding-right:30px;
+}

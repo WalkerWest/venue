@@ -7,3 +7,4 @@ cd /app/venue
 # /usr/bin/screen -d -m java -jar target/tea-1.0-SNAPSHOT-jar-with-dependencies.jar
 # java -jar target/tea-1.0-SNAPSHOT-jar-with-dependencies.jar
 
+
