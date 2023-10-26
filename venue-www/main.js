@@ -264,7 +264,7 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 									<span id="qtyLittles">0</span>
 								</ui5-table-cell>
 								<ui5-table-cell style="text-align: right" slot="default-3">
-									<span>$0.00</span>
+									<span>$7.00</span>
 								</ui5-table-cell>
 								<ui5-table-cell style="text-align: right" slot="default-4">
 									<span id="dollarsLittles">$0.00</span>

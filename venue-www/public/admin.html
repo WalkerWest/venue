@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 		else if(resBox.value==='998') {
 			console.log('Time to download CSV!');
+    			fetch(myHost+'/rest/attendees');
 		}
 		else if (!isNaN(resBox.value)) {
 			delRes.style.display='inline-block';
