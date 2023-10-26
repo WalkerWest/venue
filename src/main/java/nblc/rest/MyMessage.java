@@ -128,7 +128,7 @@ public class MyMessage {
                     String seat = "T"+String.format("%02d",
                         MyMessage.getTable(s.seat))+"-S"+
                         String.format("%02d",s.seat.number);
-                    String line = "\""+r.name+"\",\""+seat+"\",\""+s.person;
+                    String line = "\""+r.name+"\",\""+seat+"\",\""+s.person+"\"\n";
 		    baos.write(line.getBytes());
                 }
             }
