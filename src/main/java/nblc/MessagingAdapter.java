@@ -52,7 +52,7 @@ public class MessagingAdapter extends WebSocketAdapter {
     {
         super.onWebSocketText(message);
 
-        if(!message.equals("ping")) {
+        if(!message.equals("ping") && !message.equals("initSeats")) {
             Gson g = new Gson();
             SeatState ss = g.fromJson(message, SeatState.class);
             if (ss.state.equals("pending")) {
@@ -85,6 +85,15 @@ public class MessagingAdapter extends WebSocketAdapter {
         if (message.toLowerCase(Locale.US).contains("bye"))
         {
             getSession().close(StatusCode.NORMAL, "Thanks");
+        }
+        else if (message.toLowerCase(Locale.US).contains("initseats")) {
+            for(Session s : WsSingleton.getInstance().sessionDict.keySet()) {
+                for (String seat : WsSingleton.getInstance().sessionDict.get(s)) {
+                    try {
+                        this.getSession().getRemote().sendString("{\"seat\":\""+seat+"\", \"state\":\"pending\"}");
+                    } catch (IOException e) { }
+                }
+            }
         }
     }
 

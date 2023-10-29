@@ -208,16 +208,19 @@ class SeatPicker extends HTMLElement {
 									seat.style.fill = "red";
 								}
 								else {
+									/*
 									if(seat.style.fill === "yellow") {
 										picker.reservedSeats.push(seat);
 									}
-									else seat.style.fill = "green";
+									else */ seat.style.fill = "green";
 								}
 							}
 							seat.addEventListener("click",p.seatClicked);
 						}
 					}
 				}
+				console.log("Requesting pending seats...");
+				picker.seatSocket.send("initSeats");
 			}.bind(null, picker),10);
 		};
 	}
