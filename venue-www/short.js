@@ -239,7 +239,7 @@ document.getElementById('paymentForm').addEventListener('submit',function(event)
 							document.getElementById("bookedMessage").innerHTML="Seats booked; " +
 								"confirmation code: <br>"+r2;
 							document.getElementById("confirmDiv").style.display="block";
-
+							document.getElementById("userPicker").setAttribute("finalized","1");
 						}
 						/*
                         if(r2==true) {

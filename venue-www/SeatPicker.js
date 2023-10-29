@@ -21,6 +21,8 @@ class SeatPicker extends HTMLElement {
 		this.seatsListener=null;
 		this.selectedSeats=[];
 		this.reservedSeats=[];
+		this.seatSocket=null;
+		this.pingCount=0;
 	}
 
 	connectedCallback() {
@@ -47,9 +49,10 @@ class SeatPicker extends HTMLElement {
 			<slot name="reserved-seat" @slotchange=${this.onSlotChange}></slot>
 		`;
 		render(rootTemplate,this.root);
+		this.connect_socket();
 	}
 
-	static observedAttributes = ["maxselect","activated","id"];
+	static observedAttributes = ["maxselect","activated","id","finalized"];
 
 	attributeChangedCallback(name, oldValue, newValue) {
 		if(name==="maxselect") {
@@ -87,6 +90,30 @@ class SeatPicker extends HTMLElement {
 			window.addEventListener('seatsReceived',
 				this.seatsListener,true);
 		}
+		else if(name==="finalized" && oldValue==null) {
+			let i = 0;
+			console.log("selectedSeat length is: "+this.selectedSeats.length);
+			console.log(this.selectedSeats);
+			while (i<this.selectedSeats.length) {
+				console.log("working on seat: "+i);
+				if(this.seatSocket!=null && this.seatSocket.readyState == 1) {
+					console.log("sending 'reserved' status");
+					this.seatSocket.send(JSON.stringify({
+						"seat":this.selectedSeats[i].id,
+						"state":"reserved"
+					}));
+				}
+				else {
+					console.log("socket is not ready");
+				}
+				i++;
+			}
+			/*
+			this.selectedSeats.forEach(function(seat) {
+				if(!this.seatSocket) this.seatSocket.send(JSON.stringify({"seat":seat.id,"state":"reserved"}));
+			});
+			*/
+		}
 		else console.log("Attribute "+name+" was changed!");
 	}
 
@@ -98,7 +125,30 @@ class SeatPicker extends HTMLElement {
 	onEmbedUnload() { console.log("Unloading "+this.elementId); }
 
 	onSlotChange(e) {
-		console.log("Reserved seat added to slot!");
+		console.log("Reserved seat added to / removed from slot!");
+		console.log(this);
+		//console.log(this.assignedElements());
+		//console.log(this.assignedNodes());
+		//console.log(e.target);
+
+		/*
+		console.log(e);
+		const myEle=document.getElementById("userPickerSvg");
+		const myDoc = myEle?.getSVGDocument();
+		let nodeList = document.getElementsByTagName("reserved-seat");
+		let seatList = Array.prototype.slice.call(nodeList);
+		let i = 0;
+		while (i<seatList.length) {
+			let seatId = seatList[i].getAttribute("id");
+			if(this.slotList.includes(seatList[i])) {
+				myDoc.getElementById(seatId).style.fill="green";
+				this.slotList.spice(this.slotList.indexOf(seatList[i]),1);
+			} else {
+				myDoc.getElementById(seatId).style.fill="yellow";
+				this.slotList.push(seatList[i]);
+			}
+		}
+		*/
 	}
 
 	onEmbedLoad() {
@@ -157,7 +207,12 @@ class SeatPicker extends HTMLElement {
 									picker.reservedSeats.push(seat);
 									seat.style.fill = "red";
 								}
-								else seat.style.fill = "green";
+								else {
+									if(seat.style.fill === "yellow") {
+										picker.reservedSeats.push(seat);
+									}
+									else seat.style.fill = "green";
+								}
 							}
 							seat.addEventListener("click",p.seatClicked);
 						}
@@ -234,6 +289,7 @@ class SeatPicker extends HTMLElement {
 				bubbles: true
 			});
 			this.dispatchEvent(seatSelected);
+			this.seatSocket.send(JSON.stringify({"seat":seat.id,"state":"pending"}));
 		} else if (this.selectedSeats.includes(seat) && this.getAttribute('maxselect'!=="0")) {
 			const index = this.selectedSeats.indexOf(seat);
 			this.selectedSeats.splice(index,1);
@@ -245,8 +301,56 @@ class SeatPicker extends HTMLElement {
 				bubbles: true
 			});
 			this.dispatchEvent(seatUnselected);
+			this.seatSocket.send({"seat":seat.id,"state":"nonpending"});
 		}
 		//console.log('selectedSeat array: '+this.selectedSeats);
+	}
+
+	connect_socket() {
+		if(window.location.protocol==='https:')
+			this.seatSocket = new WebSocket("wss://"+window.location.host+"/ws/msg");
+		else
+			this.seatSocket = new WebSocket("ws://"+window.location.host+"/ws/msg");
+		this.seatSocket.addEventListener("open", e => {
+			this.heartbeat(this.seatSocket,this.pingCount);
+		});
+		this.seatSocket.onclose = (event) => this.connect_socket;
+		this.seatSocket.onmessage = (event) => {
+			console.log(event.data);
+			try {
+				let myMsg = JSON.parse(event.data);
+				console.log(myMsg.seat);
+				console.log(myMsg.state);
+				let sp = document.getElementById(this.elementId);
+				//let rs = document.createElement("reserved-seat");
+				//rs.setAttribute("id","S13-13");
+				//rs.setAttribute("slot","reserved-seat");
+				//sp.appendChild(rs);
+				let myDoc = sp?.getSVGDocument();
+				let seat = myDoc.getElementById(myMsg.seat);
+				if(myMsg.state=="pending") {
+					seat.style.fill="yellow";
+					this.reservedSeats.push(seat);
+				} else if(myMsg.state=="nonpending") {
+					seat.style.fill="green";
+					this.reservedSeats = reservedSeats.filter(e => e!=seat);
+				} else if(myMsg.state=="reserved") {
+					seat.style.fill="red";
+					this.reservedSeats.push(seat);
+				}
+			} catch (err) {
+				if(event.data=="pong")console.log("response received!");
+			}
+		};
+	}
+
+	heartbeat(seatSocket,pingCount) {
+		if(!seatSocket) return;
+		if(seatSocket.readyState !== 1) return;
+		seatSocket.send("ping");
+		if(pingCount++===21) location.reload()
+		let that = this;
+		setTimeout(function() { that.heartbeat(seatSocket,pingCount)},30000);
 	}
 
 }

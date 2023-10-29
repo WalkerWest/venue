@@ -25,6 +25,13 @@ public class MessagingAdapter extends WebSocketAdapter {
         logger.debug("Endpoint connected: {}", sess);
         WsSingleton.getInstance().sessionList.add(sess);
         WsSingleton.getInstance().sessionDict.put(sess,new ArrayList<String>());
+        for(Session s : WsSingleton.getInstance().sessionDict.keySet()) {
+            for (String seat : WsSingleton.getInstance().sessionDict.get(s)) {
+                try {
+                    this.getSession().getRemote().sendString("{\"seat\":\""+seat+"\", \"state\":\"pending\"}");
+                } catch (IOException e) { }
+            }
+        }
     }
 
     public void sendReOpenMsg(String seat) {
@@ -50,6 +57,8 @@ public class MessagingAdapter extends WebSocketAdapter {
             SeatState ss = g.fromJson(message, SeatState.class);
             if (ss.state.equals("pending")) {
                 WsSingleton.getInstance().sessionDict.get(getSession()).add(ss.seat);
+            } else if (ss.state.equals("reserved")) {
+                WsSingleton.getInstance().sessionDict.get(getSession()).remove(ss.seat);
             }
             logger.debug("Received TEXT message: {}", message);
         }
