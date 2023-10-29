@@ -293,7 +293,7 @@ class SeatPicker extends HTMLElement {
 			});
 			this.dispatchEvent(seatSelected);
 			this.seatSocket.send(JSON.stringify({"seat":seat.id,"state":"pending"}));
-		} else if (this.selectedSeats.includes(seat) && this.getAttribute('maxselect'!=="0")) {
+		} else if (Number(this.selectedSeats.indexOf(seat))>=0 && this.getAttribute('maxselect')!=="0") {
 			const index = this.selectedSeats.indexOf(seat);
 			this.selectedSeats.splice(index,1);
 			seat.style.fill = "green";
@@ -304,7 +304,7 @@ class SeatPicker extends HTMLElement {
 				bubbles: true
 			});
 			this.dispatchEvent(seatUnselected);
-			this.seatSocket.send({"seat":seat.id,"state":"nonpending"});
+			this.seatSocket.send(JSON.stringify({"seat":seat.id,"state":"nonpending"}));
 		}
 		//console.log('selectedSeat array: '+this.selectedSeats);
 	}

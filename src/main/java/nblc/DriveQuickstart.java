@@ -15,15 +15,13 @@ import com.google.api.services.drive.model.FileList;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import org.javatuples.Pair;
 import org.json.JSONObject;
 
 public class DriveQuickstart {
@@ -105,7 +103,7 @@ public class DriveQuickstart {
 
         // Print the names and IDs for up to 10 files.
         FileList result = service.files().list()
-                .setPageSize(10)
+                .setPageSize(100)
                 .setFields("nextPageToken, files(id, name)")
                 .execute();
         List<File> files = result.getFiles();
@@ -121,12 +119,12 @@ public class DriveQuickstart {
         return files;
     }
 
-    public static void DeleteDb() throws GeneralSecurityException, IOException {
+    public static void DeleteDb(String filename) throws GeneralSecurityException, IOException {
         List<File> driveFiles = Drive();
         File foundFile = null;
         for (File f : driveFiles) {
-            if (f.getName().equals("attendees.tar.gz")) {
-                logger.trace("Found attendees.tar.gz!");
+            if (f.getName().equals(filename)) {
+                logger.trace("Found "+filename+"!");
                 foundFile = f;
                 break;
             }
@@ -142,9 +140,9 @@ public class DriveQuickstart {
         }
     }
 
-    public static String Upload(String inFilePath, Properties prop)
+    public static String Upload(String inFilePath, String folder)
             throws IOException, GeneralSecurityException {
-        if(UPLOADDB.equals("0")) {
+        if(UPLOADDB.equals("0") && !inFilePath.toLowerCase().contains("json")) {
             logger.warn("Database upload is OFF!");
             return null;
         }
@@ -177,7 +175,7 @@ public class DriveQuickstart {
                 logger.info("Creating file now ...");
                 fileMetadata.setParents(Collections.singletonList(
                         driveFiles.stream().filter(f -> f.getName().equals(
-                                prop.getProperty("gDriveFolder")))
+                                folder))
                                 .findFirst().get().getId()));
                 File file = service.files().create(fileMetadata, mediaContent)
                         .setFields("id")
@@ -196,36 +194,39 @@ public class DriveQuickstart {
         }
     }
 
-    public static ByteArrayOutputStream Download()
+    public static HashMap<String,ByteArrayOutputStream> Download()
             throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
+        HashMap<String,ByteArrayOutputStream> retList = new HashMap<String,ByteArrayOutputStream>();
         final NetHttpTransport HTTP_TRANSPORT =
                 GoogleNetHttpTransport.newTrustedTransport();
         List<File> driveFiles = Drive();
 
-        File foundFile = null;
+        List<File> foundFiles = new ArrayList<File>();
         for (File f : driveFiles) {
-            if (f.getName().equals("attendees.tar.gz")) {
-                logger.trace("Found attendees.tar.gz!");
-                foundFile = f;
-                break;
+            if (f.getName().equals("attendees.tar.gz") || f.getName().toLowerCase().contains("json")) {
+                logger.trace(f.getName());
+                foundFiles.add(f);
             }
         }
 
-        if(foundFile!=null) {
-            Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,
-                    getCredentials(HTTP_TRANSPORT))
-                    .setApplicationName(APPLICATION_NAME)
-                    .build();
-            try {
-                OutputStream outputStream = new ByteArrayOutputStream();
-                service.files().get(foundFile.getId()).
-                        executeMediaAndDownloadTo(outputStream);
-                return (ByteArrayOutputStream) outputStream;
-            } catch (GoogleJsonResponseException e) {
-                logger.error("Unable to download file: " + e.getDetails());
-                throw e;
+        if(foundFiles.size()>0) {
+            for(File foundFile : foundFiles) {
+                Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,
+                        getCredentials(HTTP_TRANSPORT))
+                        .setApplicationName(APPLICATION_NAME)
+                        .build();
+                try {
+                    OutputStream outputStream = new ByteArrayOutputStream();
+                    service.files().get(foundFile.getId()).
+                            executeMediaAndDownloadTo(outputStream);
+                    retList.put(foundFile.getName(),(ByteArrayOutputStream) outputStream);
+                } catch (GoogleJsonResponseException e) {
+                    logger.error("Unable to download file: " + e.getDetails());
+                    throw e;
+                }
             }
+            return retList;
         }
         else return null;
     }

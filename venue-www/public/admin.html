@@ -54,7 +54,7 @@ function connect_socket() {
         reservedSeats.push(myMsg.seat);
       }
     } catch (err) {
-      if(myMsg=="pong")console.log("response received!");
+      if(event.data=="pong")console.log("response received!");
     }
   };
 }

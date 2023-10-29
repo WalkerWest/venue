@@ -182,7 +182,7 @@ public class App
 					logger.info("The tarball database backup file is: "+
 							dbPath+".tar.gz");
 					String fileId = DriveQuickstart.Upload(
-							dbPath+".tar.gz",prop);
+							dbPath+".tar.gz",prop.getProperty("gDriveFolder"));
 					if(fileId!=null) logger.info("The archive file id is "+
 							fileId);
 				}

@@ -15,6 +15,8 @@ import static nblc.TableType.*;
 import org.glassfish.hk2.api.Immediate;
 import org.javatuples.Pair;
 
+import java.io.*;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +25,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.io.ByteArrayOutputStream;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response;
 import java.time.format.DateTimeFormatter;
@@ -68,6 +69,9 @@ public class MyMessage {
         Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
                 "I will delete "+resId);
         da.deleteReservation(resId);
+        try {
+            DriveQuickstart.DeleteDb(resId+".json");
+        } catch (GeneralSecurityException | IOException e) { }
         return;
     }
 
@@ -226,6 +230,26 @@ public class MyMessage {
         long resId = da.createReservationTrans(newReservation,tableSeatPairs);
         if(params.get("guid")!=null) {
             guidToPrikeyMap.put(params.get("guid").get(0),resId);
+
+        }
+        if(resId!=-1) {
+            try {
+                OutputStreamWriter writer = new OutputStreamWriter(
+                        new FileOutputStream("/tmp/"+resId+".json"),"UTF-8");
+                BufferedWriter bufWriter = new BufferedWriter(writer);
+                Gson gson = new Gson();
+                bufWriter.write(gson.toJson(newReservation));
+                bufWriter.write("\n");
+                bufWriter.write(gson.toJson(tableSeatPairs));
+                bufWriter.write("\n");
+                bufWriter.close();
+                writer.close();
+                DriveQuickstart.Upload("/tmp/"+resId+".json","venue");
+            }
+            catch (UnsupportedEncodingException e) { }
+            catch (FileNotFoundException e) { }
+            catch (IOException e) { }
+            catch (GeneralSecurityException e) { }
         }
     }
 
@@ -233,8 +257,8 @@ public class MyMessage {
 
     @Path("confirmationCode") @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Long getConfirmationCode(@QueryParam("guid") String guid) {
-        return guidToPrikeyMap.get(guid);
+    public String getConfirmationCode(@QueryParam("guid") String guid) {
+        return guidToPrikeyMap.get(guid).toString();
     }
     public HashMap<Long,String> confirmCodeList = new HashMap<Long,String>();
 
