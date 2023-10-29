@@ -54,7 +54,7 @@ public class ChristmasTea {
 		List<ReservedSeat> res = new ArrayList<ReservedSeat>();
 		int maxSeats = r.seatQty;
 		for(ReservedSeat rs : reserved) {
-			res.add(new ReservedSeat(rs.reservation,rs.seat,rs.person, STEAK));
+			res.add(new ReservedSeat(rs.reservation,rs.seat,rs.person, REGULAR));
 			if(s==rs.seat)throw new Exception("Seat already taken");
 			else if(rs.reservation == r) maxSeats--;
 		}
@@ -63,7 +63,7 @@ public class ChristmasTea {
 		for(Table t : tables) {
 			for(Seat ts : t.seats) {
 				if(ts==s) {
-					res.add(new ReservedSeat(r,s,person, STEAK));
+					res.add(new ReservedSeat(r,s,person, REGULAR));
 					seatReserved=true;
 					break;
 				}

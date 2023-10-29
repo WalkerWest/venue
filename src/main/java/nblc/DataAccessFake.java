@@ -1,5 +1,7 @@
 package nblc;
 
+import org.javatuples.Pair;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -20,6 +22,11 @@ public class DataAccessFake implements DataAccess {
 
     @Override
     public void createReservedSeat(long resId, int tableNo, ReservedSeat rs) { }
+
+    @Override
+    public long createReservationTrans(Reservation r, List<Pair<Integer, ReservedSeat>> tableSeatPairs) {
+        return 0;
+    }
 
     @Override
     public List<ReservedSeat> getReservedSeats(Reservation r) {

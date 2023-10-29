@@ -6,11 +6,14 @@ import javax.ws.rs.core.MediaType;
 import javax.inject.Inject;
 import javax.ws.rs.core.MultivaluedMap;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import io.hypersistence.tsid.TSID;
 import nblc.*;
 import static nblc.TableType.*;
 
 import org.glassfish.hk2.api.Immediate;
+import org.javatuples.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -145,8 +148,8 @@ public class MyMessage {
     @POST
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("postReservation")
-    public void postReservationMv(
+    @Path("postReservationOld")
+    public void postReservationMvOld(
             MultivaluedMap<String,String> params
     ) {
         String partyName = params.get("partyName").get(0);
@@ -182,6 +185,57 @@ public class MyMessage {
         }
     }
 
+    @POST
+    @Produces(MediaType.TEXT_HTML)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("postReservation")
+    public void postReservationMv(
+            MultivaluedMap<String,String> params
+    ) {
+        String partyName = params.get("partyName").get(0);
+        int partyQty = Integer.parseInt(params.get("partyQty").get(0));
+        Reservation newReservation = new Reservation(partyName,partyQty);
+        List<Pair<Integer,ReservedSeat>> tableSeatPairs = new ArrayList<Pair<Integer,ReservedSeat>>();
+        for(int i=1; i<19; i++) {
+            if(params.containsKey("seatHolder"+i)) {
+                String seatSelect =
+                        params.get("seatSelect"+i).get(0);
+                String mealSelect =
+                        params.get("mealSelect"+i).get(0).toUpperCase();
+                Pattern pattern = Pattern.
+                        compile("^S(?<table>[0-9]+)-(?<seat>[0-9]+)$");
+                Matcher matcher = pattern.matcher(seatSelect);
+                if(matcher.find()) {
+                    String seatHolder = params.get("seatHolder"+i).get(0);
+                    int table = Integer.parseInt(matcher.group("table"));
+                    int seat = Integer.parseInt(matcher.group("seat"));
+                    Logger.getLogger(MyMessage.class.getName()).log(Level.INFO,
+                            "Seat "+seat+" at table #"+ table +" reserved for "+
+                                    seatHolder+" who ordered "+mealSelect+"!");
+                    Seat mySeat = tables.get(table-1).seats[seat-1];
+                    ReservedSeat resSeat = new ReservedSeat(
+                            newReservation,
+                            mySeat,
+                            seatHolder,
+                            MealType.valueOf(mealSelect)
+                    );
+                    tableSeatPairs.add(Pair.with(table,resSeat));
+                }
+            }
+        }
+        long resId = da.createReservationTrans(newReservation,tableSeatPairs);
+        if(params.get("guid")!=null) {
+            guidToPrikeyMap.put(params.get("guid").get(0),resId);
+        }
+    }
+
+    public HashMap<String,Long> guidToPrikeyMap = new HashMap<String,Long>();
+
+    @Path("confirmationCode") @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Long getConfirmationCode(@QueryParam("guid") String guid) {
+        return guidToPrikeyMap.get(guid);
+    }
     public HashMap<Long,String> confirmCodeList = new HashMap<Long,String>();
 
     @POST

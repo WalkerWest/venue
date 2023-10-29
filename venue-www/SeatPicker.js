@@ -234,7 +234,7 @@ class SeatPicker extends HTMLElement {
 				bubbles: true
 			});
 			this.dispatchEvent(seatSelected);
-		} else if (this.selectedSeats.includes(seat)) {
+		} else if (this.selectedSeats.includes(seat) && this.getAttribute('maxselect'!=="0")) {
 			const index = this.selectedSeats.indexOf(seat);
 			this.selectedSeats.splice(index,1);
 			seat.style.fill = "green";

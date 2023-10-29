@@ -42,8 +42,18 @@
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-util</artifactId>
         <version>9.4.52.v20230823</version>
-    </dependency>        
-    <dependency>
+    </dependency>
+      <dependency>
+          <groupId>org.eclipse.jetty.websocket</groupId>
+          <artifactId>websocket-api</artifactId>
+          <version>9.4.52.v20230823</version>
+      </dependency>
+      <dependency>
+          <groupId>org.eclipse.jetty.websocket</groupId>
+          <artifactId>websocket-server</artifactId>
+          <version>9.4.52.v20230823</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derby</artifactId>
         <version>10.8.3.0</version>
@@ -184,6 +194,11 @@
         <artifactId>json</artifactId>
         <version>20230618</version>
     </dependency>
+      <dependency>
+          <groupId>org.javatuples</groupId>
+          <artifactId>javatuples</artifactId>
+          <version>1.2</version>
+      </dependency>
     <!--<dependency>
         <groupId>jakarta.mail</groupId>
         <artifactId>jakarta.mail-api</artifactId>

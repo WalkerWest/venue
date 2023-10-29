@@ -61,8 +61,13 @@ public class App
 				new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
 		ctx.setContextPath("/rest");
 
+		// Setup for websocket messaging
+		ServletContextHandler ctx_ws =
+				new ServletContextHandler(ServletContextHandler.SESSIONS);
+		ctx_ws.setContextPath("/ws");
+
 		HandlerCollection handlerCollection = new HandlerCollection();
-		handlerCollection.setHandlers(new Handler[] {ctx, webAppContext /*, webAppContext2*/});
+		handlerCollection.setHandlers(new Handler[] {ctx, ctx_ws, webAppContext /*, webAppContext2*/});
 		server.setHandler(handlerCollection);
 
 		ServletHolder serHol = ctx.addServlet(ServletContainer.class, "/*");
@@ -73,6 +78,8 @@ public class App
 				"nblc.Config");
 		serHol.setInitParameter("java.util.logging.manager",
 				"org.apache.logging.log4j.jul.LogManager");
+
+		ctx_ws.addServlet(MessagingServlet.class,"/msg");
 
 		// Load static content from the top level directory.
 		URL webAppDir = App.class.getClassLoader().getResource("./www/r");

@@ -13,6 +13,7 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.javatuples.Pair;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -64,6 +65,7 @@ public class DataAccessDerby implements DataAccess {
                     "(id, name, seatQty) values (" + myId +
                     ",'" + r.name + "'," + r.seatQty + ")";
             stmt.executeUpdate(sql);
+            conn.commit();
         } catch (SQLException se) {
             logger.error(se.getMessage());
         }
@@ -82,10 +84,56 @@ public class DataAccessDerby implements DataAccess {
             stmt.setString(3,rs.person);
             stmt.setString(4,rs.meal.toString());
             stmt.executeUpdate();
+            conn.commit();
         } catch (SQLException se) {
             logger.error(se.getMessage());
         }
         return;
+    }
+
+    @Override
+    public long createReservationTrans(Reservation r, List<Pair<Integer,ReservedSeat>> tableSeatPairs) {
+        long resId = TSID.fast().toLong();
+        try {
+            Statement stmt = conn.createStatement();
+            String sql="insert into reservations " +
+                    "(id, name, seatQty) values (" + resId +
+                    ",'" + r.name + "'," + r.seatQty + ")";
+            stmt.executeUpdate(sql);
+        } catch (SQLException se) {
+            logger.error(se.getMessage());
+        }
+        for(Pair<Integer,ReservedSeat> tsp : tableSeatPairs) {
+            Integer tableNo = tsp.getValue0();
+            ReservedSeat rs = tsp.getValue1();
+            try {
+                PreparedStatement check = conn.prepareStatement(
+                    "select count (*) as seatCount from reserved_seats where seatId=?"
+                );
+                check.setString(1,"S" + tableNo + "-" + rs.seat.number);
+                ResultSet checkResult = check.executeQuery();
+                while (checkResult.next()) {
+                    if(checkResult.getInt(1)>0) {
+                        conn.rollback();
+                        return -1;
+                    }
+                }
+                PreparedStatement stmt = conn.prepareStatement(
+                        "insert into reserved_seats " +
+                                "(reservationId, seatId, name, mealEnum) " +
+                                "values (?,?,?,?)");
+                stmt.setLong(1,resId);
+                stmt.setString(2,"S" + tableNo + "-" + rs.seat.number);
+                stmt.setString(3,rs.person);
+                stmt.setString(4,rs.meal.toString());
+                stmt.executeUpdate();
+            } catch (SQLException se) {
+                logger.error(se.getMessage());
+            }
+        }
+        try { conn.commit(); }
+        catch (SQLException e) { logger.error(e.getMessage()); }
+        return resId;
     }
 
     @Override
@@ -139,6 +187,7 @@ public class DataAccessDerby implements DataAccess {
                     "WHERE reservationId="+ BigInteger.valueOf(resId));
             num=stmt.executeUpdate("DELETE FROM reservations " +
                     "WHERE id="+BigInteger.valueOf(resId));
+            conn.commit();
         } catch (SQLException se) {
             logger.error(se.getMessage());
         }
@@ -202,6 +251,7 @@ public class DataAccessDerby implements DataAccess {
             logger.info("Attempting database connection...");
             try {
                 conn = DriverManager.getConnection(dbUrl);
+                conn.setAutoCommit(false);
                 databaseConnected=true;
             } catch (Exception ex) {
                 if(ex.getMessage().contains("Failed to start database")) {
@@ -225,6 +275,7 @@ public class DataAccessDerby implements DataAccess {
             needsUploading=true;
             logger.info("Database table 'USERS' must be created ...");
             users.createTable();
+            conn.commit();
             for(String line : users.outputTable()) logger.trace(line);
         }
 
@@ -233,6 +284,7 @@ public class DataAccessDerby implements DataAccess {
             needsUploading=true;
             logger.info("Database table 'RESERVATIONS' must be created ...");
             reservations.createTable();
+            conn.commit();
             for(String line : reservations.outputTable()) logger.trace(line);
         }
         else {
@@ -245,6 +297,7 @@ public class DataAccessDerby implements DataAccess {
             needsUploading=true;
             logger.info("Database table 'RESERVED_SEATS' must be created ...");
             reservedSeats.createTable();
+            conn.commit();
             for(String line : reservedSeats.outputTable()) logger.trace(line);
         }
         else {

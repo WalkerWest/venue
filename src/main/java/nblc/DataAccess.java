@@ -1,5 +1,7 @@
 package nblc;
 
+import org.javatuples.Pair;
+
 import java.util.List;
 
 public interface DataAccess {
@@ -9,6 +11,8 @@ public interface DataAccess {
     public long createReservation(Reservation r);
 
     public void createReservedSeat(long resId, int tableNo, ReservedSeat rs);
+
+    public long createReservationTrans(Reservation r, List<Pair<Integer,ReservedSeat>> tableSeatPairs);
 
     public List<ReservedSeat> getReservedSeats(Reservation r);
 

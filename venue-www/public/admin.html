@@ -24,6 +24,47 @@
 <script>
 var myHost = window.location.origin;
 
+let seatSocket = null;
+
+function connect_socket() {
+  seatSocket = new WebSocket("ws://"+window.location.host+"/ws/msg");
+  seatSocket.addEventListener("open", e => {
+    heartbeat();
+  });
+  seatSocket.onclose = (event) => connect_socket;
+  seatSocket.onmessage = (event) => {
+    console.log(event.data);
+    try {
+      let myMsg = JSON.parse(event.data);
+      console.log(myMsg.seat);
+      console.log(myMsg.state);
+      var seat = document.getElementById(myMsg.seat);
+      if(myMsg.state=="pending") {
+        seat.style.fill="yellow";
+        reservedSeats.push(myMsg.seat);
+      } else if(myMsg.state=="nonpending") {
+        seat.style.fill="green";
+        reservedSeats = reservedSeats.filter(e => e!=myMsg.seat);
+        //reservedSeats.push(myMsg.seat);
+      } else if(myMsg.state=="reserved") {
+        seat.style.fill="red";
+        reservedSeats.push(myMsg.seat);
+      }
+    } catch (err) {
+      if(myMsg=="pong")console.log("response received!");
+    }
+  };
+}
+
+function heartbeat() {
+  if(!seatSocket) return;
+  if(seatSocket.readyState !== 1) return;
+  seatSocket.send("ping");
+  setTimeout(heartbeat,30000);
+}
+
+connect_socket();
+
 var mealChoices = { options: [
     { val: 'BEEF', txt: 'Beef' },
     { val: 'CHICKEN', txt: 'Chicken' },

@@ -89,7 +89,7 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 			</div>
 			</form>
 			<div id="confirmDiv" style="width:100%;text-align:right;display:none;">
-				<ui5-title level="H4">Seats booked!</ui5-title>
+				<ui5-title id="bookedMessage" level="H4">Seats booked!</ui5-title>
 			</div>
 			<div style="margin-top:15px;" id="userPickerDiv"></div>
 		</ui5-wizard-step>
@@ -215,13 +215,55 @@ document.getElementById('paymentForm').addEventListener('submit',function(event)
 		});
 
 		console.log(registration);
+
+		let trackingGuid = uuidv4();
+
+		form.appendChild(Object.assign(document.createElement("input"), {
+			type: "hidden",
+			name: "guid",
+			value: trackingGuid
+		}));
+
 		document.body.appendChild(form);
-		if(!window.location.href.includes(5173)) form.submit();
+		if(!window.location.href.includes(5173)) {
+			form.submit();
+			setTimeout(function() {
+				fetch(myHost+'/rest/confirmationCode?guid='+trackingGuid).then(response => {
+					response.json().then(r2 => {
+						console.log("Response code from submit: "+r2);
+						if(r2=="-1") {
+							document.getElementById("bookedMessage").innerHTML="Failed to book seats;<br>" +
+								"click <a href=\"javascript:location.reload()\">here</a> to try again";
+							document.getElementById("confirmDiv").style.display="block";
+						} else {
+							document.getElementById("bookedMessage").innerHTML="Seats booked; " +
+								"confirmation code: <br>"+r2;
+							document.getElementById("confirmDiv").style.display="block";
+
+						}
+						/*
+                        if(r2==true) {
+                            console.log("Code confirmed!");
+                            gotoPanel2();
+                        } else {
+                            console.log(r2);
+                            console.log("Code denied!");
+                        }
+                        */
+					});
+				});
+			},1500);
+		}
+
 		document.getElementById("finalButton").hidden=true;
-		document.getElementById("confirmDiv").style.display="block";
 		document.getElementById("partyId").disabled=true;
+		document.getElementById("userPicker").setAttribute("maxselect","0");
 		/*document.getElementById("confirmNumber").innerText=document.getElementById("confirmCode").value;*/
 	}
 });
 
-
+function uuidv4() {
+	return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+		(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+	);
+}
