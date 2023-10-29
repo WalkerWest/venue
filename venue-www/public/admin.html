@@ -27,7 +27,10 @@ var myHost = window.location.origin;
 let seatSocket = null;
 
 function connect_socket() {
-  seatSocket = new WebSocket("ws://"+window.location.host+"/ws/msg");
+  if(window.location.protocol==='https:')
+    seatSocket = new WebSocket("wss://"+window.location.host+"/ws/msg");
+  else
+    seatSocket = new WebSocket("ws://"+window.location.host+"/ws/msg");
   seatSocket.addEventListener("open", e => {
     heartbeat();
   });
