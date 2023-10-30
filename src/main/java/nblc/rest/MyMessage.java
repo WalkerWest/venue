@@ -229,7 +229,7 @@ public class MyMessage {
         }
         long resId = da.createReservationTrans(newReservation,tableSeatPairs);
         if(params.get("guid")!=null) {
-            guidToPrikeyMap.put(params.get("guid").get(0),resId);
+            guidToPrikeyMap.put(params.get("guid").get(0),Long.toString(resId));
 
         }
         if(resId!=-1) {
@@ -253,12 +253,15 @@ public class MyMessage {
         }
     }
 
-    public HashMap<String,Long> guidToPrikeyMap = new HashMap<String,Long>();
+    public HashMap<String,String> guidToPrikeyMap = new HashMap<String,String>();
 
     @Path("confirmationCode") @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getConfirmationCode(@QueryParam("guid") String guid) {
-        return guidToPrikeyMap.get(guid).toString();
+    public Response getConfirmationCode(@QueryParam("guid") String guid) {
+        Gson gson = new Gson();
+        return Response.ok(
+                "{\"confirmationCode\":\""+guidToPrikeyMap.get(guid)+"\"}",
+                MediaType.APPLICATION_JSON).build();
     }
     public HashMap<Long,String> confirmCodeList = new HashMap<Long,String>();
 

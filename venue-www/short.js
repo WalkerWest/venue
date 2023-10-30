@@ -230,14 +230,14 @@ document.getElementById('paymentForm').addEventListener('submit',function(event)
 			setTimeout(function() {
 				fetch(myHost+'/rest/confirmationCode?guid='+trackingGuid).then(response => {
 					response.json().then(r2 => {
-						console.log("Response code from submit: "+r2);
-						if(r2=="-1") {
+						console.log("Response code from submit: "+r2.confirmationCode);
+						if(r2.confirmationCode=="-1") {
 							document.getElementById("bookedMessage").innerHTML="Failed to book seats;<br>" +
 								"click <a href=\"javascript:location.reload()\">here</a> to try again";
 							document.getElementById("confirmDiv").style.display="block";
 						} else {
 							document.getElementById("bookedMessage").innerHTML="Seats booked; " +
-								"confirmation code: <br>"+r2;
+								"confirmation code: <br>"+r2.confirmationCode;
 							document.getElementById("confirmDiv").style.display="block";
 							document.getElementById("userPicker").setAttribute("finalized","1");
 						}
