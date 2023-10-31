@@ -95,15 +95,20 @@ public class DataAccessDerby implements DataAccess {
     @Override
     public long createReservationTrans(Reservation r, List<Pair<Integer,ReservedSeat>> tableSeatPairs) {
         long resId = TSID.fast().toLong();
+        boolean gotError=false;
         if(r.reservationId>0) resId = r.reservationId;
         try {
-            Statement stmt = conn.createStatement();
-            String sql="insert into reservations " +
-                    "(id, name, seatQty) values (" + resId +
-                    ",'" + r.name + "'," + r.seatQty + ")";
-            stmt.executeUpdate(sql);
+            PreparedStatement insert = conn.prepareStatement(
+                    "insert into reservations (id, name, seatQty) values (?,?,?)"
+            );
+            insert.setLong(1,resId);
+            insert.setString(2,r.name);
+            insert.setInt(3,r.seatQty);
+            insert.executeUpdate();
         } catch (SQLException se) {
-            logger.error(se.getMessage());
+            logger.error("INSERT Reservations ERROR: "+se.getMessage());
+            gotError=true;
+            resId=-1;
         }
         for(Pair<Integer,ReservedSeat> tsp : tableSeatPairs) {
             Integer tableNo = tsp.getValue0();
@@ -130,10 +135,13 @@ public class DataAccessDerby implements DataAccess {
                 stmt.setString(4,rs.meal.toString());
                 stmt.executeUpdate();
             } catch (SQLException se) {
+                logger.error("INSERT Reserved_Seats ERROR: "+se.getMessage());
                 logger.error(se.getMessage());
+                gotError=true;
+                resId=-1;
             }
         }
-        try { conn.commit(); }
+        try { if(!gotError) conn.commit(); }
         catch (SQLException e) { logger.error(e.getMessage()); }
         return resId;
     }
@@ -378,7 +386,7 @@ public class DataAccessDerby implements DataAccess {
                     tarIn.close();
                 } else if (!isDownloadDb && fileEntry.getKey().toLowerCase().contains("json")) {
                     logger.info("Successfully downloaded "+fileEntry.getKey()+"!");
-                    logger.info("Writing downloaded database to /tmp/"+fileEntry.getKey());
+                    logger.info("Writing downloaded JSON file to /tmp/"+fileEntry.getKey());
                     OutputStream os = new FileOutputStream("/tmp/"+fileEntry.getKey());
                     fileEntry.getValue().writeTo(os);
                     fileEntry.getValue().close();
@@ -391,10 +399,17 @@ public class DataAccessDerby implements DataAccess {
                     String myLine = bufRead.readLine();
                     Reservation r = gson.fromJson(myLine,Reservation.class);
                     //Type pairType = new TypeToken<Pair<Integer,ReservedSeat>>(){}.getType();
+
                     Type listType = new TypeToken<ArrayList<Pair<Integer,ReservedSeat>>>(){}.getType();
                     List<Pair<Integer,ReservedSeat>> resList = gson.fromJson(bufRead.readLine(),listType);
+
                     if(!checkReservation(r.reservationId)) {
-                        this.createReservationTrans(r,resList);
+                        long returnCode = this.createReservationTrans(r,resList);
+                        if(returnCode==-1) {
+                            logger.error("The Reservation could not be created from "+
+                                    fileEntry.getKey()+"; consider removing file from Google Drive");
+                            //DriveQuickstart.DeleteDb(fileEntry.getKey());
+                        }
                     } else if (UPLOADDB.equals("1")) {
                         DriveQuickstart.DeleteDb(fileEntry.getKey());
                     }
