@@ -322,8 +322,8 @@ class SeatPicker extends HTMLElement {
 			console.log(event.data);
 			try {
 				let myMsg = JSON.parse(event.data);
-				console.log(myMsg.seat);
-				console.log(myMsg.state);
+				//console.log(myMsg.seat);
+				//console.log(myMsg.state);
 				let sp = document.getElementById(this.elementId);
 				//let rs = document.createElement("reserved-seat");
 				//rs.setAttribute("id","S13-13");
