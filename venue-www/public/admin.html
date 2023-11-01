@@ -1,30 +1,12 @@
 <html>
 <head>
 <title>Christmas Tea 2023 (Admin)</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
-
-<!--
-<script id="seat_template" type="text/template">
-  <tr>
-    <td><input name="seatHolder" type="text" value="{{ seatHolder }}"></td>
-    <td>
-      <select name="mealSelect">
-        <option>--SELECT ONE--</option>
-        {{#mealChoices}}
-        <option value="{{val}}" {{#sel}}selected{{/sel}}>{{txt}}</option>
-        {{/mealChoices}}
-    </select></td>
-    <td>
-      <select id="seatSelect" name="seatSelect">
-      </select>
-    </td>
-  </tr>
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js">
 </script>
--->
-<script>
-var myHost = window.location.origin;
 
+<script>
+let myHost = window.location.origin;
 let seatSocket = null;
 
 function connect_socket() {
@@ -32,16 +14,12 @@ function connect_socket() {
     seatSocket = new WebSocket("wss://"+window.location.host+"/ws/msg");
   else
     seatSocket = new WebSocket("ws://"+window.location.host+"/ws/msg");
-  seatSocket.addEventListener("open", e => {
-    heartbeat();
-  });
+  seatSocket.addEventListener("open", e => { heartbeat(); });
   seatSocket.onclose = (event) => connect_socket;
   seatSocket.onmessage = (event) => {
     console.log(event.data);
     try {
       let myMsg = JSON.parse(event.data);
-      console.log(myMsg.seat);
-      console.log(myMsg.state);
       var seat = document.getElementById(myMsg.seat);
       if(myMsg.state=="pending") {
         seat.style.fill="yellow";
@@ -103,8 +81,10 @@ document.addEventListener('DOMContentLoaded', function() {
           });
           //console.log(r.name)
         });
-        console.log(JSON.stringify(reservations));
-        console.log(JSON.stringify(reservedSeats));
+        if(reservedSeats.length<20) {
+          console.log(JSON.stringify(reservations));
+          console.log(JSON.stringify(reservedSeats));
+        }
       });
     });
 
@@ -115,7 +95,8 @@ document.addEventListener('DOMContentLoaded', function() {
           var seat = document.getElementById(seatString);
           seat.style.fill = "green";
           seat.onclick = function () {
-            if (selectedSeat.length < partyQty.value && !selectedSeat.includes(this.id)) {
+            if (selectedSeat.length < partyQty.value &&
+                    !selectedSeat.includes(this.id)) {
               var mySeat = this.id;
               document.getElementById('seat').innerHTML = mySeat;
               this.style.fill = "cyan";
@@ -125,11 +106,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 let newOption = new Option(mySeat, mySeat);
                 s.add(newOption, undefined);
               }
-              /*
-              seatSelect.forEach(function (s) {
-              });
-              */
-              //seatSelect.add(newOption,undefined);
             } else if (selectedSeat.includes(this.id)) {
               var mySeat=this.id;
               document.getElementById('seat').innerHTML = '';
@@ -140,18 +116,13 @@ document.addEventListener('DOMContentLoaded', function() {
               for (let s of seatSelect) {
                 console.log("Checking for seat ...");
                 for (var i = 0; i <= seatSelect.length; i++) {
-                  console.log(s.options[i].value+'; i is '+i+' and total length is '+seatSelect.length);
+                  console.log(s.options[i].value+'; i is '+i+' ' +
+                          'and total length is '+seatSelect.length);
                   if (s.options[i].value === mySeat) {
                     s.remove(i); break;
                   }
                 }
               }
-              /*
-              seatSelect.forEach(function (s) {
-              });
-              */
-              /* if (seatSelect.options[i].value == this.id)
-                  seatSelect.remove(i); */
             }
             console.log('selectedSeat array: '+selectedSeat);
           }
@@ -159,13 +130,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 	console.log("Started");
-
-    /*
-	var seat1 = document.getElementById('S1-1');
-	console.log(seat1);
-	seat1.style.fill="red";
-	document.getElementById('S1-6').style.fill="yellow";
-    */
 
     var delRes = document.getElementById('delRes');
 	var resBox = document.getElementById('reservation');
@@ -176,8 +140,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		console.log('Reservation selected: '+resBox.value);
 		if(resBox.value==='B') {
 			console.log('Time to display ADD form!');
-			//addFormDiv.style.display='block';
-			//delRes.style.display='none';
 			window.location="./short.html";
 		}
 		else if(resBox.value==='C') {
@@ -199,8 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						window.URL.revokeObjectURL(file);
 						link.remove();
 					}, 100);
-					//window.location.assign(file);
-				});;
+				});
 		}
 		if (!isNaN(resBox.value)) {
 			delRes.style.display='inline-block';
@@ -213,7 +174,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	},false);
     delRes.addEventListener('click',function() {
         console.log("It's time to delete reservation "+resBox.value+"!");
-        fetch(myHost+'/rest/deleteReservation?id='+resBox.value).then(response => {
+        fetch(myHost+'/rest/deleteReservation?id='+resBox.value).
+            then(response => {
           console.log("Back from delete routine");
           setTimeout(function() {
             location.reload(true);
@@ -234,7 +196,8 @@ document.addEventListener('DOMContentLoaded', function() {
         },1500);
 	},false);
     partyQty.addEventListener('change',function(event) {
-      console.log('Seat qty changed to '+partyQty.value+'; it was '+selectedQty);
+      console.log('Seat qty changed to '+partyQty.value+
+              '; it was '+selectedQty);
       while(partyQty.value>selectedQty) {
         console.log('append clone');
         cloneRow(); selectedQty++;
@@ -246,14 +209,12 @@ document.addEventListener('DOMContentLoaded', function() {
 },false);
 
 function cloneRow() {
-  var row = document.getElementById("dataRow1"); // find row to copy
-  var table = document.getElementById("reservedSeats"); // find table to append to
-  var clone = row.cloneNode(true); // copy children too
-  clone.id = "dataRow"+table.rows.length; // change id or other attributes/contents
+  var row = document.getElementById("dataRow1");
+  var table = document.getElementById("reservedSeats");
+  var clone = row.cloneNode(true);
+  clone.id = "dataRow"+table.rows.length;
   for(var i = 0, col; i<clone.cells.length; i++) {
     col = clone.cells[i];
-    //console.log(col.firstChild.name);
-    //console.log(col.firstChild);
     col.firstChild.name=col.firstChild.name.slice(0,-1)+table.rows.length;
   }
   table.appendChild(clone); // add new row to end of table
@@ -265,19 +226,6 @@ function deleteRow() {
   table.deleteRow(rowCount -1);
 }
 
-/*
-function createRow() {
-  var row = document.createElement('tr'); // create row node
-  var col = document.createElement('td'); // create column node
-  var col2 = document.createElement('td'); // create second column node
-  row.appendChild(col); // append first column to row
-  row.appendChild(col2); // append second column to row
-  col.innerHTML = "qwe"; // put data in first column
-  col2.innerHTML = "rty"; // put data in second column
-  var table = document.getElementById("tableToModify"); // find table to append to
-  table.appendChild(row); // append row to table
-}
-*/
 </script>
 <style>
 </style>

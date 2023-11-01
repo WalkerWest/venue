@@ -11,11 +11,6 @@ class SeatPicker extends HTMLElement {
 			console.log("The picker's id in constructor is "+this.elementId);
 		}
 		else this.elementId=null;
-		/*
-		if(this.getAttribute("maxselect")!=null) {
-			console.log("The maxselect is "+this.getAttribute("maxselect"));
-		}
-		*/
 		this.onWinResize = function() {};
 		this.initialized=false;
 		this.seatsListener=null;
@@ -23,6 +18,7 @@ class SeatPicker extends HTMLElement {
 		this.reservedSeats=[];
 		this.seatSocket=null;
 		this.pingCount=0;
+		this.totalSeatCount=0;
 	}
 
 	connectedCallback() {
@@ -32,10 +28,6 @@ class SeatPicker extends HTMLElement {
 		div.setAttribute("slot","venue-layout")
 		div.innerHTML =`<embed style="display: inline; width: 100%; height: 100%;"
 				id=${this.elementId} version="1.1" src="./sanctuary.svg"/>`;
-		/*
-		div.innerHTML =`<object style="display: inline; width: 100%; height: 100%;"
-				id=${this.elementId} type="image/svg+xml" data="./sanctuary.svg"/>`;
-		*/
 
 		document.getElementById(this.getAttribute("id")).appendChild(div);
 		document.getElementById(this.elementId).
@@ -56,7 +48,7 @@ class SeatPicker extends HTMLElement {
 
 	attributeChangedCallback(name, oldValue, newValue) {
 		if(name==="maxselect") {
-			console.log("User must pick "+newValue+" seats!");
+			console.log("User can pick up to "+newValue+" seats!");
 		}
 		else if(name==="activated" && this.elementId!=null) {
 			if (newValue == 1 && oldValue != 1) {
@@ -85,7 +77,8 @@ class SeatPicker extends HTMLElement {
 		}
 		else if(name==="id" && oldValue==null) {
 			this.elementId=this.getAttribute("id")+"Svg";
-			console.log("The picker's id in changed attribute is "+this.elementId);
+			console.log("The picker's id in changed attribute is "+
+				this.elementId);
 			this.seatsListener=this.outerSeatsReceived(this);
 			window.addEventListener('seatsReceived',
 				this.seatsListener,true);
@@ -108,11 +101,6 @@ class SeatPicker extends HTMLElement {
 				}
 				i++;
 			}
-			/*
-			this.selectedSeats.forEach(function(seat) {
-				if(!this.seatSocket) this.seatSocket.send(JSON.stringify({"seat":seat.id,"state":"reserved"}));
-			});
-			*/
 		}
 		else console.log("Attribute "+name+" was changed!");
 	}
@@ -189,7 +177,6 @@ class SeatPicker extends HTMLElement {
 			console.log("Got seats!");
 			const itemTemplates = [];
 			const detail=event.detail;
-			console.log(detail);
 			console.log("Attempting to lookup "+picker.elementId);
 			setTimeout(function(p) {
 				const myEle=document.getElementById(p.elementId);
@@ -203,23 +190,24 @@ class SeatPicker extends HTMLElement {
 						if (myDoc?.getElementById(seatString) != null) {
 							var seat = myDoc?.getElementById(seatString);
 							if(seat!=null) {
+								picker.totalSeatCount++;
 								if(detail.payload.includes(seatString)) {
 									picker.reservedSeats.push(seat);
 									seat.style.fill = "red";
 								}
-								else {
-									/*
-									if(seat.style.fill === "yellow") {
-										picker.reservedSeats.push(seat);
-									}
-									else */ seat.style.fill = "green";
-								}
+								else { seat.style.fill = "green"; }
 							}
 							seat.addEventListener("click",p.seatClicked);
 						}
 					}
 				}
-				console.log("Requesting pending seats...");
+				if(detail.payload.length>10) {
+					console.log("Seats reserved/total: " +
+						detail.payload.length + " / " + picker.totalSeatCount + " = " +
+						((detail.payload.length /
+							picker.totalSeatCount) * 100).toFixed(1) + "%");
+				} else console.log(detail.payload);
+				console.log("Are any seats pending?  If so, they'll appear next.");
 				picker.seatSocket.send("initSeats");
 			}.bind(null, picker),10);
 		};
@@ -292,8 +280,10 @@ class SeatPicker extends HTMLElement {
 				bubbles: true
 			});
 			this.dispatchEvent(seatSelected);
-			this.seatSocket.send(JSON.stringify({"seat":seat.id,"state":"pending"}));
-		} else if (Number(this.selectedSeats.indexOf(seat))>=0 && this.getAttribute('maxselect')!=="0") {
+			this.seatSocket.send(
+				JSON.stringify({"seat":seat.id,"state":"pending"}));
+		} else if (Number(this.selectedSeats.indexOf(seat))>=0 &&
+				this.getAttribute('maxselect')!=="0") {
 			const index = this.selectedSeats.indexOf(seat);
 			this.selectedSeats.splice(index,1);
 			seat.style.fill = "green";
@@ -304,16 +294,19 @@ class SeatPicker extends HTMLElement {
 				bubbles: true
 			});
 			this.dispatchEvent(seatUnselected);
-			this.seatSocket.send(JSON.stringify({"seat":seat.id,"state":"nonpending"}));
+			this.seatSocket.send(
+				JSON.stringify({"seat":seat.id,"state":"nonpending"}));
 		}
 		//console.log('selectedSeat array: '+this.selectedSeats);
 	}
 
 	connect_socket() {
 		if(window.location.protocol==='https:')
-			this.seatSocket = new WebSocket("wss://"+window.location.host+"/ws/msg");
+			this.seatSocket =
+				new WebSocket("wss://"+window.location.host+"/ws/msg");
 		else
-			this.seatSocket = new WebSocket("ws://"+window.location.host+"/ws/msg");
+			this.seatSocket =
+				new WebSocket("ws://"+window.location.host+"/ws/msg");
 		this.seatSocket.addEventListener("open", e => {
 			this.heartbeat(this.seatSocket,this.pingCount);
 		});
@@ -322,13 +315,7 @@ class SeatPicker extends HTMLElement {
 			console.log(event.data);
 			try {
 				let myMsg = JSON.parse(event.data);
-				//console.log(myMsg.seat);
-				//console.log(myMsg.state);
 				let sp = document.getElementById(this.elementId);
-				//let rs = document.createElement("reserved-seat");
-				//rs.setAttribute("id","S13-13");
-				//rs.setAttribute("slot","reserved-seat");
-				//sp.appendChild(rs);
 				let myDoc = sp?.getSVGDocument();
 				let seat = myDoc.getElementById(myMsg.seat);
 				if(myMsg.state=="pending") {
