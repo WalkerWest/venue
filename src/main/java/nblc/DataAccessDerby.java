@@ -352,7 +352,7 @@ public class DataAccessDerby implements DataAccess {
     }
 
     public void downloadDb(boolean isDownloadDb) throws GeneralSecurityException, IOException {
-        HashMap<String,ByteArrayOutputStream> fileMap = DriveQuickstart.Download();
+        HashMap<String,ByteArrayOutputStream> fileMap = DriveQuickstart.Download(isDownloadDb);
         if(fileMap!=null) {
             boolean foundTgz=false;
             for(Map.Entry<String,ByteArrayOutputStream> fileEntry : fileMap.entrySet()) {

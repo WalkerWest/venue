@@ -7,6 +7,7 @@ import com.google.api.client.http.FileContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
@@ -17,11 +18,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
+import com.google.api.services.drive.model.Revision;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.json.JSONObject;
 
 public class DriveQuickstart {
@@ -104,7 +107,7 @@ public class DriveQuickstart {
         // Print the names and IDs for up to 10 files.
         FileList result = service.files().list()
                 .setPageSize(100)
-                .setFields("nextPageToken, files(id, name)")
+                .setFields("nextPageToken, files(id, name, size)")
                 .execute();
         List<File> files = result.getFiles();
         if (files == null || files.isEmpty()) {
@@ -194,7 +197,8 @@ public class DriveQuickstart {
         }
     }
 
-    public static HashMap<String,ByteArrayOutputStream> Download()
+    public static
+            HashMap<String,ByteArrayOutputStream> Download(boolean isDownloadDb)
             throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         HashMap<String,ByteArrayOutputStream> retList = new HashMap<String,ByteArrayOutputStream>();
@@ -204,7 +208,10 @@ public class DriveQuickstart {
 
         List<File> foundFiles = new ArrayList<File>();
         for (File f : driveFiles) {
-            if (f.getName().equals("attendees.tar.gz") || f.getName().toLowerCase().contains("json")) {
+            if (f.getName().equals("attendees.tar.gz") && isDownloadDb) {
+                logger.trace(f.getName());
+                foundFiles.add(f);
+            } else if (f.getName().toLowerCase().contains("json")) {
                 logger.trace(f.getName());
                 foundFiles.add(f);
             }
@@ -217,10 +224,47 @@ public class DriveQuickstart {
                         .setApplicationName(APPLICATION_NAME)
                         .build();
                 try {
+                    if (foundFile.getName().equals("attendees.tar.gz")) {
+                        logger.trace("Size of file is "+foundFile.getSize()+
+                                "; its id is "+foundFile.getId());
+                        Drive.Revisions.List oper =
+                                service.revisions().list(foundFile.getId());
+                        oper.setFields("revisions(size,modifiedTime,id)");
+                        List<Triplet<String,Long,DateTime>> revList =
+                                new ArrayList<Triplet<String,Long,DateTime>>();
+                        for (Revision rev : oper.execute().getRevisions()) {
+                            revList.add(Triplet.with(
+                                    rev.getId(),
+                                    rev.getSize(),
+                                    rev.getModifiedTime()));
+                        }
+                        if(revList.size()>1) {
+                            Triplet<String,Long, DateTime> last =
+                                    revList.get(revList.size()-2);
+                            logger.info(
+                                    "Previous version (" + last.getValue(0)+
+                                            ") was created on " +
+                                            last.getValue2() +
+                                            " and had size " +
+                                            last.getValue1());
+                        }
+                        // Remove empty revisions
+                        /*
+                        if(revList.get(revList.size()-1).getValue1()==0) {
+                            for (int i = revList.size()-1; i>=0; i--) {
+                                if(revList.get(i).getValue1()==0)
+                                    service.revisions().delete(
+                                            foundFile.getId(),
+                                            revList.get(i).getValue0());
+                            }
+                        }
+                        */
+                    }
                     OutputStream outputStream = new ByteArrayOutputStream();
                     service.files().get(foundFile.getId()).
                             executeMediaAndDownloadTo(outputStream);
-                    retList.put(foundFile.getName(),(ByteArrayOutputStream) outputStream);
+                    retList.put(foundFile.getName(),
+                            (ByteArrayOutputStream) outputStream);
                 } catch (GoogleJsonResponseException e) {
                     logger.error("Unable to download file: " + e.getDetails());
                     throw e;
