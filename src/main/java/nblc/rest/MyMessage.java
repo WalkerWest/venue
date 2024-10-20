@@ -78,7 +78,7 @@ public class MyMessage {
     public static List<Table> tables = new ArrayList<Table>() {{
 
         // parking lot side of sanctuary
-        add(new Table( 1,TEN));
+        add(new Table( 1,EIGHTEEN));
         add(new Table( 2,EIGHTEEN));
         add(new Table( 3,TEN));
         add(new Table( 4,TEN));
@@ -90,7 +90,7 @@ public class MyMessage {
         add(new Table(10,TEN));
 
         // middle column of tables
-        add(new Table(11,EIGHTEEN));
+        add(new Table(11,TEN));
         add(new Table(12,EIGHTEEN));
         add(new Table(13,EIGHTEEN));
         add(new Table(14,EIGHTEEN));
@@ -98,8 +98,8 @@ public class MyMessage {
         add(new Table(16,EIGHTEEN));
 
         // lake side of sanctuary
-        add(new Table(17,TEN));
-        add(new Table(18,EIGHTEEN));
+        add(new Table(17,EIGHTEEN));
+        add(new Table(18,TEN));
         add(new Table(19,TEN));
         add(new Table(20,TEN));
         add(new Table(21,TEN));
