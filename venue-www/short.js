@@ -79,7 +79,7 @@ ui5-table ui5-table-column.table-header-text-alignment::part(column) {
 			
 			<form id="paymentForm">
 			<ui5-label required show-colon>Party Identification</ui5-label>
-			<ui5-input id="partyId" placeholder="Horner Party of 5"
+			<ui5-input id="partyId" placeholder="Jess Horner Party of 5"
 				required="" 
 				style="--_ui5-v1-18-0-input-icons-count: 0;">
 			</ui5-input>
